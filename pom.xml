@@ -10,4 +10,14 @@
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
     </properties>
+    <distributionManagement>
+        <repository>
+            <uniqueVersion>false</uniqueVersion>
+            <id>corp1</id>
+            <name>Corporate Repository</name>
+            <url>https://git.pg.edu.pl/pggit_oidc9162511/lsa-project.git</url>
+            <layout>default</layout>
+        </repository>
+    </distributionManagement>
+
 </project>
