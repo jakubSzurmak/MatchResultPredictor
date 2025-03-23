@@ -3,9 +3,9 @@ package pg.gda.edu.lsea.absPerson.implPerson;
 import pg.gda.edu.lsea.absPerson.Person;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.UUID;
-import java.util.Vector;
 
 
 public class Player extends Person {
@@ -13,15 +13,15 @@ public class Player extends Person {
     private LocalDate dateOfBirth;
     private int jerseyNr;
     private String currClub;
-    private Vector<String> positions; //to discuss
+    private ArrayList<String> positions; //to discuss
     private int rating;
 
     public Player(UUID id) {
         super(id);
     }
 
-    public Player(UUID id, String name, Map<Integer, String> country, String nickname,
-                  LocalDate dateOfBirth, int jerseyNr, String currClub, Vector<String> positions, int rating) {
+    public Player(UUID id, String name, Map<UUID, String> country, String nickname,
+                  LocalDate dateOfBirth, int jerseyNr, String currClub, ArrayList<String> positions, int rating) {
         super(id, name, country);
         this.nickname = nickname;
         this.dateOfBirth = dateOfBirth;
@@ -72,11 +72,11 @@ public class Player extends Person {
         this.currClub = currClub;
     }
 
-    public Vector<String> getPositions() {
+    public ArrayList<String> getPositions() {
         return positions;
     }
 
-    public void setPositions(Vector<String> positions) {
+    public void setPositions(ArrayList<String> positions) {
         this.positions = positions;
     }
 }

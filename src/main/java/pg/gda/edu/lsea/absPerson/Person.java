@@ -8,13 +8,13 @@ import java.util.UUID;
 public abstract class Person {
     final private UUID id;
     private String name;
-    private Map<Integer, String> country;
+    private Map<UUID, String> country;
 
     public Person(UUID id) {
         this.id = id;
     }
 
-    public Person(UUID id, String name, Map<Integer, String> country) {
+    public Person(UUID id, String name, Map<UUID, String> country) {
         this.id = id;
         this.name = name;
         this.country = country;
@@ -33,11 +33,11 @@ public abstract class Person {
         this.name = name;
     }
 
-    public Map<Integer, String> getCountry() {
+    public Map<UUID, String> getCountry() {
         return country;
     }
 
-    public void setCountry(Map<Integer, String> country) {
+    public void setCountry(Map<UUID, String> country) {
         this.country = country;
     }
 }

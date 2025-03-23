@@ -15,7 +15,7 @@ public class Coach extends Person {
         super(id);
     }
 
-    public Coach(UUID id, String name, Map<Integer, String> country, String nickname, Date dateOfBirth,
+    public Coach(UUID id, String name, Map<UUID, String> country, String nickname, Date dateOfBirth,
                  String currEmployment) {
         super(id, name, country);
         this.nickname = nickname;

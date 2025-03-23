@@ -10,7 +10,7 @@ public class Referee extends Person {
         super(id);
     }
 
-    public Referee(UUID id, String name, Map<Integer, String> country) {
+    public Referee(UUID id, String name, Map<UUID, String> country) {
         super(id, name, country);
     }
 
