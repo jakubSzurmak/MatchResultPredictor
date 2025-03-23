@@ -1,11 +1,12 @@
 package pg.gda.edu.lsea.absPerson;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
 
 // Implementation of abstract class Person - provides basics information about the players/coaches/referees
-public abstract class Person {
+public abstract class Person implements Cloneable {
     final private UUID id;
     private String name;
     private Map<UUID, String> country;
@@ -23,6 +24,19 @@ public abstract class Person {
     @Override
     public String toString(){
         return "Person [id=" + id + ", name=" + name + ", country=" + country + "]";
+    }
+
+    @Override
+    protected Object clone() throws CloneNotSupportedException {
+        Person cloned =  (Person) super.clone();
+
+        if(this.country != null){
+            Map<UUID, String> clonedCountry = new HashMap<>();
+            this.country.forEach((k,v) -> clonedCountry.put(k, v));
+            cloned.country = clonedCountry;
+        }
+
+        return cloned;
     }
 
     public UUID getId() {

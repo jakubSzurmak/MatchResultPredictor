@@ -4,11 +4,12 @@ import pg.gda.edu.lsea.absPerson.Person;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
 
-public class Player extends Person implements Comparable<Player> {
+public class Player extends Person implements Comparable<Player>, Cloneable {
     private String nickname;
     private LocalDate dateOfBirth;
     private int jerseyNr;
@@ -34,6 +35,27 @@ public class Player extends Person implements Comparable<Player> {
     @Override
     public int compareTo(Player o) {
         return Integer.compare(rating, o.getRating());
+    }
+
+    @Override
+    public Player clone() throws CloneNotSupportedException {
+        try{
+            Player cloned = (Player) super.clone();
+
+            if(this.positions != null){
+                cloned.positions = new ArrayList<>(this.positions);
+            }
+
+            if(this.getCountry() != null){
+                Map<UUID, String> clonedCountry = new HashMap<>();
+                this.getCountry().forEach((k, v) -> clonedCountry.put(k, v));
+                cloned.setCountry(clonedCountry);
+            }
+
+            return cloned;
+        } catch (CloneNotSupportedException e) {
+            throw new RuntimeException("Cloning Player failed", e);
+        }
     }
 
     public int getRating() {
