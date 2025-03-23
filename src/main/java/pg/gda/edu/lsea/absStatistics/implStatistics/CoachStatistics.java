@@ -9,8 +9,8 @@ public class CoachStatistics extends Statistics {
         super(id);
     }
 
-    public CoachStatistics(int gamesPlayed, int gamesWon, int goalsScored, int goalsConceded,
-                          int totalCleanSheets, UUID id) {
-        super(gamesPlayed, gamesWon, goalsScored, goalsConceded, totalCleanSheets, id);
+    public CoachStatistics(UUID id, int gamesPlayed, int gamesWon, int goalsScored,
+                           int totalCleanSheets, int totalGoalConceded) {
+        super(id, gamesPlayed, gamesWon, goalsScored, totalCleanSheets, totalGoalConceded);
     }
 }

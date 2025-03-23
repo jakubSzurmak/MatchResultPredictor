@@ -7,32 +7,23 @@ import java.util.UUID;
 public class fPlayerStatistics extends PlayerStatistics {
     private int totalDuel;
     private int totalDuelWins;
-    private int duelPercentage;
-    private int totalShots;
+    private float duelPercentage;
 
 
     public fPlayerStatistics(UUID id) {
         super(id);
     }
 
-    public fPlayerStatistics(int gamesPlayed, int gamesWon, int goalsScored, int goalsConceded, int totalCleanSheets,
+    public fPlayerStatistics(UUID id, int gamesPlayed, int gamesWon, int goalsScored, int totalCleanSheets,
                              int totalAssists, int totalPasses, int totalBallLooses, int totalStartingEleven,
-                             int duelPercentage, int totalDuelWins, int totalDuel, UUID id, int totalShots) {
-        super(gamesPlayed, gamesWon, goalsScored, goalsConceded, totalCleanSheets, totalAssists,
-                totalPasses, totalBallLooses, totalStartingEleven, id);
-        this.duelPercentage = duelPercentage;
+                             int totalDuelWins, int totalDuel, int totalShots, int totalGoalConceded) {
+        super(id, gamesPlayed, gamesWon, goalsScored, totalCleanSheets, totalAssists,
+                totalPasses, totalBallLooses, totalStartingEleven, totalShots, totalGoalConceded);
+        this.duelPercentage = (float) this.totalDuelWins / this.totalDuel;
         this.totalDuelWins = totalDuelWins;
         this.totalDuel = totalDuel;
-        this.totalShots = totalShots;
     }
 
-    public int getTotalShots() {
-        return totalShots;
-    }
-
-    public void setTotalShots(int totalShots) {
-        this.totalShots = totalShots;
-    }
 
     public int getTotalDuel() {
         return totalDuel;
@@ -50,11 +41,7 @@ public class fPlayerStatistics extends PlayerStatistics {
         this.totalDuelWins = totalDuelWins;
     }
 
-    public int getDuelPercentage() {
+    public float getDuelPercentage() {
         return duelPercentage;
-    }
-
-    public void setDuelPercentage(int duelPercentage) {
-        this.duelPercentage = duelPercentage;
     }
 }

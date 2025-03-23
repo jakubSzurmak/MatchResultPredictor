@@ -12,11 +12,11 @@ public class gPlayerStatistics extends PlayerStatistics {
     }
 
 
-    public gPlayerStatistics(int gamesPlayed, int gamesWon, int goalsScored, int goalsConceded, int totalCleanSheets,
-                             int totalAssists, int totalPasses, int totalBallLooses, int totalStartingEleven, UUID id,
-                             int totalSaves) {
-        super(gamesPlayed, gamesWon, goalsScored, goalsConceded, totalCleanSheets, totalAssists,
-                totalPasses, totalBallLooses, totalStartingEleven, id);
+    public gPlayerStatistics(UUID id, int gamesPlayed, int gamesWon, int goalsScored, int totalCleanSheets,
+                             int totalAssists, int totalPasses, int totalBallLooses, int totalStartingEleven,
+                             int totalSaves, int totalShots, int totalGoalConceded) {
+        super(id, gamesPlayed, gamesWon, goalsScored, totalCleanSheets, totalAssists,
+                totalPasses, totalBallLooses, totalStartingEleven, totalShots, totalGoalConceded);
         this.totalSaves = totalSaves;
     }
 

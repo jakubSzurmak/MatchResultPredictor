@@ -7,23 +7,32 @@ import java.util.UUID;
 public class PlayerStatistics extends Statistics {
     private int totalAssists;
     private int totalPasses;
-    private int totalBallLooses;
+    private int totalBallLosses;
     private int totalStartingEleven;
+    private int totalShots;
 
     public PlayerStatistics(UUID id) {
         super(id);
     }
 
 
-    public PlayerStatistics(int gamesPlayed, int gamesWon, int goalsScored, int goalsConceded, int totalCleanSheets,
-                            int totalAssists, int totalPasses, int totalBallLooses, int totalStartingEleven, UUID id) {
-        super(gamesPlayed, gamesWon, goalsScored, goalsConceded, totalCleanSheets, id);
+    public PlayerStatistics(UUID id, int gamesPlayed, int gamesWon, int goalsScored, int totalCleanSheets,
+                            int totalAssists, int totalPasses, int totalBallLosses, int totalStartingEleven, int totalShots, int totalGoalConceded) {
+        super(id, gamesPlayed, gamesWon, goalsScored, totalCleanSheets, totalGoalConceded);
         this.totalAssists = totalAssists;
         this.totalPasses = totalPasses;
-        this.totalBallLooses = totalBallLooses;
+        this.totalBallLosses = totalBallLosses;
         this.totalStartingEleven = totalStartingEleven;
+        this.totalShots = totalShots;
     }
 
+    public int getTotalShots() {
+        return totalShots;
+    }
+
+    public void setTotalShots(int totalShots) {
+        this.totalShots = totalShots;
+    }
 
     public int getTotalAssists() {
         return totalAssists;
@@ -41,12 +50,12 @@ public class PlayerStatistics extends Statistics {
         this.totalPasses = totalPasses;
     }
 
-    public int getTotalBallLooses() {
-        return totalBallLooses;
+    public int getTotalBallLosses() {
+        return totalBallLosses;
     }
 
-    public void setTotalBallLooses(int totalBallLooses) {
-        this.totalBallLooses = totalBallLooses;
+    public void setTotalBallLosses(int totalBallLosses) {
+        this.totalBallLosses = totalBallLosses;
     }
 
     public int getTotalStartingEleven() {
