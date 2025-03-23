@@ -8,7 +8,7 @@ import java.util.Map;
 import java.util.UUID;
 
 
-public class Player extends Person {
+public class Player extends Person implements Comparable<Player> {
     private String nickname;
     private LocalDate dateOfBirth;
     private int jerseyNr;
@@ -29,6 +29,11 @@ public class Player extends Person {
         this.currClub = currClub;
         this.positions = positions;
         this.rating = rating;
+    }
+
+    @Override
+    public int compareTo(Player o) {
+        return Integer.compare(rating, o.getRating());
     }
 
     public int getRating() {

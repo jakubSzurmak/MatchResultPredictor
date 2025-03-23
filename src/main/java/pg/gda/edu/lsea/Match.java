@@ -3,7 +3,7 @@ package pg.gda.edu.lsea;
 import java.time.LocalDate;
 import java.util.UUID;
 
-public class Match {
+public class Match implements Comparable<Match> {
     final private UUID id;
     private LocalDate date;
     private UUID comptID;
@@ -30,6 +30,11 @@ public class Match {
         this.homeScore = homeScore;
         this.awayScore = awayScore;
         this.refereeId = refereeId;
+    }
+
+    @Override
+    public int compareTo(Match o) {
+        return this.date.compareTo(o.date);
     }
 
     public UUID getId() {
@@ -99,4 +104,5 @@ public class Match {
     public void setRefereeId(UUID refereeId) {
         this.refereeId = refereeId;
     }
+
 }
