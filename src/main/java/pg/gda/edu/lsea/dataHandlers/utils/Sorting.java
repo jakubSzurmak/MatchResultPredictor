@@ -15,10 +15,4 @@ public class Sorting {
         list.sort(Collections.reverseOrder());
     }
 
-    public static void sortPlayersQueue(PriorityQueue<Player> pq) {
-        while (!pq.isEmpty()) {
-            pq.poll();
-        }
-    }
-
 }

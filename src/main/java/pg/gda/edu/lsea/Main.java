@@ -36,8 +36,23 @@ public class Main {
         Player person5 = new Player(UUID.randomUUID(), "person5", m, "Orzeł Polski",
                 LocalDate.of(1988, Month.AUGUST, 21), 9, "Fc Barcelona", positions, 76);
 
-        ArrayList<Player> players = new ArrayList<>();
-        PriorityQueue<Player> playerQueue = new PriorityQueue<>(players);
+        List<Player> players = new ArrayList<>();
+
+
+        Match x = new Match(UUID.randomUUID(), LocalDate.of(1988, Month.AUGUST, 21), UUID.randomUUID(),
+                "Season", UUID.randomUUID(), UUID.randomUUID(), 1, 2, UUID.randomUUID());
+
+        Match x1 = new Match(UUID.randomUUID(), LocalDate.of(1990, Month.AUGUST, 21), UUID.randomUUID(),
+                "Season", UUID.randomUUID(), UUID.randomUUID(), 1, 2, UUID.randomUUID());
+
+        Match x2 = new Match(UUID.randomUUID(), LocalDate.of(1989, Month.AUGUST, 21), UUID.randomUUID(),
+                "Season", UUID.randomUUID(), UUID.randomUUID(), 1, 2, UUID.randomUUID());
+
+        List<Match> matches = new LinkedList<>();
+
+        matches.add(x);
+        matches.add(x1);
+        matches.add(x2);
 
         players.add(person1);
         players.add(person2);
@@ -54,9 +69,12 @@ public class Main {
             System.out.println(player.toString());
         }
         System.out.println("==================");
-        System.out.println(playerQueue);
-        Sorting.sortPlayersQueue(playerQueue);
-        System.out.println(playerQueue);
-
+        for (Match i: matches) {
+            System.out.println(i);
+        }
+        Sorting.sortMatchesList(matches);
+        for (Match i: matches) {
+            System.out.println(i);
+        }
     }
 }
