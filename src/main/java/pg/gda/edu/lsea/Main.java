@@ -49,6 +49,10 @@ public class Main {
                 "Season", UUID.randomUUID(), UUID.randomUUID(), 1, 2, UUID.randomUUID());
 
         List<Match> matches = new LinkedList<>();
+        Set<Match> mySet = new TreeSet<>();
+        mySet.add(x);
+        mySet.add(x1);
+        mySet.add(x2);
 
         matches.add(x);
         matches.add(x1);
@@ -69,12 +73,20 @@ public class Main {
             System.out.println(player.toString());
         }
         System.out.println("==================");
-        for (Match i: matches) {
-            System.out.println(i);
+        for (Match match : mySet) {
+            System.out.println(match.getDate());
         }
+
+        System.out.println("==================");
+
+        for (Match i: matches) {
+            System.out.println(i.getDate());
+
+        }
+        System.out.println("Sorted: ");
         Sorting.sortMatchesList(matches);
         for (Match i: matches) {
-            System.out.println(i);
+            System.out.println(i.getDate());
         }
     }
 }
