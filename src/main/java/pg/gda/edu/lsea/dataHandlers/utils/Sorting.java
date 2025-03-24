@@ -24,7 +24,7 @@ public class Sorting {
 
     public static void sortPeopleByCountry(List<Person> list) {
         Comparator<Person> comparator = new ComparatorUtils.PersonCountryComparator();
-        list.sort(comparator.reversed());
+        list.sort(comparator);
     }
 
     public static void sortPlayersByAge(List<Player> list) {

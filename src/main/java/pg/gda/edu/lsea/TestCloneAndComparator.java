@@ -1,6 +1,9 @@
 package pg.gda.edu.lsea;
 
+import pg.gda.edu.lsea.absPerson.Person;
+import pg.gda.edu.lsea.absPerson.implPerson.Coach;
 import pg.gda.edu.lsea.absPerson.implPerson.Player;
+import pg.gda.edu.lsea.absPerson.implPerson.Referee;
 import pg.gda.edu.lsea.dataHandlers.utils.Sorting;
 
 import java.time.LocalDate;
@@ -101,5 +104,59 @@ public class TestCloneAndComparator {
 
 
         }
+
+        List<Person> peopleList = new ArrayList<>();
+
+        Map<UUID, String> country1 = new HashMap<>();
+        country1.put(UUID.randomUUID(), "Portugal");
+
+        peopleList.add(new Player(UUID.randomUUID(), "Cristiano Ronaldo", country1,
+                "CR7", LocalDate.of(1985, Month.FEBRUARY, 5), 7, "Al-Nassr", new ArrayList<>(Arrays.asList("Forward")), 91));
+
+        Map<UUID, String> country2 = new HashMap<>();
+        country2.put(UUID.randomUUID(), "Argentina");
+
+        peopleList.add(new Player(UUID.randomUUID(), "Lionel Messi", country2,
+                "Leo", LocalDate.of(1987, Month.JUNE, 24), 10, "Inter Miami", new ArrayList<>(Arrays.asList("Forward")), 90));
+
+        Map<UUID, String> country3 = new HashMap<>();
+        country3.put(UUID.randomUUID(), "Germany");
+
+        peopleList.add(new Coach(UUID.randomUUID(), "Jurgen Klopp", country3,
+                "Kloppo", new Date(), "Liverpool FC"));
+
+        Map<UUID, String> country4 = new HashMap<>();
+        country4.put(UUID.randomUUID(), "Spain");
+
+        peopleList.add(new Coach(UUID.randomUUID(), "Pep Guardiola", country4,
+                "Pep", new Date(), "Manchester City"));
+
+
+
+        peopleList.add(new Referee(UUID.randomUUID(), "Szymon Marciniak", country));
+
+        peopleList.add(new Referee(UUID.randomUUID(), "Felix Brych", country3));
+
+
+        System.out.println("Unsorted people list :");
+        for (Person person : peopleList) {
+            String strCountry = person.getCountry() != null ?
+                    person.getCountry().values().toString() : "Unknown";
+            String type = person.getClass().getSimpleName();
+            System.out.println(type + ": " + person.getName() + " - Country: " + strCountry);
+        }
+
+
+        Sorting.sortPeopleByCountry(peopleList);
+
+
+        System.out.println("\nPeople sorted by country:");
+        for (Person person : peopleList) {
+            String strCountry = person.getCountry() != null ?
+                    person.getCountry().values().toString() : "Unknown";
+            String type = person.getClass().getSimpleName();
+            System.out.println(type + ": " + person.getName() + " - Country: " + strCountry);
+        }
+
     }
 }

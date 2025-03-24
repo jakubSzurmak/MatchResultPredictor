@@ -22,8 +22,8 @@ public class ComparatorUtils {
     public static class PersonCountryComparator implements Comparator<Person> {
         @Override
         public int compare(Person p1, Person p2) {
-            String country1 = (p1.getCountry() != null) ? p1.getCountry().values().iterator().next() : "Unknown";
-            String country2 = (p2.getCountry() != null) ? p2.getCountry().values().iterator().next() : "Unknown";
+            String country1 = (p1.getCountry() != null) ? p1.getCountry().values().toString() : "Unknown";
+            String country2 = (p2.getCountry() != null) ? p2.getCountry().values().toString() : "Unknown";
             return country1.compareToIgnoreCase(country2);
         }
     }
