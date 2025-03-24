@@ -2,20 +2,49 @@ package pg.gda.edu.lsea.absStatistics;
 
 import java.util.UUID;
 
-// Implementation of abstract class Statistics
+/**
+ * Statistics is an abstract class that provides the foundation for tracking
+ * various performance metrics in the football system
+ *
+ * Core statistical attributes and methods have been implemented in it.
+ */
 public abstract class Statistics {
+    /** Unique identifier for these statistics */
     private final UUID id;
+    /** Winning percentage */
     private float winPerc;
+    /** Number of games played */
     private int gamesPlayed;
+    /** Number of games won */
     private int gamesWon;
+    /** Number of goals scored */
     private int goalsScored;
+    /** Number of clean sheets (no goals conceded) */
     private int totalCleanSheets;
+    /** Number of goals conceded */
     private int totalGoalConceded;
 
+    /**
+     * Constructs Statistics with the specified ID
+     *
+     * @param id is the unique identifier for these statistics
+     */
     public Statistics(UUID id) {
         this.id = id;
     }
 
+    /**
+     * Constructs Statistics with the specified attributes
+     * This constructor also calculates the winning percentage based on
+     * games played and games won
+     *
+     * @param id is the unique identifier for these statistics
+     * @param gamesPlayed is the number of games played
+     * @param gamesWon is the number of games won
+     * @param goalsScored is the number of goals scored
+     * @param totalCleanSheets is the number of clean sheets
+     * @param totalGoalConceded is the number of goals conceded
+     */
     public Statistics(UUID id, int gamesPlayed, int gamesWon, int goalsScored, int totalCleanSheets, int totalGoalConceded) {
         this.gamesPlayed = gamesPlayed;
         this.gamesWon = gamesWon;
@@ -26,49 +55,108 @@ public abstract class Statistics {
         this.winPerc = (float) this.gamesWon / this.gamesPlayed;
     }
 
+    /**
+     * Returns the unique identifier of these statistics
+     *
+     * @return the UUID of these statistics
+     */
     public UUID getId(){
         return id;
     }
 
+    /**
+     * Returns the number of goals conceded
+     *
+     * @return the number of goals conceded
+     */
     public int getTotalGoalConceded() {
         return totalGoalConceded;
     }
 
+    /**
+     * Sets the number of goals conceded
+     *
+     * @param totalGoalConceded is the number of goals conceded to set
+     */
     public void setTotalGoalConceded(int totalGoalConceded) {this.totalGoalConceded = totalGoalConceded;}
 
+    /**
+     * Returns the winning percentage
+     *
+     * @return the winning percentage
+     */
     public float getWinPerc() {
         return winPerc;
     }
 
-
+    /**
+     * Returns the number of games played
+     *
+     * @return the number of games played
+     */
     public int getGamesPlayed() {
         return gamesPlayed;
     }
 
+    /**
+     * Sets the number of games played
+     *
+     * @param gamesPlayed is the number of games played to set
+     */
     public void setGamesPlayed(int gamesPlayed) {
         this.gamesPlayed = gamesPlayed;
     }
 
+    /**
+     * Returns the number of games won
+     *
+     * @return the number of games won
+     */
     public int getGamesWon() {
         return gamesWon;
     }
 
+    /**
+     * Sets the number of games won
+     *
+     * @param gamesWon is the number of games won to set
+     */
     public void setGamesWon(int gamesWon) {
         this.gamesWon = gamesWon;
     }
 
+    /**
+     * Returns the number of goals scored
+     *
+     * @return the number of goals scored
+     */
     public int getGoalsScored() {
         return goalsScored;
     }
 
+    /**
+     * Sets the number of goals scored
+     *
+     * @param goalsScored is the number of goals scored to set
+     */
     public void setGoalsScored(int goalsScored) {
         this.goalsScored = goalsScored;
     }
 
+    /**
+     * Returns the number of clean sheets
+     *
+     * @return the number of clean sheets
+     */
     public int getTotalCleanSheets() {
         return totalCleanSheets;
     }
 
+    /**
+     * Sets the number of clean sheets
+     *
+     * @param totalCleanSheets is the number of clean sheets to set
+     */
     public void setTotalCleanSheets(int totalCleanSheets) {
         this.totalCleanSheets = totalCleanSheets;
     }
