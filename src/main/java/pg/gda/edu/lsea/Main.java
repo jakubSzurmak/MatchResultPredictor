@@ -8,23 +8,27 @@ import java.time.LocalDate;
 import java.time.Month;
 import java.util.*;
 
-//TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or
-// click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
+/**
+ * 1st entry point class
+ */
 public class Main {
     public static void main(String[] args) {
-        //TIP Press <shortcut actionId="ShowIntentionActions"/> with your caret at the highlighted text
-        // to see how IntelliJ IDEA suggests fixing it.
-        System.out.printf("Hello and welcome!");
+        /**
+         * Initialization of the data
+         */
+        System.out.println("Hello and welcome!");
         Map<UUID, String> m = new HashMap<>();
         ArrayList<String> positions = new ArrayList<>();
         positions.add("Striker");
-        m.put(UUID.randomUUID(), "Poland");
+        m.put(UUID.randomUUID(), "Poland"); // showing the polymorphism usage
         Person person = new Player(UUID.randomUUID(), "Robert Lewandowski", m, "Orzeł Polski",
                 LocalDate.of(1988, Month.AUGUST, 21), 9, "Fc Barcelona", positions, 99);
         System.out.println(person.toString());
 
 
-        // Comparable Sorting testing
+        /**
+         * Comparable Sorting testing
+         */
         Player person1 = new Player(UUID.randomUUID(), "person1", m, "Orzeł Polski",
                 LocalDate.of(1988, Month.AUGUST, 21), 9, "Fc Barcelona", positions, 0);
         Player person2 = new Player(UUID.randomUUID(), "person2", m, "Orzeł Polski",
@@ -63,6 +67,10 @@ public class Main {
         players.add(person3);
         players.add(person4);
         players.add(person5);
+
+        /**
+         * Printing the results of our tests
+         */
 
         for (Player player : players) {
             System.out.println(player.toString());

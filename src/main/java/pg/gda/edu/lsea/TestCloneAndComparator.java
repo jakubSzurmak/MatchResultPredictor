@@ -10,18 +10,25 @@ import java.time.LocalDate;
 import java.time.Month;
 import java.util.*;
 
+/**
+ * 2nd entry point class
+ */
 public class TestCloneAndComparator {
     public static void main(String[] args) throws CloneNotSupportedException {
         System.out.println("Testing Deep Clone and Comparator Implementations");
 
-        // Create test data
+        /**
+         * Creating test data
+         */
         Map<UUID, String> country = new HashMap<>();
         country.put(UUID.randomUUID(), "Poland");
 
         ArrayList<String> positions = new ArrayList<>();
         positions.add("Striker");
 
-        // Create original player
+        /**
+         * Creating original player
+         */
         Player original = new Player(
                 UUID.randomUUID(),
                 "Robert Oryginalny",
@@ -36,11 +43,15 @@ public class TestCloneAndComparator {
 
         System.out.println("Original player: " + original);
 
-        // Test deep cloning
+        /**
+         * Test deep cloning
+         */
         Player cloned = original.clone();
         System.out.println("Cloned player: " + cloned);
 
-        // Verify deep cloning works correctly
+        /**
+         * Verify deep cloning works correctly
+         */
         System.out.println("\nModifying original player data...");
         original.setName("Robert Zmodyfikowany");
         original.getPositions().add("Midfielder");
@@ -50,7 +61,9 @@ public class TestCloneAndComparator {
         System.out.println("Original positions: " + original.getPositions());
         System.out.println("Cloned positions: " + cloned.getPositions());
 
-        // Test comparator-based sorting
+        /**
+         * Test comparator-based sorting
+         */
         System.out.println("\nTesting Comparator sorting");
 
         List<Player> players = new ArrayList<>();

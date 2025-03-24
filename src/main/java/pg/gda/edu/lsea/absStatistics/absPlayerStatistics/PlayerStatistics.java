@@ -12,7 +12,7 @@ import java.util.UUID;
  * such as assists, passes, ball losses etc.
  * have been added to this class.
  */
-public class PlayerStatistics extends Statistics {
+public abstract class PlayerStatistics extends Statistics {
     /** Number of assists provided */
     private int totalAssists;
     /** Number of passes completed */

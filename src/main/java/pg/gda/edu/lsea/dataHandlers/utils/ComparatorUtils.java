@@ -6,9 +6,15 @@ import pg.gda.edu.lsea.absPerson.implPerson.Player;
 
 import java.util.Comparator;
 
+/**
+ * In this class implementation of sorting classes using comparator interface
+ */
 public class ComparatorUtils {
 
 
+    /**
+     * Implementation of sorting matches by the total goals scored
+     */
     public static class TotalGoalsComparator implements Comparator<Match> {
         @Override
         public int compare(Match o1, Match o2) {
@@ -19,6 +25,9 @@ public class ComparatorUtils {
         }
     }
 
+    /**
+     * Implementation of sorting Person by their country values
+     */
     public static class PersonCountryComparator implements Comparator<Person> {
         @Override
         public int compare(Person p1, Person p2) {
@@ -28,6 +37,9 @@ public class ComparatorUtils {
         }
     }
 
+    /**
+     * Implementation of sorting Players by their age values
+     */
     public static class PlayerAgeComparator implements Comparator<Player> {
         @Override
         public int compare(Player p1, Player p2) {
