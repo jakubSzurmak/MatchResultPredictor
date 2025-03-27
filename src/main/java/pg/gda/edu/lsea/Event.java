@@ -29,7 +29,6 @@ public class Event {
     /** Outcome of the event (goal, miss, etc.) */
     private String outcome;
 
-
     /**
      * Constructs an Event with some specified ID
      *
@@ -40,7 +39,7 @@ public class Event {
     }
 
     /**
-     * Constructs an Event with some specified field attributes
+     * Constructs an Event with some specified field attributes.
      *
      * @param id is the unique identifier for this event
      * @param half is the half of the match
