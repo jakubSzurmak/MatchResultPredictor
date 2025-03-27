@@ -1,6 +1,7 @@
 package pg.gda.edu.lsea;
 
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.UUID;
 
 /**
@@ -16,7 +17,7 @@ public class Event {
     /** Half of the match (1st, 2nd) */
     private int half;
     /** Exact time when the event occurred */
-    private LocalDateTime timestamp;
+    private LocalTime timestamp;
     /** Pattern of play */
     private String playPattern;
     /** Identifier of the team that performed the action */
@@ -50,7 +51,7 @@ public class Event {
      * @param performBodyPart is the body part used by the player
      * @param outcome is the outcome of the event
      */
-    public Event(UUID id, int half, LocalDateTime timestamp, String playPattern,
+    public Event(UUID id, int half, LocalTime timestamp, String playPattern,
                  UUID idPerformTeam, UUID idPerformPlayer, String performBodyPart, String outcome) {
         this.id = id;
         this.half = half;
@@ -94,7 +95,7 @@ public class Event {
      *
      * @return the exact time in which the event has occurred
      */
-    public LocalDateTime getTimestamp() {
+    public LocalTime getTimestamp() {
         return timestamp;
     }
 
@@ -103,7 +104,7 @@ public class Event {
      *
      * @param timestamp is the exact time to be set
      */
-    public void setTimestamp(LocalDateTime timestamp) {
+    public void setTimestamp(LocalTime timestamp) {
         this.timestamp = timestamp;
     }
 
