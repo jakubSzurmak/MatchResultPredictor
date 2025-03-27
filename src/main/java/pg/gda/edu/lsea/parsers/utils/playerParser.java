@@ -13,11 +13,12 @@ import java.util.*;
 
 public class playerParser {
 
-    public static List<Player> parsing(String filePath) throws IOException {
+    public static List<Player> parsing(String filePath, String filePathTwo) throws IOException {
         ObjectMapper objectMapper = new ObjectMapper();
         List<Player> parsedPlayers = new ArrayList<>();
 
         List<JsonNode> teams = objectMapper.readValue(new File(filePath), new TypeReference<List<JsonNode>>() {});
+        List<JsonNode> ratings = objectMapper.readValue(new File(filePathTwo), new TypeReference<List<JsonNode>>() {});
 
         for (JsonNode team: teams) {
 
@@ -56,14 +57,20 @@ public class playerParser {
                         }
                     }
 
-                    Player newPlayer = new Player(playerID, name, country, nickname, LocalDate.now(), jerseyNumber, teamName, playerPositions, 0);
+                    int rating = 0;
 
+                    for (JsonNode ratingNode : ratings){
+                        if (ratingNode.get("long_name").asText().equals(name)){
+                            rating = ratingNode.get("overall").asInt();
+                            break;
+                        }
+                    }
+
+                    Player newPlayer = new Player(playerID, name, country, nickname, LocalDate.now(), jerseyNumber, teamName, playerPositions, rating);
                     parsedPlayers.add(newPlayer);
-
                 }
             }
         }
-
 
         return parsedPlayers;
     }
