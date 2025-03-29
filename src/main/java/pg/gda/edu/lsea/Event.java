@@ -26,6 +26,8 @@ public class Event {
     private UUID idPerformPlayer;
     /** Body part used by the player */
     private String performBodyPart;
+    /** Type of event */
+    private String type;
     /** Outcome of the event (goal, miss, etc.) */
     private String outcome;
 
@@ -51,7 +53,7 @@ public class Event {
      * @param outcome is the outcome of the event
      */
     public Event(UUID id, int half, LocalTime timestamp, String playPattern,
-                 UUID idPerformTeam, UUID idPerformPlayer, String performBodyPart, String outcome) {
+                 UUID idPerformTeam, UUID idPerformPlayer, String performBodyPart, String type, String outcome) {
         this.id = id;
         this.half = half;
         this.timestamp = timestamp;
@@ -59,6 +61,7 @@ public class Event {
         this.idPerformTeam = idPerformTeam;
         this.idPerformPlayer = idPerformPlayer;
         this.performBodyPart = performBodyPart;
+        this.type = type;
         this.outcome = outcome;
     }
 
@@ -178,6 +181,21 @@ public class Event {
     public void setPerformBodyPart(String performBodyPart) {
         this.performBodyPart = performBodyPart;
     }
+
+    /**
+     * Returns the type of the event
+     *
+     * @return the type of the vent
+     */
+    public String getType(){ return type;}
+
+    /**
+     * Sets the type of the event
+     *
+     * @param type is the type of the event
+     */
+    public void setType(String type){ this.type = type;}
+
 
     /**
      * Returns the outcome of the event
