@@ -1,6 +1,9 @@
-package pg.gda.edu.lsea;
+package pg.gda.edu.lsea.match;
+
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 import java.time.LocalDate;
+import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -8,13 +11,16 @@ import java.util.UUID;
  *
  * This class implements the Comparable interface to allow matches to be compared based on their date
  */
+
+
+@JsonDeserialize(using = MatchDeserializer.class)
 public class Match implements Comparable<Match> {
     /** Unique identifier for this match */
     final private UUID id;
     /** Date when the match was played */
     private LocalDate date;
     /** Identifier of the competition */
-    private UUID comptID;
+    private Map<UUID, String> compt;
     /** Season when the match was played */
     private String season;
     /** Identifier of the home team */
@@ -42,7 +48,7 @@ public class Match implements Comparable<Match> {
      *
      * @param id is the unique identifier for this match
      * @param date is the date when the match was played
-     * @param comptID is the identifier of the competition
+     * @param compt is the map with identifier and name of the competition
      * @param season is the season when the match was played
      * @param homeTeamId is the identifier of the home team
      * @param awayTeamId is the identifier of the away team
@@ -50,11 +56,11 @@ public class Match implements Comparable<Match> {
      * @param awayScore is the score of the away team
      * @param refereeId is the identifier of the referee
      */
-    public Match(UUID id, LocalDate date, UUID comptID, String season, UUID homeTeamId,
+    public Match(UUID id, LocalDate date, Map<UUID, String> compt, String season, UUID homeTeamId,
                  UUID awayTeamId, int homeScore, int awayScore, UUID refereeId) {
         this.id = id;
         this.date = date;
-        this.comptID = comptID;
+        this.compt = compt;
         this.season = season;
         this.homeTeamId = homeTeamId;
         this.awayTeamId = awayTeamId;
@@ -107,17 +113,17 @@ public class Match implements Comparable<Match> {
      *
      * @return the competition in which the match has taken part
      */
-    public UUID getComptID() {
-        return comptID;
+    public Map<UUID, String> getCompt() {
+        return compt;
     }
 
     /**
      * Set the competition in which the match has taken part
      *
-     * @param comptID is the competition to be set
+     * @param compt is the competition to be set
      */
-    public void setComptID(UUID comptID) {
-        this.comptID = comptID;
+    public void setCompt(Map<UUID, String> compt) {
+        this.compt = compt;
     }
 
     /**

@@ -1,9 +1,11 @@
 package pg.gda.edu.lsea;
 
+import net.bytebuddy.asm.Advice;
+import pg.gda.edu.lsea.match.Match;
 import pg.gda.edu.lsea.absPerson.Person;
-import pg.gda.edu.lsea.absPerson.implPerson.Coach;
+import pg.gda.edu.lsea.absPerson.implPerson.coach.Coach;
 import pg.gda.edu.lsea.absPerson.implPerson.Player;
-import pg.gda.edu.lsea.absPerson.implPerson.Referee;
+import pg.gda.edu.lsea.absPerson.implPerson.referee.Referee;
 import pg.gda.edu.lsea.dataHandlers.utils.Sorting;
 
 import java.time.LocalDate;
@@ -96,12 +98,15 @@ public class TestCloneAndComparator {
 
         List<Match> matches = new ArrayList<>();
 
-        matches.add(new Match(UUID.randomUUID(), LocalDate.of(2020, Month.APRIL, 12), UUID.randomUUID(), "2020/2021", UUID.randomUUID(), UUID.randomUUID(),
-                1, 2, UUID.randomUUID()));
-        matches.add(new Match(UUID.randomUUID(), LocalDate.of(2021, Month.JUNE, 21), UUID.randomUUID(), "2021/2022", UUID.randomUUID(), UUID.randomUUID(),
-                5, 3, UUID.randomUUID()));
-        matches.add(new Match(UUID.randomUUID(), LocalDate.of(2010, Month.APRIL, 13), UUID.randomUUID(), "2010/2011", UUID.randomUUID(), UUID.randomUUID(),
-                0, 1, UUID.randomUUID()));
+        HashMap<UUID, String> compt = new HashMap<>();
+        compt.put(UUID.randomUUID(), "PremierLeague");
+
+       // matches.add(new Match(UUID.randomUUID(), LocalDate.of(2020, Month.APRIL, 12), compt, "2020/2021", UUID.randomUUID(), UUID.randomUUID(),
+         //       1, 2, UUID.randomUUID()));
+        //matches.add(new Match(UUID.randomUUID(), LocalDate.of(2021, Month.JUNE, 21), compt, "2021/2022", UUID.randomUUID(), UUID.randomUUID(),
+          //      5, 3, UUID.randomUUID()));
+        //matches.add(new Match(UUID.randomUUID(), LocalDate.of(2010, Month.APRIL, 13), compt, "2010/2011", UUID.randomUUID(), UUID.randomUUID(),
+          //      0, 1, UUID.randomUUID()));
 
         System.out.println("\nUnsorted matches:");
         for (Match match : matches) {
@@ -136,13 +141,13 @@ public class TestCloneAndComparator {
         country3.put(UUID.randomUUID(), "Germany");
 
         peopleList.add(new Coach(UUID.randomUUID(), "Jurgen Klopp", country3,
-                "Kloppo", new Date(), "Liverpool FC"));
+                "Kloppo", null, null, null));
 
         Map<UUID, String> country4 = new HashMap<>();
         country4.put(UUID.randomUUID(), "Spain");
 
         peopleList.add(new Coach(UUID.randomUUID(), "Pep Guardiola", country4,
-                "Pep", new Date(), "Manchester City"));
+                "Pep", null, null, null));
 
 
 

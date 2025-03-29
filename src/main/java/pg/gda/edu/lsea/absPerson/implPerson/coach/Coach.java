@@ -1,7 +1,8 @@
-package pg.gda.edu.lsea.absPerson.implPerson;
+package pg.gda.edu.lsea.absPerson.implPerson.coach;
 
 import pg.gda.edu.lsea.absPerson.Person;
 
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.Map;
 import java.util.UUID;
@@ -18,9 +19,10 @@ public class Coach extends Person {
     /** Nickname of the coach */
     private String nickname;
     /** Date of the birth of the coach */
-    private Date dateOfBirth;
+    private LocalDate dateOfBirth;
     /** Current employment information of the coach */
-    private String currEmployment;
+    private String employment;
+    private String season;
 
     /**
      * Constructs a Coach object with some specified ID
@@ -41,14 +43,22 @@ public class Coach extends Person {
      * @param dateOfBirth is Coach's date of birth
      * @param currEmployment is Coach's current employment information
      */
-    public Coach(UUID id, String name, Map<UUID, String> country, String nickname, Date dateOfBirth,
-                 String currEmployment) {
+    public Coach(UUID id, String name, Map<UUID, String> country, String nickname, LocalDate dateOfBirth,
+                 String currEmployment, String season) {
         super(id, name, country);
         this.nickname = nickname;
         this.dateOfBirth = dateOfBirth;
-        this.currEmployment = currEmployment;
+        this.employment = currEmployment;
+        this.season = season;
     }
 
+
+    public String getSeason() {
+        return season;
+    }
+    public void setSeason(String season) {
+        this.season = season;
+    }
     /**
      * Returns the nickname of this coach
      *
@@ -72,7 +82,7 @@ public class Coach extends Person {
      *
      * @return the date of birth of this coach
      */
-    public Date getDateOfBirth() {
+    public LocalDate getDateOfBirth() {
         return dateOfBirth;
     }
 
@@ -81,7 +91,7 @@ public class Coach extends Person {
      *
      * @param dateOfBirth is the date of birth to set
      */
-    public void setDateOfBirth(Date dateOfBirth) {
+    public void setDateOfBirth(LocalDate dateOfBirth) {
         this.dateOfBirth = dateOfBirth;
     }
 
@@ -91,7 +101,7 @@ public class Coach extends Person {
      * @return the current employment information about this coach
      */
     public String getCurrEmployment() {
-        return currEmployment;
+        return employment;
     }
 
     /**
@@ -100,7 +110,7 @@ public class Coach extends Person {
      * @param currEmployment is the current employment information about this coach to set
      */
     public void setCurrEmployment(String currEmployment) {
-        this.currEmployment = currEmployment;
+        this.employment = currEmployment;
     }
 }
 

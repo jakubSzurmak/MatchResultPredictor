@@ -1,18 +1,22 @@
 package pg.gda.edu.lsea;
 
+
+import pg.gda.edu.lsea.match.Match;
 import pg.gda.edu.lsea.absPerson.Person;
 import pg.gda.edu.lsea.absPerson.implPerson.Player;
 import pg.gda.edu.lsea.dataHandlers.utils.Sorting;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.Month;
 import java.util.*;
+
 
 /**
  * 1st entry point class
  */
 public class Main {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         /**
          * Initialization of the data
          */
@@ -42,14 +46,15 @@ public class Main {
 
         List<Player> players = new ArrayList<>();
 
+        HashMap<UUID, String> compt = new HashMap<>();
+        compt.put(UUID.randomUUID(), "PremierLeague");
+        Match x = new Match(UUID.randomUUID(), LocalDate.of(1988, Month.AUGUST, 21), compt,
+                  "Season", UUID.randomUUID(), UUID.randomUUID(), 1, 2, UUID.randomUUID());
 
-        Match x = new Match(UUID.randomUUID(), LocalDate.of(1988, Month.AUGUST, 21), UUID.randomUUID(),
+        Match x1 = new Match(UUID.randomUUID(), LocalDate.of(1990, Month.AUGUST, 21), compt,
                 "Season", UUID.randomUUID(), UUID.randomUUID(), 1, 2, UUID.randomUUID());
 
-        Match x1 = new Match(UUID.randomUUID(), LocalDate.of(1990, Month.AUGUST, 21), UUID.randomUUID(),
-                "Season", UUID.randomUUID(), UUID.randomUUID(), 1, 2, UUID.randomUUID());
-
-        Match x2 = new Match(UUID.randomUUID(), LocalDate.of(1989, Month.AUGUST, 21), UUID.randomUUID(),
+        Match x2 = new Match(UUID.randomUUID(), LocalDate.of(1989, Month.AUGUST, 21), compt,
                 "Season", UUID.randomUUID(), UUID.randomUUID(), 1, 2, UUID.randomUUID());
 
         List<Match> matches = new LinkedList<>();
@@ -96,5 +101,8 @@ public class Main {
         for (Match i: matches) {
             System.out.println(i.getDate());
         }
+
+
+
     }
 }

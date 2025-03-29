@@ -1,5 +1,6 @@
-package pg.gda.edu.lsea.absPerson.implPerson;
+package pg.gda.edu.lsea.absPerson.implPerson.referee;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import pg.gda.edu.lsea.absPerson.Person;
 
 import java.util.Map;
@@ -12,6 +13,8 @@ import java.util.UUID;
  * The class does not implement any additional
  * fields or methods besides the constructors
  */
+
+@JsonDeserialize(using = RefereeDeserializer.class)
 public class Referee extends Person {
     /**
      * Constructs a referee with some specified ID
@@ -33,5 +36,18 @@ public class Referee extends Person {
         super(id, name, country);
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof Referee) {
+            Referee other = (Referee) obj;
+            return this.getId().equals(other.getId());
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return this.getId().hashCode();
+    }
 
 }
