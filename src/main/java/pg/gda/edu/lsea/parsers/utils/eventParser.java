@@ -8,6 +8,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalTime;
 import java.util.*;
 
@@ -27,12 +28,13 @@ public class eventParser {
 
             LocalTime eventTime = LocalTime.parse(event.get("timestamp").asText());
 
-            // TODO Change the UUID to Int
-            //int idPerformTeam = event.get("team").get("id").asInt();
-            //int idPerformPlayer = event.has("player") ? event.get("player").get("id").asInt() : -1;
+            String type = event.get("type").get("name").asText();
 
-            UUID idPerformTeam = UUID.randomUUID();
-            UUID idPerformPlayer = UUID.randomUUID();
+            UUID idPerformTeam = convertToUUID(event.get("team").get("id").asText());
+            UUID idPerformPlayer = event.has("player")
+                    ? convertToUUID(event.get("player").get("id").asText())
+                    : UUID.fromString("00000000-0000-0000-0000-000000000000");
+
 
             JsonNode playPatternNode = event.get("play_pattern");
             String playPatternName = "";
@@ -44,16 +46,27 @@ public class eventParser {
                     ? event.get("pass").get("body_part").get("name").asText()
                     : "Unknown";
 
-            String outcome = event.has("pass") && event.get("pass").has("outcome")
-                    ? event.get("pass").get("outcome").get("name").asText()
-                    : "Unknown";
 
+            String outcome = "Unknown";
+            String[] possibleTypes = { "pass", "ball_receipt", "interception", "goalkeeper", "shot" };
 
-            Event newEvent = new Event(eventID, eventHalf, eventTime, playPatternName, idPerformTeam, idPerformPlayer, performBodyPart, outcome);
+            for (String typer : possibleTypes) {
+                if (event.has(typer) && event.get(typer).has("outcome") && event.get(typer).get("outcome").has("name")) {
+                    outcome = event.get(typer).get("outcome").get("name").asText();
+                    break;
+                }
+            }
+
+            Event newEvent = new Event(eventID, eventHalf, eventTime, playPatternName, idPerformTeam, idPerformPlayer, performBodyPart, type, outcome);
             parsedEvents.add(newEvent);
 
         }
 
         return parsedEvents;
     }
+
+    private static UUID convertToUUID(String id) {
+        return UUID.nameUUIDFromBytes(String.valueOf(id).getBytes(StandardCharsets.UTF_8));
+    }
+
 }

@@ -8,6 +8,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.util.*;
 
@@ -39,7 +40,7 @@ public class playerParser {
                     JsonNode countryNode = node.get("country");
 
                     if (countryNode != null){
-                        UUID countryID = UUID.randomUUID();
+                        UUID countryID = convertToUUID(countryNode.get("id").asText());
                         String countryName = countryNode.get("name").asText();
 
                         country.put(countryID, countryName);
@@ -58,21 +59,27 @@ public class playerParser {
                     }
 
                     int rating = 0;
+                    LocalDate dateOfBirth = LocalDate.parse("1900-01-01"); // Basic dateOfBirth
 
                     for (JsonNode ratingNode : ratings){
                         if (ratingNode.get("long_name").asText().equals(name)){
                             rating = ratingNode.get("overall").asInt();
+                            dateOfBirth = LocalDate.parse(ratingNode.get("dob").asText());
                             break;
                         }
                     }
 
-                    Player newPlayer = new Player(playerID, name, country, nickname, LocalDate.now(), jerseyNumber, teamName, playerPositions, rating);
+                    Player newPlayer = new Player(playerID, name, country, nickname, dateOfBirth, jerseyNumber, teamName, playerPositions, rating);
                     parsedPlayers.add(newPlayer);
                 }
             }
         }
 
         return parsedPlayers;
+    }
+
+    private static UUID convertToUUID(String id) {
+        return UUID.nameUUIDFromBytes(String.valueOf(id).getBytes(StandardCharsets.UTF_8));
     }
 
 }
