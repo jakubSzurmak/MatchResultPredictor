@@ -3,14 +3,14 @@ package pg.gda.edu.lsea.parsers.utils;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import pg.gda.edu.lsea.teams.Team;
+import pg.gda.edu.lsea.team.Team;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
-public class teamParser {
+public class TeamParser {
 
     public static List<Team> parsing(String filePath) throws IOException {
         ObjectMapper objectMapper = new ObjectMapper();

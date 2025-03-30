@@ -1,17 +1,14 @@
 package pg.gda.edu.lsea;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import pg.gda.edu.lsea.absPerson.implPerson.Player;
 import pg.gda.edu.lsea.absPerson.implPerson.coach.Coach;
-import pg.gda.edu.lsea.absPerson.implPerson.coach.ResultHolder;
 import pg.gda.edu.lsea.match.Match;
 import pg.gda.edu.lsea.absPerson.implPerson.referee.Referee;
 import pg.gda.edu.lsea.parsers.utils.ParserCoach;
 import pg.gda.edu.lsea.parsers.utils.ParserMatch;
 import pg.gda.edu.lsea.parsers.utils.ParserReferee;
-import pg.gda.edu.lsea.parsers.utils.teamParser;
-import pg.gda.edu.lsea.teams.Team;
+import pg.gda.edu.lsea.parsers.utils.TeamParser;
+import pg.gda.edu.lsea.team.Team;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -36,8 +33,9 @@ public class ParseData {
         List<Player> parsedPlayers = new ArrayList<>();
         List<Event> parsedEvents = new ArrayList<>();
         String directory = "C:\\Users\\Mikolaj\\Desktop\\matches\\"; // sciezka dla meczow, trenerow, sedziow, timow
-        String directory2 = "sciezka dla playerow";
-        String directory3 = "sciezka dla eventow";
+        String directory2 = "C:\\Users\\Mikolaj\\Desktop\\lineups\\";
+        String directory3 = "C:\\Users\\Mikolaj\\Desktop\\events\\"; //sciezka dla eventow
+        String directory4 = "C:\\Users\\Mikolaj\\Desktop\\player_rating.java"; //sciezka dla ratingow
         try {
             List<Path> paths = Files.walk(Paths.get(directory), 2)
                     .filter(Files::isRegularFile)
@@ -45,7 +43,7 @@ public class ParseData {
                     .collect(Collectors.toList());
 
             for (Path path : paths) {
-                parsedTeams.addAll(teamParser.parsing(String.valueOf(path.toFile())));
+                parsedTeams.addAll(TeamParser.parsing(String.valueOf(path.toFile())));
             }
         } catch (Exception e) {
             e.printStackTrace();

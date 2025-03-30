@@ -1,4 +1,4 @@
-package pg.gda.edu.lsea.teams;
+package pg.gda.edu.lsea.team;
 
 import java.util.Map;
 import java.util.UUID;

@@ -12,7 +12,7 @@ import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.util.*;
 
-public class playerParser {
+public class PlayerParser {
 
     public static List<Player> parsing(String filePath, String filePathTwo) throws IOException {
         ObjectMapper objectMapper = new ObjectMapper();

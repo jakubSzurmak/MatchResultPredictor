@@ -12,7 +12,7 @@ import java.nio.charset.StandardCharsets;
 import java.time.LocalTime;
 import java.util.*;
 
-public class eventParser {
+public class EventParser {
 
     public static List<Event> parsing(String filePath) throws IOException {
         ObjectMapper objectMapper = new ObjectMapper();
