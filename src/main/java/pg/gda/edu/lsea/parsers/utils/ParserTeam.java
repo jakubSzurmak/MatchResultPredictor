@@ -10,7 +10,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
-public class TeamParser {
+public class ParserTeam {
 
     public static List<Team> parsing(String filePath) throws IOException {
         ObjectMapper objectMapper = new ObjectMapper();

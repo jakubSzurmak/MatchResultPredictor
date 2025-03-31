@@ -12,7 +12,7 @@ import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.util.*;
 
-public class PlayerParser {
+public class ParserPlayer {
 
     public static List<Player> parsing(String filePath, String filePathTwo) throws IOException {
         ObjectMapper objectMapper = new ObjectMapper();
@@ -64,7 +64,7 @@ public class PlayerParser {
                     for (JsonNode ratingNode : ratings){
                         if (ratingNode.get("long_name").asText().equals(name)){
                             rating = ratingNode.get("overall").asInt();
-                            dateOfBirth = LocalDate.parse(ratingNode.get("dob").asText());
+                       //     dateOfBirth = LocalDate.parse(ratingNode.get("dob").asText());
                             break;
                         }
                     }

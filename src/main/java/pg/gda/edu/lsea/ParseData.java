@@ -45,21 +45,21 @@ public class ParseData {
                     .collect(Collectors.toList());
 
             for (Path path : paths) {
-                parsedTeams.addAll(TeamParser.parsing(String.valueOf(path.toFile())));
+                parsedTeams.addAll(ParserTeam.parsing(String.valueOf(path.toFile())));
             }
             for(Path path: pathsE){
-                parsedEvents.addAll(EventParser.parsing(String.valueOf(path.toFile())));
+                parsedEvents.addAll(ParserEvent.parsing(String.valueOf(path.toFile())));
                 counter++;
                 System.out.println(counter);
-                if(counter == 1000){
+                if(counter == 300){
                     break;
                 }
             }
             for(Path path: pathsP){
-                parsedPlayers.addAll(PlayerParser.parsing(String.valueOf(path.toFile()), directory4));
+                parsedPlayers.addAll(ParserPlayer.parsing(String.valueOf(path.toFile()), directory4));
                 counter++;
                 System.out.println(counter);
-                if(counter == 1100) {
+                if(counter == 700) {
                     break;
                 }
             }
