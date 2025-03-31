@@ -160,4 +160,17 @@ public abstract class Statistics {
     public void setTotalCleanSheets(int totalCleanSheets) {
         this.totalCleanSheets = totalCleanSheets;
     }
+
+    @Override
+    public String toString() {
+        return "Statistics{" +
+                "id=" + id +
+                ", winPerc=" + winPerc +
+                ", gamesPlayed=" + gamesPlayed +
+                ", gamesWon=" + gamesWon +
+                ", goalsScored=" + goalsScored +
+                ", totalCleanSheets=" + totalCleanSheets +
+                ", totalGoalConceded=" + totalGoalConceded +
+                '}';
+    }
 }

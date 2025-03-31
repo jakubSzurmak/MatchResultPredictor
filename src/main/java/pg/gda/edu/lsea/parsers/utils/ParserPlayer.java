@@ -30,8 +30,15 @@ public class ParserPlayer {
             if (lineup != null && lineup.isArray()){
 
                 for (JsonNode node : lineup){
-                    UUID playerID = UUID.randomUUID();
-                    String name = node.get("player_name").asText();
+                    UUID playerID = convertToUUID(node.get("player_id").asText());
+                    String name = "";
+                    if (node.has("player_name") ){
+                        name = node.get("player_name").asText();
+                    }
+                    else
+                    {
+                        name = "";
+                    }
                     String nickname = node.get("player_nickname").asText();
                     int jerseyNumber = node.get("jersey_number").asInt();
 
