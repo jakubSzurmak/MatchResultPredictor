@@ -141,13 +141,13 @@ public class TestCloneAndComparator {
         country3.put(UUID.randomUUID(), "Germany");
 
         peopleList.add(new Coach(UUID.randomUUID(), "Jurgen Klopp", country3,
-                "Kloppo", null, null, null));
+                "Kloppo", null, null));
 
         Map<UUID, String> country4 = new HashMap<>();
         country4.put(UUID.randomUUID(), "Spain");
 
         peopleList.add(new Coach(UUID.randomUUID(), "Pep Guardiola", country4,
-                "Pep", null, null, null));
+                "Pep", null, null));
 
 
 

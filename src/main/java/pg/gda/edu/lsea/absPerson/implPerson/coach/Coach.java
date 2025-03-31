@@ -3,9 +3,7 @@ package pg.gda.edu.lsea.absPerson.implPerson.coach;
 import pg.gda.edu.lsea.absPerson.Person;
 
 import java.time.LocalDate;
-import java.util.Date;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 
 /**
@@ -21,8 +19,7 @@ public class Coach extends Person {
     /** Date of the birth of the coach */
     private LocalDate dateOfBirth;
     /** Current employment information of the coach */
-    private String employment;
-    private String season;
+    Map<String, HashSet<String>> employments;
 
     /**
      * Constructs a Coach object with some specified ID
@@ -41,23 +38,23 @@ public class Coach extends Person {
      * @param country is Coach's country of origin
      * @param nickname is Coach's nickname
      * @param dateOfBirth is Coach's date of birth
-     * @param currEmployment is Coach's current employment information
+     * @param employments is Coach's current employment information
      */
     public Coach(UUID id, String name, Map<UUID, String> country, String nickname, LocalDate dateOfBirth,
-                 String currEmployment, String season) {
+                 Map<String, HashSet<String>> employments) {
         super(id, name, country);
         this.nickname = nickname;
         this.dateOfBirth = dateOfBirth;
-        this.employment = currEmployment;
-        this.season = season;
+        this.employments = employments;
     }
 
 
-    public String getSeason() {
-        return season;
+    public Map<String, HashSet<String>> getEmployments() {
+        return employments;
     }
-    public void setSeason(String season) {
-        this.season = season;
+
+    public void setEmployments(Map<String, HashSet<String>> employments) {
+        this.employments = employments;
     }
     /**
      * Returns the nickname of this coach
@@ -100,17 +97,6 @@ public class Coach extends Person {
      *
      * @return the current employment information about this coach
      */
-    public String getCurrEmployment() {
-        return employment;
-    }
 
-    /**
-     * Sets the current employment information about this coach
-     *
-     * @param currEmployment is the current employment information about this coach to set
-     */
-    public void setCurrEmployment(String currEmployment) {
-        this.employment = currEmployment;
-    }
 }
 

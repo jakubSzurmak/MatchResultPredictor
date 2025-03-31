@@ -21,7 +21,7 @@ public class EventParser {
         List<JsonNode> events = objectMapper.readValue(new File(filePath), new TypeReference<List<JsonNode>>() {});
 
         for (JsonNode event : events) {
-
+            // Event id - nie chodzilo tutaj o event tylko o player id do zmiany
             UUID eventID = UUID.fromString(event.get("id").asText());
 
             int eventHalf = event.get("period").asInt();

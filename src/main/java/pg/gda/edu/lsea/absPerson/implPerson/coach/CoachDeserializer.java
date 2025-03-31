@@ -16,6 +16,28 @@ public class CoachDeserializer extends JsonDeserializer<ResultHolder> {
         return UUID.nameUUIDFromBytes(String.valueOf(id).getBytes(StandardCharsets.UTF_8));
     }
 
+
+    private static Coach createCoach(JsonNode nodeG, JsonNode node){
+        ArrayList<Coach> coaches = new ArrayList<>();
+        for (JsonNode element : nodeG) {
+            Coach coach = new Coach(convertToUUID(element.get("id").asInt()));
+            coach.setName(element.get("name").asText());
+            coach.setNickname(element.get("nickname").asText());
+            Map<String, HashSet<String>> employment = new HashMap<>();
+            HashSet<String> clubs = new HashSet<>();
+            clubs.add(node.get("home_team").get("home_team_name").asText());
+            employment.put(node.get("season").get("season_name").asText(),
+                   clubs);
+            coach.setEmployments(employment);
+            Map<UUID, String> country = new HashMap<>();
+            country.put(convertToUUID(element.get("country").get("id").asInt()),
+                    element.get("country").get("name").asText());
+            coach.setCountry(country);
+            coaches.add(coach);
+        }
+        return coaches.get(0);
+    }
+
     @Override
     public ResultHolder deserialize(JsonParser jp, DeserializationContext ctxt) throws IOException{
         JsonNode node = jp.getCodec().readTree(jp);
@@ -25,33 +47,11 @@ public class CoachDeserializer extends JsonDeserializer<ResultHolder> {
             return null;
         }
 
-        for (JsonNode element : node.get("home_team").get("managers")) {
-            Coach coach = new Coach(convertToUUID(element.get("id").asInt()));
-            coach.setName(element.get("name").asText());
-            coach.setNickname(element.get("nickname").asText());
-            coach.setSeason(node.get("season").get("season_name").asText());
-            coach.setCurrEmployment(node.get("home_team").get("home_team_name").asText());
-            Map<UUID, String> country = new HashMap<>();
-            country.put(convertToUUID(element.get("country").get("id").asInt()),
-                    element.get("country").get("name").asText());
-            coach.setCountry(country);
-            coaches.add(coach);
-        }
+        Coach coach = createCoach(node.get("home_team").get("managers"), node);
+        Coach coach1 = createCoach(node.get("away_team").get("managers"), node);
 
-        for(JsonNode element : node.get("away_team").get("managers")){
-            Coach coach = new Coach(convertToUUID(element.get("id").asInt()));
-            coach.setName(element.get("name").asText());
-            coach.setNickname(element.get("nickname").asText());
-            coach.setSeason(node.get("season").get("season_name").asText());
-            coach.setCurrEmployment(node.get("away_team").get("away_team_name").asText());
-            Map<UUID, String> country = new HashMap<>();
-            country.put(convertToUUID(element.get("country").get("id").asInt()),
-                    element.get("country").get("name").asText());
-            coach.setCountry(country);
-            coaches.add(coach);
-        }
 
-        return new ResultHolder(coaches.get(0), coaches.get(1));
+        return new ResultHolder(coach, coach1);
     }
 
 }

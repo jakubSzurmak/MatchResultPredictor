@@ -9,15 +9,43 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class ParserCoach {
 
-    public Set<Coach> parseCoache() throws IOException {
+    private static void getCoaches(Set<ResultHolder> bothCoaches, Map<UUID, Coach> coaches, boolean isHome){
+        for (ResultHolder resultHolder : bothCoaches) {
+            UUID coachId;
+            Coach currentCoach;
+            if(isHome){
+                coachId = resultHolder.getHomeCoach().getId();
+                currentCoach = resultHolder.getHomeCoach();
+            }
+            else{
+                coachId = resultHolder.getAwayCoach().getId();
+                currentCoach = resultHolder.getAwayCoach();
+            }
+
+            if (coaches.containsKey(coachId)) {
+                Map<String, HashSet<String>> existingEmployments = coaches.get(coachId).getEmployments();
+                for (String season : currentCoach.getEmployments().keySet()) {
+                    if (existingEmployments.containsKey(season)) {
+                        existingEmployments.get(season).add(
+                                currentCoach.getEmployments().get(season).stream().
+                                        findFirst().orElse(null)
+                        );
+                    } else {
+                        existingEmployments.put(season, currentCoach.getEmployments().get(season));
+                    }
+                }
+            } else {
+                coaches.put(coachId, currentCoach);
+            }
+        }
+    }
+
+    public Map<UUID,Coach> parseCoache() throws IOException {
         ObjectMapper objectMapper = new ObjectMapper();
         Set<ResultHolder> bothCoaches = new HashSet<>();
         int counter = 0;
@@ -42,12 +70,11 @@ public class ParserCoach {
         }
 
         bothCoaches = bothCoaches.stream().filter(Objects::nonNull).collect(Collectors.toSet());
-        Set<Coach> coaches = new HashSet<>();
-        for (ResultHolder resultHolder : bothCoaches) {
-            coaches.add(resultHolder.getAwayCoach());
-            coaches.add(resultHolder.getHomeCoach());
-        }
+        Map<UUID, Coach> coaches = new HashMap<>();
+        getCoaches(bothCoaches, coaches, true);
+        getCoaches(bothCoaches, coaches, false);
         return coaches;
+
     }
 }
 
