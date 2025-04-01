@@ -65,13 +65,12 @@ public class ParserPlayer {
                         }
                     }
 
-                    int rating = 0;
+                    int rating = 50;
                     LocalDate dateOfBirth = LocalDate.parse("1900-01-01"); // Basic dateOfBirth
 
                     for (JsonNode ratingNode : ratings){
                         if (ratingNode.get("long_name").asText().equals(name)){
                             rating = ratingNode.get("overall").asInt();
-                       //     dateOfBirth = LocalDate.parse(ratingNode.get("dob").asText());
                             break;
                         }
                     }
