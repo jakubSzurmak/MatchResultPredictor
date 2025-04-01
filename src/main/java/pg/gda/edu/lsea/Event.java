@@ -29,6 +29,8 @@ public class Event {
     private String type;
     /** Outcome of the event (goal, miss, etc.) */
     private String outcome;
+    /** */
+    private boolean assist;
 
     /**
      * Constructs an Event with some specified ID
@@ -52,7 +54,7 @@ public class Event {
      * @param outcome is the outcome of the event
      */
     public Event(UUID id, int half, LocalTime timestamp, String playPattern,
-                 UUID idPerformTeam, UUID idPerformPlayer, String performBodyPart, String type, String outcome) {
+                 UUID idPerformTeam, UUID idPerformPlayer, String performBodyPart, String type, String outcome, boolean assist) {
         this.id = id;
         this.half = half;
         this.timestamp = timestamp;
@@ -62,6 +64,7 @@ public class Event {
         this.performBodyPart = performBodyPart;
         this.type = type;
         this.outcome = outcome;
+        this.assist = assist;
     }
 
     /**
@@ -213,4 +216,19 @@ public class Event {
     public void setOutcome(String outcome) {
         this.outcome = outcome;
     }
+
+    /**
+     * Returns where the event is connected with an assist
+     *
+     * @return the assist of the event
+     */
+    public boolean getAssist(){return assist;}
+
+    /**
+     * Sets the assist of the event
+     *
+     * @param assist is the assist of the event
+     */
+    public void setAssist(boolean assist){ this.assist = assist;}
+
 }

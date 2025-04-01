@@ -48,16 +48,24 @@ public class ParserEvent {
 
 
             String outcome = "Unknown";
-            String[] possibleTypes = { "pass", "ball_receipt", "interception", "goalkeeper", "shot" };
+            String[] possibleTypes = { "pass", "ball_receipt", "interception", "goalkeeper", "shot", "duel"};
+
+            boolean eventAssist = false;
+
+            if (event.has("pass") && event.get("pass").has("shot_assist")) {
+                String eventAssistText = event.get("pass").get("shot_assist").asText();
+                eventAssist = Boolean.parseBoolean(eventAssistText);
+            }
 
             for (String typer : possibleTypes) {
                 if (event.has(typer) && event.get(typer).has("outcome") && event.get(typer).get("outcome").has("name")) {
                     outcome = event.get(typer).get("outcome").get("name").asText();
+
                     break;
                 }
             }
 
-            Event newEvent = new Event(eventID, eventHalf, eventTime, playPatternName, idPerformTeam, idPerformPlayer, performBodyPart, type, outcome);
+            Event newEvent = new Event(eventID, eventHalf, eventTime, playPatternName, idPerformTeam, idPerformPlayer, performBodyPart, type, outcome, eventAssist);
             parsedEvents.add(newEvent);
 
         }
