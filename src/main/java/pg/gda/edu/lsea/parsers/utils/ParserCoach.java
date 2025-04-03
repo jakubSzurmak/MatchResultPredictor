@@ -49,7 +49,7 @@ public class ParserCoach {
         ObjectMapper objectMapper = new ObjectMapper();
         Set<ResultHolder> bothCoaches = new HashSet<>();
         int counter = 0;
-        String directory = "C:\\Users\\Mikolaj\\Desktop\\matches\\";
+        String directory = "C:\\Users\\ASUS RoG\\Desktop\\matches\\";
         try {
             List<Path> paths = Files.walk(Paths.get(directory), 2)
                     .filter(Files::isRegularFile)

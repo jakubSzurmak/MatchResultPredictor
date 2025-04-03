@@ -101,4 +101,8 @@ public class fPlayerStatistics extends PlayerStatistics {
     public float getDuelPercentage() {
         return duelPercentage;
     }
+
+    public void setDuelPercentage() {
+        this.duelPercentage = (float) this.totalDuelWins / this.totalDuel;
+    }
 }

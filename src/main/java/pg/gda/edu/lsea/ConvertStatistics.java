@@ -5,6 +5,9 @@ import pg.gda.edu.lsea.absStatistics.Statistics;
 import pg.gda.edu.lsea.absStatistics.absPlayerStatistics.PlayerStatistics;
 import pg.gda.edu.lsea.absStatistics.absPlayerStatistics.implPlayerStatistics.fPlayerStatistics;
 import pg.gda.edu.lsea.absStatistics.absPlayerStatistics.implPlayerStatistics.gPlayerStatistics;
+import pg.gda.edu.lsea.absStatistics.implStatistics.TeamStatistics;
+import pg.gda.edu.lsea.match.Match;
+import pg.gda.edu.lsea.team.Team;
 
 import java.util.*;
 
@@ -28,7 +31,7 @@ public class ConvertStatistics {
         return convertToG;
     }
 
-    private static void checkForShot(Map<UUID, Statistics> playerS,UUID playerId, Event event, Integer flagScored, Player currPlayer){
+    private static void checkForShot(Map<UUID, Statistics> playerS,UUID playerId, Integer flagScored, Player currPlayer){
         if(playerS.containsKey(playerId)){
             PlayerStatistics player = null;
             if(currPlayer.getPositions().contains("Goalkeeper")) {
@@ -42,18 +45,18 @@ public class ConvertStatistics {
             playerS.put(playerId, player);
         }else{
             if(currPlayer.getPositions().contains("Goalkeeper")) {
-                playerS.put(playerId, new gPlayerStatistics(event.getIdPerformPlayer(), 0,
+                playerS.put(playerId, new gPlayerStatistics(playerId, 0,
                         0,flagScored,0,0,0,0,
                         0,0,1,0));
             }else{
-                playerS.put(playerId, new fPlayerStatistics(event.getIdPerformPlayer(), 0
+                playerS.put(playerId, new fPlayerStatistics(playerId, 0
                         , 0, flagScored, 0, 0, 0, 0,
                         0, 0, 0, 1, 0));
             }
         }
     }
 
-    private static void checkForSave(Map<UUID, Statistics> playerS, UUID playerId, Event event, Integer flagSaved,
+    private static void checkForSave(Map<UUID, Statistics> playerS, UUID playerId, Integer flagSaved,
                               Integer flagGoalConceded, Map<UUID,Player>uniquePlayers, Player currPlayer){
         if(playerS.containsKey(playerId)){
             if(!currPlayer.getPositions().contains("Goalkeeper")){
@@ -72,7 +75,7 @@ public class ConvertStatistics {
         }
         else
         {
-            playerS.put(playerId, new gPlayerStatistics(event.getIdPerformPlayer(),0,0,
+            playerS.put(playerId, new gPlayerStatistics(playerId,0,0,
                     0,0,0,0,0,0,flagSaved,0,flagGoalConceded));
             if(!uniquePlayers.get(playerId).getPositions().contains("Goalkeeper")){
                 ArrayList<String> positions = new ArrayList<>();
@@ -84,48 +87,103 @@ public class ConvertStatistics {
 
 
 
-    private static void checkForPasses(Map<UUID, Statistics> playerS, UUID playerId, Event event, Player currPlayer){
+    private static void checkForPasses(Map<UUID, Statistics> playerS, UUID playerId, Player currPlayer){
         if(playerS.containsKey(playerId)){
             PlayerStatistics player = (PlayerStatistics) playerS.get(playerId);
             player.setTotalPasses(player.getTotalPasses()+1);
             playerS.put(playerId, player);
         }else{
             if(currPlayer.getPositions().contains("Goalkeeper")) {
-                playerS.put(playerId, new gPlayerStatistics(event.getIdPerformPlayer(), 0,
+                playerS.put(playerId, new gPlayerStatistics(playerId, 0,
                         0,0,0,0,1,0,
                         0,0,0,0));
             }else{
-                playerS.put(playerId, new fPlayerStatistics(event.getIdPerformPlayer(), 0
+                playerS.put(playerId, new fPlayerStatistics(playerId, 0
                         , 0, 0, 0, 0, 1, 0,
                         0, 0, 0, 0, 0));
             }
         }
     }
 
-    private static void checkForBallLoose(Map<UUID, Statistics> playerS, UUID playerId, Event event, Player currPlayer){
+    private static void checkForBallLoose(Map<UUID, Statistics> playerS, UUID playerId, Player currPlayer){
         if(playerS.containsKey(playerId)){
             PlayerStatistics player = (PlayerStatistics) playerS.get(playerId);
             player.setTotalBallLosses(player.getTotalBallLosses()+1);
             playerS.put(playerId, player);
         }else{
             if(currPlayer.getPositions().contains("Goalkeeper")) {
-                playerS.put(playerId, new gPlayerStatistics(event.getIdPerformPlayer(), 0,
+                playerS.put(playerId, new gPlayerStatistics(playerId, 0,
                         0,0,0,0,0,1,
                         0,0,0,0));
             }else{
-                playerS.put(playerId, new fPlayerStatistics(event.getIdPerformPlayer(), 0
+                playerS.put(playerId, new fPlayerStatistics(playerId, 0
                         , 0, 0, 0, 0, 0, 1,
                         0, 0, 0, 0, 0));
             }
         }
     }
 
+    private static void checkForDuel(Map<UUID, Statistics> playerS, UUID playerId, Player currPlayer, int duelFlag){
+        if(playerS.containsKey(playerId)){
+            fPlayerStatistics player = (fPlayerStatistics) playerS.get(playerId);
+            player.setTotalDuel(player.getTotalDuel()+1);
+            player.setTotalDuelWins(player.getTotalDuelWins()+duelFlag);
+            player.setDuelPercentage();
+            playerS.put(playerId, player);
+        }else{
+            if(!currPlayer.getPositions().contains("Goalkeeper")) {
+                playerS.put(playerId, new fPlayerStatistics(playerId, 0,0,0,0,0,0,
+                        0,0,duelFlag,1,0,0));
+            }
+
+        }
+    }
 
 
+    private static void setTeamStat(Map<UUID, Statistics> stats, UUID id, Integer rivalScore, Integer ourScore,
+                                    Integer cleanSheetFlag, Integer gamesWonFlag){
+        if(stats.containsKey(id) && stats.get(id) instanceof TeamStatistics){
+            Statistics teamS = (TeamStatistics) stats.get(id);
+            teamS.setGamesPlayed(teamS.getGamesPlayed()+1);
+            teamS.setGamesWon(teamS.getGamesWon()+gamesWonFlag);
+            teamS.setTotalCleanSheets(teamS.getTotalCleanSheets()+cleanSheetFlag);
+            teamS.setGoalsScored(teamS.getGoalsScored()+ourScore);
+            teamS.setTotalGoalConceded(teamS.getTotalGoalConceded()+rivalScore);
+            teamS.setCleanSheetPerc();
+            teamS.setGoalPerc();
+            teamS.setWinPerc();
+            stats.put(id, teamS);
+        }else{
+            Statistics teamS = (TeamStatistics) new TeamStatistics(id,1,gamesWonFlag,ourScore,cleanSheetFlag, rivalScore);
+            teamS.setCleanSheetPerc();
+            teamS.setGoalPerc();
+            teamS.setWinPerc();
+            stats.put(id, teamS);
+        }
+    }
 
-    public void convert(List<Player> players, List<Event> events){
+    private static int checkWin(int ourScore, int rivalScore){
+        if(ourScore > rivalScore){
+            return 1;
+        }
+        else if(ourScore < rivalScore){
+            return 0;
+        }
+        return 0;
+    }
+
+    private static int checkCleanSheet(int rivalScore){
+        if(rivalScore == 0){
+            return 1;
+        }else{
+            return 0;
+        }
+    }
+
+
+    public void convert(List<Player> players, List<Event> events, List<Match> matches){
         System.out.println("Converting statistics...");
-        Map<UUID, Statistics> playerS = new HashMap<>();
+        Map<UUID, Statistics> stats = new HashMap<>();
         Map<UUID, Player> uniquePlayers = new HashMap<>();
         int counter = 0;
         for(Player player:players){
@@ -146,38 +204,42 @@ public class ConvertStatistics {
             UUID playerId = event.getIdPerformPlayer();
             // check goals and shoots
             if(type.equals("Shot") && event.getOutcome().equals("Goal")){
-                checkForShot(playerS,playerId,event,1, uniquePlayers.get(playerId));
+                checkForShot(stats,playerId,1, uniquePlayers.get(playerId));
                 counter2++;
             }else if(type.equals("Shot") && !event.getOutcome().equals("Goal")){
-                checkForShot(playerS,playerId,event,0, uniquePlayers.get(playerId));
+                checkForShot(stats,playerId,0, uniquePlayers.get(playerId));
                 counter2++;
             }
             //check saves and goals conceeded
             if(type.equals("Goal Keeper") && (event.getOutcome().equals("Success") || event.getOutcome().equals("Saved Twice"))){
-                checkForSave(playerS,playerId,event,1,0, uniquePlayers,uniquePlayers.get(playerId));
+                checkForSave(stats,playerId,1,0, uniquePlayers,uniquePlayers.get(playerId));
             }else if (type.equals("Goal Keeper") && event.getOutcome().equals("Goal Conceded") ){
-                checkForSave(playerS,playerId,event,0,1,uniquePlayers, uniquePlayers.get(playerId));
+                checkForSave(stats,playerId,0,1,uniquePlayers, uniquePlayers.get(playerId));
             }
 
             if(type.equals("Pass")){
-                checkForPasses(playerS,playerId,event,uniquePlayers.get(playerId));
+                checkForPasses(stats,playerId,uniquePlayers.get(playerId));
             }
 
             if(type.equals("Dispossessed")){
-                checkForBallLoose(playerS,playerId,event,uniquePlayers.get(playerId));
+                checkForBallLoose(stats,playerId,uniquePlayers.get(playerId));
+            }
+
+            if(type.equals("Duel")){
+                checkForDuel(stats,playerId,uniquePlayers.get(playerId),1);
             }
 
 
 
             //tu mozesz sprawdzic
             //------------------------------------------
-            if(type.equals("Duel")){
+            if(type.equals("Goal Keeper")){
                 eventList.add(event.getOutcome());
             }
 
 
             try {
-                System.out.println(playerS.get(playerId).toString());
+                System.out.println(stats.get(playerId).toString());
             }
             catch (Exception e){
                 System.out.println("Player not found: " + playerId);
@@ -192,20 +254,20 @@ public class ConvertStatistics {
 //            outcomeList.add(event.getOutcome());
 //            if(uniquePlayers.containsKey(event.getIdPerformPlayer())){
 //                System.out.println("Found player: " + event.getId());
-//                if(playerS.containsKey(event.getIdPerformPlayer())){
+//                if(stats.containsKey(event.getIdPerformPlayer())){
 //                    System.out.println("Player already exists: " + event.getId());
 //                }
 //                else {
 //
 //                    if(uniquePlayers.get(event.getIdPerformPlayer()).getPositions().contains("Goalkeeper")){
-//                        playerS.put(event.getIdPerformPlayer(), new gPlayerStatistics(event.getIdPerformPlayer(),1
+//                        stats.put(event.getIdPerformPlayer(), new gPlayerStatistics(event.getIdPerformPlayer(),1
 //                        ,0,0,0,0,0,0,0,0,0,0));
 //                        if(event.getType().equals("Goal Keeper")){
 //                            System.out.println(event.getOutcome());
 //                        }
 //                    }
 //                    else{
-//                        playerS.put(event.getIdPerformPlayer(), new fPlayerStatistics(event.getIdPerformPlayer()));
+//                        stats.put(event.getIdPerformPlayer(), new fPlayerStatistics(event.getIdPerformPlayer()));
 //                        System.out.println("Added player: " + event.getIdPerformPlayer() + " " + uniquePlayers.get(event.getIdPerformPlayer())
 //                                .getName());
 //
@@ -221,9 +283,26 @@ public class ConvertStatistics {
 //            }
 
         }
+
+
+        for(Match match:matches){
+            UUID homeTeamId = match.getHomeTeamId();
+            UUID awayTeamId = match.getAwayTeamId();
+            Integer homeScore = match.getHomeScore();
+            Integer awayScore = match.getAwayScore();
+            setTeamStat(stats, homeTeamId,awayScore, homeScore, checkCleanSheet(awayScore), checkWin(homeScore, awayScore));
+            setTeamStat(stats, awayTeamId, homeScore, awayScore, checkCleanSheet(homeScore), checkWin(awayScore, homeScore));
+        }
         System.out.println(eventList);
         System.out.println(outcomeList);
         System.out.println( counter2);
+        for (Statistics statistics: stats.values()){
+            if(statistics.getGoalsScored() > 10 && statistics instanceof fPlayerStatistics){
+                System.out.println(uniquePlayers.get(statistics.getId()).getName() + " - " + statistics.getGoalsScored() + " goals scored");
+            }else if(statistics.getGoalsScored() > 10 && statistics instanceof TeamStatistics){
+                System.out.println(statistics.toString());
+            }
+        }
     }
 
 }
