@@ -18,7 +18,7 @@ public class ParserReferee {
     public Set<Referee> parseReferee() throws IOException {
         ObjectMapper objectMapper = new ObjectMapper();
         Set<Referee> referees = new HashSet<>();
-        String directory = "C:\\Users\\ASUS RoG\\Desktop\\matches\\";
+        String directory = "matches";
         try {
             List<Path> paths = Files.walk(Paths.get(directory), 2)
                     .filter(Files::isRegularFile)

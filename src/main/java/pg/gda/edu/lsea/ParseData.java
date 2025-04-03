@@ -7,6 +7,8 @@ import pg.gda.edu.lsea.absPerson.implPerson.referee.Referee;
 import pg.gda.edu.lsea.parsers.utils.*;
 import pg.gda.edu.lsea.team.Team;
 
+import java.util.concurrent.CountDownLatch;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -16,71 +18,152 @@ import java.util.stream.Collectors;
 
 public class ParseData {
 
-    public static List<Path> getFilePath(String directory, int depth) throws IOException {
+    private static List<Path> getFilePath(String directory, int depth) throws IOException {
         return Files.walk(Paths.get(directory), depth)
                 .filter(Files::isRegularFile)
                 .filter(path -> path.getFileName().toString().endsWith(".json"))
                 .collect(Collectors.toList());
-
-
     }
 
 
-    public static void main(String[] args) throws CloneNotSupportedException, IOException {
-        System.out.println("Parsing data...");
-        List<Match> matches = new ParserMatch().parseMatch();
-        Set<Referee> referees = new ParserReferee().parseReferee();
-        Map<UUID, Coach> coaches = new ParserCoach().parseCoache();
-
-        List<Team> parsedTeams = new ArrayList<>();
-        List<Player> parsedPlayers = new ArrayList<>();
+    private static List<Event> parseEvents() {
         List<Event> parsedEvents = new ArrayList<>();
-        int counter = 0;
-        String directory = "C:\\Users\\ASUS RoG\\Desktop\\matches\\"; // sciezka dla meczow, trenerow, sedziow, timow
-        String directory2 = "C:\\Users\\ASUS RoG\\Desktop\\lineupsModified\\";
-        String directory3 = "C:\\Users\\ASUS RoG\\Desktop\\events\\"; //sciezka dla eventow
-        String directory4 = "C:\\Users\\ASUS RoG\\Desktop\\player_rating.json"; //sciezka dla ratingow
+        String directory = "events";
         try {
-            List<Path> pathsL = getFilePath(directory, 2);
-
-            List<Path> pathsE = getFilePath(directory3, 1);
-
-            List<Path> pathsP = getFilePath(directory2, 1);
-
-            for (Path path : pathsL) {
-                parsedTeams.addAll(ParserTeam.parsing(String.valueOf(path.toFile())));
-            }
-            for(Path path: pathsE){
+            List<Path> pathsE = getFilePath(directory, 1);
+            for (Path path : pathsE) {
                 parsedEvents.addAll(ParserEvent.parsing(String.valueOf(path.toFile())));
-                counter++;
-                System.out.println(counter);
-                if(counter == 100){
-                    break;
-                }
-            }
-            for(Path path: pathsP){
-                parsedPlayers.addAll(ParserPlayer.parsing(String.valueOf(path.toFile()), directory4));
-                counter++;
-                System.out.println(counter);
-                if(counter == 200) {
-                    break;
-                }
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
+        return parsedEvents;
+    }
 
 
+    private static List<Team> parseTeams() {
+        String directory = "matches";
+        List<Team> parsedTeams = new ArrayList<>();
+        try {
+            List<Path> pathsL = getFilePath(directory, 2);
+            for (Path path : pathsL) {
+                parsedTeams.addAll(ParserTeam.parsing(String.valueOf(path.toFile())));
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return parsedTeams;
+    }
+
+    private static List<Player> parsePlayers() {
+        String directory2 = "lineupsModified";
+        String directory4 = "player_rating.json";
+        List<Player> parsedPlayers = new ArrayList<>();
+        try {
+            List<Path> pathsP = getFilePath(directory2, 1);
+            for (Path path : pathsP) {
+                parsedPlayers.addAll(ParserPlayer.parsing(String.valueOf(path.toFile()), directory4));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return parsedPlayers;
+    }
+
+    private static void functionalThread(Runnable task) {
+        Thread t = new Thread(task);
+        t.start();
+    }
+
+    public static void main(String[] args) throws InterruptedException {
+        System.out.println("Parsing data...");
+        final CountDownLatch latch = new CountDownLatch(6);
+
+        List<Match> matches = new ArrayList<>();
+        Set<Referee> referees = new HashSet<>();
+        Map<UUID, Coach> coaches = new HashMap<>();
+        List<Team> parsedTeams = new ArrayList<>();
+        List<Player> parsedPlayers = new ArrayList<>();
+        List<Event> parsedEvents = new ArrayList<>();
+
+
+        functionalThread(() -> {
+            try {
+                matches.addAll(new ParserMatch().parseMatch());
+                System.out.println("Matches parsing complete: " + matches.size());
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                latch.countDown();
+            }
+        });
+
+        functionalThread(() -> {
+            try {
+                try {
+                    referees.addAll(new ParserReferee().parseReferee());
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+                System.out.println("Referees parsing complete: " + referees.size());
+            } finally {
+                latch.countDown();
+            }
+        });
+
+        // Similar pattern for other parsing tasks...
+        functionalThread(() -> {
+            try {
+                try {
+                    coaches.putAll(new ParserCoach().parseCoache());
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+                System.out.println("Coaches parsing complete: " + coaches.size());
+            } finally {
+                latch.countDown();
+            }
+        });
+
+        functionalThread(() -> {
+            try {
+                parsedTeams.addAll(parseTeams());
+                System.out.println("Teams parsing complete: " + parsedTeams.size());
+            } finally {
+                latch.countDown();
+            }
+        });
+
+        functionalThread(() -> {
+            try {
+                parsedPlayers.addAll(parsePlayers());
+                System.out.println("Players parsing complete: " + parsedPlayers.size());
+            } finally {
+                latch.countDown();
+            }
+        });
+
+        functionalThread(() -> {
+            try {
+                parsedEvents.addAll(parseEvents());
+                System.out.println("Events parsing complete: " + parsedEvents.size());
+            } finally {
+                latch.countDown();
+            }
+        });
+
+        // Wait for all parsing operations to complete
+        latch.await();
         System.out.println(matches.size() + " - matches in total");
         System.out.println(referees.size() + " - referees in total");
         System.out.println(coaches.size() + " - coaches in total");
         System.out.println(parsedTeams.size() + " - teams in total");
         System.out.println(parsedPlayers.size() + " - players in total");
         System.out.println(parsedEvents.size() + " - events in total");
-        System.out.println();
-        ConvertStatistics convertStatistics = new ConvertStatistics();
-        convertStatistics.convert(parsedPlayers, parsedEvents, matches);
 
-
+        //ConvertStatistics convertStatistics = new ConvertStatistics();
+        //convertStatistics.convert(parsedPlayers, parsedEvents, matches);
     }
 }

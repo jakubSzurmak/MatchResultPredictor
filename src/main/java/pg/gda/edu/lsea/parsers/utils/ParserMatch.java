@@ -19,7 +19,7 @@ public class ParserMatch {
     public List<Match> parseMatch() {
         ObjectMapper objectMapper = new ObjectMapper();
         List<Match> matches = new ArrayList<>();
-        String directory = "C:\\Users\\ASUS RoG\\Desktop\\matches\\";
+        String directory = "matches";
         try {
             List<Path> paths = Files.walk(Paths.get(directory), 2)
                     .filter(Files::isRegularFile)

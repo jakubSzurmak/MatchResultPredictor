@@ -143,7 +143,7 @@ public class ConvertStatistics {
     private static void setTeamStat(Map<UUID, Statistics> stats, UUID id, Integer rivalScore, Integer ourScore,
                                     Integer cleanSheetFlag, Integer gamesWonFlag){
         if(stats.containsKey(id) && stats.get(id) instanceof TeamStatistics){
-            Statistics teamS = (TeamStatistics) stats.get(id);
+            Statistics teamS = stats.get(id);
             teamS.setGamesPlayed(teamS.getGamesPlayed()+1);
             teamS.setGamesWon(teamS.getGamesWon()+gamesWonFlag);
             teamS.setTotalCleanSheets(teamS.getTotalCleanSheets()+cleanSheetFlag);
@@ -154,7 +154,7 @@ public class ConvertStatistics {
             teamS.setWinPerc();
             stats.put(id, teamS);
         }else{
-            Statistics teamS = (TeamStatistics) new TeamStatistics(id,1,gamesWonFlag,ourScore,cleanSheetFlag, rivalScore);
+            Statistics teamS = new TeamStatistics(id,1,gamesWonFlag,ourScore,cleanSheetFlag, rivalScore);
             teamS.setCleanSheetPerc();
             teamS.setGoalPerc();
             teamS.setWinPerc();
@@ -185,7 +185,6 @@ public class ConvertStatistics {
         System.out.println("Converting statistics...");
         Map<UUID, Statistics> stats = new HashMap<>();
         Map<UUID, Player> uniquePlayers = new HashMap<>();
-        int counter = 0;
         for(Player player:players){
             uniquePlayers.put(player.getId(),player);
         }
@@ -195,7 +194,6 @@ public class ConvertStatistics {
         Set<String> eventList = new HashSet<>();
         Set<String> outcomeList = new HashSet<>();
         int counter2 = 0;
-        UUID prevId = null;
         for(Event event:events){
             if(!uniquePlayers.containsKey(event.getIdPerformPlayer())) {
                 continue;   // if player not found in the player list
@@ -243,45 +241,7 @@ public class ConvertStatistics {
             }
             catch (Exception e){
                 System.out.println("Player not found: " + playerId);
-                continue;
             }
-
-
-
-
-//
-//            eventList.add(event.getType());
-//            outcomeList.add(event.getOutcome());
-//            if(uniquePlayers.containsKey(event.getIdPerformPlayer())){
-//                System.out.println("Found player: " + event.getId());
-//                if(stats.containsKey(event.getIdPerformPlayer())){
-//                    System.out.println("Player already exists: " + event.getId());
-//                }
-//                else {
-//
-//                    if(uniquePlayers.get(event.getIdPerformPlayer()).getPositions().contains("Goalkeeper")){
-//                        stats.put(event.getIdPerformPlayer(), new gPlayerStatistics(event.getIdPerformPlayer(),1
-//                        ,0,0,0,0,0,0,0,0,0,0));
-//                        if(event.getType().equals("Goal Keeper")){
-//                            System.out.println(event.getOutcome());
-//                        }
-//                    }
-//                    else{
-//                        stats.put(event.getIdPerformPlayer(), new fPlayerStatistics(event.getIdPerformPlayer()));
-//                        System.out.println("Added player: " + event.getIdPerformPlayer() + " " + uniquePlayers.get(event.getIdPerformPlayer())
-//                                .getName());
-//
-//                    }
-//
-//                }
-//            }
-//            else{
-//                System.out.println("Player not found: " + event.getId());
-//                counter++;
-//             //   playerEmpty.add(event.getId());
-//                continue;
-//            }
-
         }
 
 
@@ -300,7 +260,7 @@ public class ConvertStatistics {
             if(statistics.getGoalsScored() > 10 && statistics instanceof fPlayerStatistics){
                 System.out.println(uniquePlayers.get(statistics.getId()).getName() + " - " + statistics.getGoalsScored() + " goals scored");
             }else if(statistics.getGoalsScored() > 10 && statistics instanceof TeamStatistics){
-                System.out.println(statistics.toString());
+                System.out.println(statistics);
             }
         }
     }
