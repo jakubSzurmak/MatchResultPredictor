@@ -57,10 +57,10 @@ public class ParseData {
         return parsedTeams;
     }
 
-    private static List<Player> parsePlayers() {
+    private static HashSet<Player> parsePlayers() {
         String directory2 = "lineupsModified";
         String directory4 = "player_rating.json";
-        List<Player> parsedPlayers = new ArrayList<>();
+        HashSet<Player> parsedPlayers = new HashSet<>();
         try {
             List<Path> pathsP = getFilePath(directory2, 1);
             for (Path path : pathsP) {
@@ -85,7 +85,7 @@ public class ParseData {
         Set<Referee> referees = new HashSet<>();
         Map<UUID, Coach> coaches = new HashMap<>();
         List<Team> parsedTeams = new ArrayList<>();
-        List<Player> parsedPlayers = new ArrayList<>();
+        HashSet<Player> parsedPlayers = new HashSet<>();
         List<Event> parsedEvents = new ArrayList<>();
 
 

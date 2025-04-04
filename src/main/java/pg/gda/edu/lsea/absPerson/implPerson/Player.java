@@ -208,4 +208,30 @@ public class Player extends Person implements Comparable<Player>, Cloneable {
     public void setPositions(ArrayList<String> positions) {
         this.positions = positions;
     }
+
+
+    /**
+     * Compares two players if they are the same
+     *
+     * @param o is the object to compare
+     * @return true/false statement if the players are the same
+     */
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Player player = (Player) o;
+        return this.getId().equals(player.getId());
+    }
+
+    /**
+     * Returns hashCode of the UUID of the player
+     *
+     * @return hashCode of the UUID of the player
+     */
+    @Override
+    public int hashCode() {
+        return getId().hashCode();
+    }
+
 }

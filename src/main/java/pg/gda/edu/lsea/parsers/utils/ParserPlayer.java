@@ -14,9 +14,9 @@ import java.util.*;
 
 public class ParserPlayer {
 
-    public static List<Player> parsing(String filePath, String filePathTwo) throws IOException {
+    public static HashSet<Player> parsing(String filePath, String filePathTwo) throws IOException {
         ObjectMapper objectMapper = new ObjectMapper();
-        List<Player> parsedPlayers = new ArrayList<>();
+        HashSet<Player> parsedPlayers = new HashSet<>();
 
         List<JsonNode> teams = objectMapper.readValue(new File(filePath), new TypeReference<List<JsonNode>>() {});
         List<JsonNode> ratings = objectMapper.readValue(new File(filePathTwo), new TypeReference<List<JsonNode>>() {});
