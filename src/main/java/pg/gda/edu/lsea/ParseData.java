@@ -2,6 +2,7 @@ package pg.gda.edu.lsea;
 
 import pg.gda.edu.lsea.absPerson.implPerson.Player;
 import pg.gda.edu.lsea.absPerson.implPerson.coach.Coach;
+import pg.gda.edu.lsea.absStatistics.Statistics;
 import pg.gda.edu.lsea.match.Match;
 import pg.gda.edu.lsea.absPerson.implPerson.referee.Referee;
 import pg.gda.edu.lsea.parsers.utils.*;
@@ -29,10 +30,15 @@ public class ParseData {
     private static List<Event> parseEvents() {
         List<Event> parsedEvents = new ArrayList<>();
         String directory = "events";
+        int counter = 0;
         try {
             List<Path> pathsE = getFilePath(directory, 1);
             for (Path path : pathsE) {
-                parsedEvents.addAll(ParserEvent.parsing(String.valueOf(path.toFile())));
+                parsedEvents.addAll(ParserEvent.parsing(String.valueOf(path.toFile()), counter));
+                counter++;
+                if (counter % 1000 == 0) {
+                    break;
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -61,11 +67,18 @@ public class ParseData {
         String directory2 = "lineupsModified";
         String directory4 = "player_rating.json";
         HashSet<Player> parsedPlayers = new HashSet<>();
+        int counter = 0;
         try {
+
             List<Path> pathsP = getFilePath(directory2, 1);
             for (Path path : pathsP) {
                 parsedPlayers.addAll(ParserPlayer.parsing(String.valueOf(path.toFile()), directory4));
+                if (counter == 100){
+                    break;
+                }
+                counter++;
             }
+
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -163,7 +176,9 @@ public class ParseData {
         System.out.println(parsedPlayers.size() + " - players in total");
         System.out.println(parsedEvents.size() + " - events in total");
 
-        //ConvertStatistics convertStatistics = new ConvertStatistics();
-        //convertStatistics.convert(parsedPlayers, parsedEvents, matches);
+        ConvertStatistics convertStatistics = new ConvertStatistics();
+        Map<UUID, Statistics> stats = new HashMap<>();
+        convertStatistics.getPlayerStat(parsedPlayers, parsedEvents,stats);
+        convertStatistics.getTeamCoachStats(stats, matches);
     }
 }

@@ -47,10 +47,10 @@ public class fPlayerStatistics extends PlayerStatistics {
      * @param totalGoalConceded is the number of goals conceded
      */
     public fPlayerStatistics(UUID id, int gamesPlayed, int gamesWon, int goalsScored, int totalCleanSheets,
-                             int totalAssists, int totalPasses, int totalBallLooses, int totalStartingEleven,
+                             int totalAssists, int totalPasses, int totalBallLooses,
                              int totalDuelWins, int totalDuel, int totalShots, int totalGoalConceded) {
         super(id, gamesPlayed, gamesWon, goalsScored, totalCleanSheets, totalAssists,
-                totalPasses, totalBallLooses, totalStartingEleven, totalShots, totalGoalConceded);
+                totalPasses, totalBallLooses, totalShots, totalGoalConceded);
         this.duelPercentage = (float) this.totalDuelWins / this.totalDuel;
         this.totalDuelWins = totalDuelWins;
         this.totalDuel = totalDuel;

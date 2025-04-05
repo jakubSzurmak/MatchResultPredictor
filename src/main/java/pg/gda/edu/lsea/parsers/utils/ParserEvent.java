@@ -14,15 +14,37 @@ import java.util.*;
 
 public class ParserEvent {
 
-    public static List<Event> parsing(String filePath) throws IOException {
+    private static void setTeam(Map<UUID, ArrayList<UUID>> team, JsonNode teamNode, UUID teamId){
+        ArrayList<UUID> teamIds = new ArrayList<>();
+        for(JsonNode node : teamNode){
+            teamIds.add(convertToUUID(node.get("player").get("id").asText()));
+        }
+        team.put(teamId,teamIds);
+
+    }
+
+    public static List<Event> parsing(String filePath, int matchId) throws IOException {
         ObjectMapper objectMapper = new ObjectMapper();
         List<Event> parsedEvents = new ArrayList<>();
 
         List<JsonNode> events = objectMapper.readValue(new File(filePath), new TypeReference<List<JsonNode>>() {});
-
+        Map<UUID, ArrayList<UUID>> team1 = new HashMap<>();
+        int counter = 0;
         for (JsonNode event : events) {
             // Event id - nie chodzilo tutaj o event tylko o player id do zmiany
             UUID eventID = UUID.fromString(event.get("id").asText());
+            if(counter == 0){
+                UUID teamId = convertToUUID(event.get("team").get("id").asText());
+                team1.put(teamId,null);
+                counter++;
+                setTeam(team1,event.get("tactics").get("lineup"),teamId);
+            }
+            else if(counter ==1){
+                UUID teamId = convertToUUID(event.get("team").get("id").asText());
+                team1.put(teamId,null);
+                counter++;
+                setTeam(team1,event.get("tactics").get("lineup"), teamId);
+            }
 
             int eventHalf = event.get("period").asInt();
 
@@ -64,8 +86,14 @@ public class ParserEvent {
                     break;
                 }
             }
+            if(event.get("type").get("name").asText().equals("Substitution")){
+                UUID teamId = convertToUUID(event.get("team").get("id").asText());
+                team1.get(teamId).
+                        add(convertToUUID(event.get("substitution").get("replacement").get("id").asText()));
+            }
 
-            Event newEvent = new Event(eventID, eventHalf, eventTime, playPatternName, idPerformTeam, idPerformPlayer, performBodyPart, type, outcome, eventAssist);
+            Event newEvent = new Event(eventID, eventHalf, eventTime, playPatternName, idPerformTeam, idPerformPlayer,
+                    performBodyPart, type, outcome, eventAssist,team1,matchId);
             parsedEvents.add(newEvent);
 
         }

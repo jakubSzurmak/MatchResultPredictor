@@ -19,8 +19,6 @@ public abstract class PlayerStatistics extends Statistics {
     private int totalPasses;
     /** Number of ball losses */
     private int totalBallLosses;
-    /** Number of appearances in starting eleven */
-    private int totalStartingEleven;
     /** Number of shots taken */
     private int totalShots;
 
@@ -45,17 +43,15 @@ public abstract class PlayerStatistics extends Statistics {
      * @param totalAssists is the number of assists provided
      * @param totalPasses is the number of passes completed
      * @param totalBallLosses is the number of ball losses
-     * @param totalStartingEleven is the number of appearances in starting eleven
      * @param totalShots is the number of shots taken
      * @param totalGoalConceded is the number of goals conceded
      */
     public PlayerStatistics(UUID id, int gamesPlayed, int gamesWon, int goalsScored, int totalCleanSheets,
-                            int totalAssists, int totalPasses, int totalBallLosses, int totalStartingEleven, int totalShots, int totalGoalConceded) {
+                            int totalAssists, int totalPasses, int totalBallLosses, int totalShots, int totalGoalConceded) {
         super(id, gamesPlayed, gamesWon, goalsScored, totalCleanSheets, totalGoalConceded);
         this.totalAssists = totalAssists;
         this.totalPasses = totalPasses;
         this.totalBallLosses = totalBallLosses;
-        this.totalStartingEleven = totalStartingEleven;
         this.totalShots = totalShots;
     }
 
@@ -131,21 +127,4 @@ public abstract class PlayerStatistics extends Statistics {
         this.totalBallLosses = totalBallLosses;
     }
 
-    /**
-     * Returns the number of apperances in starting eleven
-     *
-     * @return the number of apperances in starting eleven
-     */
-    public int getTotalStartingEleven() {
-        return totalStartingEleven;
-    }
-
-    /**
-     * Sets the number of appearances in starting eleven
-     *
-     * @param totalStartingEleven is the number of appearances to set
-     */
-    public void setTotalStartingEleven(int totalStartingEleven) {
-        this.totalStartingEleven = totalStartingEleven;
-    }
 }

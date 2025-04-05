@@ -33,6 +33,8 @@ public class Match implements Comparable<Match> {
     private int awayScore;
     /** Identifier of the referee */
     private UUID refereeId;
+    private UUID homeCoachId;
+    private UUID awayCoachId;
 
     /**
      * Constructs a Match with the specified ID.
@@ -57,7 +59,7 @@ public class Match implements Comparable<Match> {
      * @param refereeId is the identifier of the referee
      */
     public Match(UUID id, LocalDate date, Map<UUID, String> compt, String season, UUID homeTeamId,
-                 UUID awayTeamId, int homeScore, int awayScore, UUID refereeId) {
+                 UUID awayTeamId, int homeScore, int awayScore, UUID refereeId, UUID homeCoachId, UUID awayCoachId) {
         this.id = id;
         this.date = date;
         this.compt = compt;
@@ -67,6 +69,8 @@ public class Match implements Comparable<Match> {
         this.homeScore = homeScore;
         this.awayScore = awayScore;
         this.refereeId = refereeId;
+        this.homeCoachId = homeCoachId;
+        this.awayCoachId = awayCoachId;
     }
 
     /**
@@ -234,4 +238,19 @@ public class Match implements Comparable<Match> {
         this.refereeId = refereeId;
     }
 
+    public UUID getHomeCoachId() {
+        return homeCoachId;
+    }
+
+    public UUID getAwayCoachId() {
+        return awayCoachId;
+    }
+
+    public void setHomeCoachId(UUID homeCoachId) {
+        this.homeCoachId = homeCoachId;
+    }
+
+    public void setAwayCoachId(UUID awayCoachId) {
+        this.awayCoachId = awayCoachId;
+    }
 }

@@ -165,15 +165,15 @@ public abstract class Statistics {
     }
 
     public void setGoalPerc(){
-        this.goalPerc = (float) (this.goalsScored / this.gamesPlayed);
+        this.goalPerc = ( (float) this.goalsScored / (float) this.gamesPlayed);
     }
 
     public void setCleanSheetPerc(){
-        this.cleanSheetPerc = (float) (this.totalCleanSheets / this.gamesPlayed);
+        this.cleanSheetPerc =  ( (float) this.totalCleanSheets / (float) this.gamesPlayed);
     }
 
     public void setWinPerc(){
-        this.winPerc = (float) (this.gamesWon / this.gamesPlayed);
+        this.winPerc = ( (float)  this.gamesWon / (float)  this.gamesPlayed);
     }
 
     @Override

@@ -19,10 +19,12 @@ public class ParserCoach {
             UUID coachId;
             Coach currentCoach;
             if(isHome){
+                if(resultHolder.getHomeCoach() == null) continue;
                 coachId = resultHolder.getHomeCoach().getId();
                 currentCoach = resultHolder.getHomeCoach();
             }
             else{
+                if(resultHolder.getAwayCoach() == null) continue;
                 coachId = resultHolder.getAwayCoach().getId();
                 currentCoach = resultHolder.getAwayCoach();
             }

@@ -1,6 +1,8 @@
 package pg.gda.edu.lsea;
 
 import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -31,6 +33,8 @@ public class Event {
     private String outcome;
     /** */
     private boolean assist;
+    int matchID;
+    Map<UUID, ArrayList<UUID>> team;
 
     /**
      * Constructs an Event with some specified ID
@@ -54,7 +58,8 @@ public class Event {
      * @param outcome is the outcome of the event
      */
     public Event(UUID id, int half, LocalTime timestamp, String playPattern,
-                 UUID idPerformTeam, UUID idPerformPlayer, String performBodyPart, String type, String outcome, boolean assist) {
+                 UUID idPerformTeam, UUID idPerformPlayer, String performBodyPart, String type, String outcome, boolean assist,
+                 Map<UUID, ArrayList<UUID>> team1, int matchID) {
         this.id = id;
         this.half = half;
         this.timestamp = timestamp;
@@ -65,6 +70,8 @@ public class Event {
         this.type = type;
         this.outcome = outcome;
         this.assist = assist;
+        this.team = team1;
+        this.matchID = matchID;
     }
 
     /**
@@ -231,4 +238,29 @@ public class Event {
      */
     public void setAssist(boolean assist){ this.assist = assist;}
 
+    public int getMatchID(){return matchID;}
+
+    public void setMatchID(int matchID){this.matchID = matchID;}
+
+    public Map<UUID, ArrayList<UUID>> getTeam(){return team;}
+
+    public void setTeam(Map<UUID, ArrayList<UUID>> team){this.team = team;}
+
+    @Override
+    public String toString() {
+        return "Event{" +
+                "id=" + id +
+                ", half=" + half +
+                ", timestamp=" + timestamp +
+                ", playPattern='" + playPattern + '\'' +
+                ", idPerformTeam=" + idPerformTeam +
+                ", idPerformPlayer=" + idPerformPlayer +
+                ", performBodyPart='" + performBodyPart + '\'' +
+                ", type='" + type + '\'' +
+                ", outcome='" + outcome + '\'' +
+                ", assist=" + assist +
+                ", matchID=" + matchID +
+                ", team=" + team +
+                '}';
+    }
 }

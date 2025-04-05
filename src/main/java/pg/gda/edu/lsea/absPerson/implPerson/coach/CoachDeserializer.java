@@ -41,9 +41,15 @@ public class CoachDeserializer extends JsonDeserializer<ResultHolder> {
     @Override
     public ResultHolder deserialize(JsonParser jp, DeserializationContext ctxt) throws IOException{
         JsonNode node = jp.getCodec().readTree(jp);
-        if(node.get("home_team").get("managers") == null || node.get("away_team").get("managers") == null)
+        if(node.get("home_team").get("managers") == null && node.get("away_team").get("managers") == null)
         {
             return null;
+        }else if(node.get("home_team").get("managers") == null)
+        {
+            return new ResultHolder(null, createCoach(node.get("away_team").get("managers"), node));
+        }
+        else if(node.get("away_team").get("managers") == null){
+            return new ResultHolder(createCoach(node.get("home_team").get("managers"), node), null);
         }
 
         Coach coach = createCoach(node.get("home_team").get("managers"), node);

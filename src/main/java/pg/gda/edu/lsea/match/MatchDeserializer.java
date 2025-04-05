@@ -3,19 +3,20 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonNode;
+import pg.gda.edu.lsea.absPerson.implPerson.coach.Coach;
+import pg.gda.edu.lsea.absPerson.implPerson.coach.ResultHolder;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 public class MatchDeserializer extends JsonDeserializer<Match>{
 
     private static UUID convertToUUID(int id) {
         return UUID.nameUUIDFromBytes(String.valueOf(id).getBytes(StandardCharsets.UTF_8));
     }
+
 
 
     @Override
@@ -44,7 +45,24 @@ public class MatchDeserializer extends JsonDeserializer<Match>{
         else{
             match.setRefereeId(null);
         }
-      //  match.setRefereeId(convertToUUID(node.get("referee").get("id").asInt()));
+
+        if(node.get("home_team").get("managers") == null && node.get("away_team").get("managers") == null)
+        {
+            match.setHomeCoachId(null);
+            match.setAwayCoachId(null);
+        }
+        else if(node.get("home_team").get("managers") == null)
+        {
+            match.setHomeCoachId(null);
+            match.setAwayCoachId(convertToUUID(node.get("away_team").get("managers").get(0).get("id").asInt()));
+        }
+        else if(node.get("away_team").get("managers") == null){
+            match.setHomeCoachId(convertToUUID(node.get("home_team").get("managers").get(0).get("id").asInt()));
+            match.setAwayCoachId(null);
+        }else if(node.get("home_team").get("managers") != null && node.get("away_team").get("managers") != null){
+            match.setHomeCoachId(convertToUUID(node.get("home_team").get("managers").get(0).get("id").asInt()));
+            match.setAwayCoachId(convertToUUID(node.get("away_team").get("managers").get(0).get("id").asInt()));
+        }
         return match;
     }
 }
