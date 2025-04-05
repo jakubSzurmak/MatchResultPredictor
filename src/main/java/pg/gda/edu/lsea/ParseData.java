@@ -15,9 +15,21 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.stream.Collectors;
 
 public class ParseData {
+
+    // Read-write lock for synchronizing access to shared collections
+    private static final ReadWriteLock eventsLock = new ReentrantReadWriteLock();
+    private static final ReadWriteLock playersLock = new ReentrantReadWriteLock();
+
+    // Thread-safe counter for event processing
+    private static final AtomicInteger eventCounter = new AtomicInteger(0);
 
     private static List<Path> getFilePath(String directory, int depth) throws IOException {
         return Files.walk(Paths.get(directory), depth)
@@ -28,18 +40,45 @@ public class ParseData {
 
 
     private static List<Event> parseEvents() {
-        List<Event> parsedEvents = new ArrayList<>();
+        List<Event> parsedEvents = Collections.synchronizedList(new ArrayList<>());
         String directory = "events";
-        int counter = 0;
+
         try {
             List<Path> pathsE = getFilePath(directory, 1);
+            int numThreads = 4;
+            ExecutorService executor = Executors.newFixedThreadPool(numThreads);
+            CountDownLatch eventLatch = new CountDownLatch(pathsE.size());
+
             for (Path path : pathsE) {
-                parsedEvents.addAll(ParserEvent.parsing(String.valueOf(path.toFile()), counter));
-                counter++;
+                executor.submit(() -> {
+                    try {
+                        // CRITICAL SECTION #1: Multiple threads getting an event counter
+                        int currentCounter = eventCounter.getAndIncrement();
+                        List<Event> threadEvents = ParserEvent.parsing(String.valueOf(path.toFile()), currentCounter);
+
+                        // CRITICAL SECTION #2: Multiple threads updating shared collection
+                        eventsLock.writeLock().lock();
+                        try {
+                            parsedEvents.addAll(threadEvents);
+                        } finally {
+                            eventsLock.writeLock().unlock();
+                        }
+
+                       // System.out.println("Parsed events from: " + path.getFileName() + " - Added " + threadEvents.size() + " events");
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    } finally {
+                        eventLatch.countDown();
+                    }
+                });
             }
+
+            eventLatch.await(); // Wait for all event parsing to complete
+            executor.shutdown();
         } catch (Exception e) {
             e.printStackTrace();
         }
+
         return parsedEvents;
     }
 
@@ -93,7 +132,7 @@ public class ParseData {
         Map<UUID, Coach> coaches = new HashMap<>();
         List<Team> parsedTeams = new ArrayList<>();
         HashSet<Player> parsedPlayers = new HashSet<>();
-        List<Event> parsedEvents = new ArrayList<>();
+        List<Event> parsedEvents = Collections.synchronizedList(new ArrayList<>());
 
 
         functionalThread(() -> {
