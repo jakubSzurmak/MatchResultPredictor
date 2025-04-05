@@ -36,9 +36,6 @@ public class ParseData {
             for (Path path : pathsE) {
                 parsedEvents.addAll(ParserEvent.parsing(String.valueOf(path.toFile()), counter));
                 counter++;
-                if (counter % 1000 == 0) {
-                    break;
-                }
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -67,18 +64,15 @@ public class ParseData {
         String directory2 = "lineupsModified";
         String directory4 = "player_rating.json";
         HashSet<Player> parsedPlayers = new HashSet<>();
-        int counter = 0;
         try {
+            // Parse ratings file once and create a map for O(1) lookups with player data including DOB
+            Map<String, ParserPlayer.PlayerData> playerDataMap = ParserPlayer.parseRatingsToMap(directory4);
 
             List<Path> pathsP = getFilePath(directory2, 1);
             for (Path path : pathsP) {
-                parsedPlayers.addAll(ParserPlayer.parsing(String.valueOf(path.toFile()), directory4));
-                if (counter == 100){
-                    break;
-                }
-                counter++;
+                // Use the method that accepts the player data map
+                parsedPlayers.addAll(ParserPlayer.parsing(String.valueOf(path.toFile()), playerDataMap));
             }
-
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -180,5 +174,6 @@ public class ParseData {
         Map<UUID, Statistics> stats = new HashMap<>();
         convertStatistics.getPlayerStat(parsedPlayers, parsedEvents,stats);
         convertStatistics.getTeamCoachStats(stats, matches);
+        System.out.println("Done");
     }
 }
