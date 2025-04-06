@@ -253,4 +253,15 @@ public class Match implements Comparable<Match> {
     public void setAwayCoachId(UUID awayCoachId) {
         this.awayCoachId = awayCoachId;
     }
+
+    public UUID getWinner(){
+        if(this.homeScore > this.awayScore){
+            return this.homeTeamId;
+        }else if(this.homeScore < this.awayScore){
+            return this.awayTeamId;
+        }else{
+            return null;
+        }
+    }
+
 }

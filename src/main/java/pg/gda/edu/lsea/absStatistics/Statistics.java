@@ -176,6 +176,15 @@ public abstract class Statistics {
         this.winPerc = ( (float)  this.gamesWon / (float)  this.gamesPlayed);
     }
 
+
+    public float getGoalPerc(){
+        return goalPerc;
+    }
+
+    public float getCleanSheetPerc(){
+        return cleanSheetPerc;
+    }
+
     @Override
     public String toString() {
         return "Statistics{" +

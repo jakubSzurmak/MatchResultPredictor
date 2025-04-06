@@ -12,6 +12,7 @@ import pg.gda.edu.lsea.absPerson.implPerson.referee.Referee;
 import pg.gda.edu.lsea.parsers.utils.*;
 import pg.gda.edu.lsea.absStatistics.statisticHandlers.ConvertStatistics;
 import pg.gda.edu.lsea.team.Team;
+import pg.gda.edu.lsea.prediction.MatchPrediction;
 
 import java.util.concurrent.CountDownLatch;
 
@@ -26,12 +27,15 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.stream.Collectors;
+import weka.classifiers.functions.Logistic;
+import weka.core.Attribute;
+import weka.core.DenseInstance;
+import weka.core.Instances;
 
 public class ParseData {
 
     // Read-write lock for synchronizing access to shared collections
     private static final ReadWriteLock eventsLock = new ReentrantReadWriteLock();
-    private static final ReadWriteLock playersLock = new ReentrantReadWriteLock();
 
     // Thread-safe counter for event processing
     private static final AtomicInteger eventCounter = new AtomicInteger(0);
@@ -50,10 +54,9 @@ public class ParseData {
 
         try {
             List<Path> pathsE = getFilePath(directory, 1);
-            int numThreads = 4;
+            int numThreads = 8;
             ExecutorService executor = Executors.newFixedThreadPool(numThreads);
             CountDownLatch eventLatch = new CountDownLatch(pathsE.size());
-
             for (Path path : pathsE) {
                 executor.submit(() -> {
                     try {
@@ -128,7 +131,7 @@ public class ParseData {
         t.start();
     }
 
-    public static void main(String[] args) throws InterruptedException {
+    public static void main(String[] args) throws Exception {
         System.out.println("Parsing data...");
         final CountDownLatch latch = new CountDownLatch(6);
 
@@ -138,7 +141,6 @@ public class ParseData {
         List<Team> parsedTeams = new ArrayList<>();
         HashSet<Player> parsedPlayers = new HashSet<>();
         List<Event> parsedEvents = Collections.synchronizedList(new ArrayList<>());
-
 
         functionalThread(() -> {
             try {
@@ -165,6 +167,7 @@ public class ParseData {
         });
 
         // Similar pattern for other parsing tasks...
+
         functionalThread(() -> {
             try {
                 try {
@@ -186,7 +189,6 @@ public class ParseData {
                 latch.countDown();
             }
         });
-
         functionalThread(() -> {
             try {
                 parsedPlayers.addAll(parsePlayers());
@@ -195,7 +197,6 @@ public class ParseData {
                 latch.countDown();
             }
         });
-
         functionalThread(() -> {
             try {
                 parsedEvents.addAll(parseEvents());
@@ -219,36 +220,104 @@ public class ParseData {
         convertStatistics.getPlayerStat(parsedPlayers, parsedEvents,stats);
         convertStatistics.getTeamCoachStats(stats, matches);
 
+        Map<String, List<Integer>> statsList = new HashMap<>();
 
-        List<Integer> goals = new ArrayList<>();
-        List<Integer> shots = new ArrayList<>();
-        List<Integer> passes = new ArrayList<>();
-        List<Integer> assists = new ArrayList<>();
-        List<Integer> wonDuels = new ArrayList<>();
+        List<Integer> totalShots = new ArrayList<>();
+        List<Integer> totalPasses = new ArrayList<>();
+        List<Integer> totalAssists = new ArrayList<>();
+        List<Integer> totalDuelWins = new ArrayList<>();
         List<Integer> wonMatches = new ArrayList<>();
+        List<Integer> gamesPlayed = new ArrayList<>();
+        List<Integer> goalsScored = new ArrayList<>();
+        List<Integer> totalCleanSheets = new ArrayList<>();
+        List<Integer> totalBallLosses = new ArrayList<>();
+        List<Integer> totalGoalConceded = new ArrayList<>();
+
+        statsList.put("totalShots", totalShots);
+        statsList.put("totalPasses", totalPasses);
+        statsList.put("totalAssists", totalAssists);
+        statsList.put("totalDuelWins", totalDuelWins);
+        statsList.put("wonMatches", wonMatches);
+        statsList.put("gamesPlayed", gamesPlayed);
+        statsList.put("goalsScored", goalsScored);
+        statsList.put("totalCleanSheets", totalCleanSheets);
+        statsList.put("totalBallLosses", totalBallLosses);
+        statsList.put("totalGoalConceded", totalGoalConceded);
+
 
 
         for (Player player : parsedPlayers){
             if( !player.getPositions().contains("Goalkeeper") && stats.get(player.getId()) instanceof PlayerStatistics){
                 fPlayerStatistics pStatistics = (fPlayerStatistics) stats.get(player.getId());
                 if(pStatistics != null) {
-                    shots.add(pStatistics.getTotalShots());
-                    goals.add(pStatistics.getGoalsScored());
-                    passes.add(pStatistics.getTotalPasses());
-                    assists.add(pStatistics.getTotalDuelWins());
-                    wonDuels.add(pStatistics.getTotalDuelWins());
+                    totalShots.add(pStatistics.getTotalShots());
+                    totalPasses.add(pStatistics.getTotalPasses());
+                    totalAssists.add(pStatistics.getTotalAssists());
+                    totalDuelWins.add(pStatistics.getTotalDuelWins());
                     wonMatches.add(pStatistics.getGamesWon());
+                    gamesPlayed.add(pStatistics.getGamesPlayed());
+                    goalsScored.add(pStatistics.getGoalsScored());
+                    totalCleanSheets.add(pStatistics.getTotalCleanSheets());
+                    totalBallLosses.add(pStatistics.getTotalBallLosses());
+                    totalGoalConceded.add(pStatistics.getTotalGoalConceded());
+
                 }
             }
         }
-        double shotsGoalsCorrelation = Correlation.calculatePearson(shots, goals);
-        double passesGoalsCorrelation = Correlation.calculatePearson(passes, goals);
-        double assistPassesCorrelation = Correlation.calculatePearson(assists, passes);
-        double wonDuelWonMatchesCorrelation = Correlation.calculatePearson(wonDuels, wonMatches);
 
-        System.out.println("Shots Goals Correlation:" + shotsGoalsCorrelation);
-        System.out.println("Passes Goals Correlation:" + passesGoalsCorrelation);
-        System.out.println("Assists Passes Correlation:" + assistPassesCorrelation);
-        System.out.println("Won duels won matches Correlation:" + wonDuelWonMatchesCorrelation);
+        List<String> keys = new ArrayList<>(statsList.keySet());
+
+        for (int i = 0; i < keys.size(); i++) {
+            for (int j = i + 1; j < keys.size(); j++) {
+                String keyA = keys.get(i);
+                String keyB = keys.get(j);
+
+                List<Integer> listA = statsList.get(keyA);
+                List<Integer> listB = statsList.get(keyB);
+
+                double correlation = Correlation.calculatePearson(listA, listB);
+
+                System.out.println("Correlation between " + keyA + " and " + keyB + ": " + correlation);
+            }
+        }
+
+        System.out.println("Train data...");
+
+        Logistic logisticModel = new Logistic();
+        logisticModel = MatchPrediction.trainModel(matches, stats);
+
+        try {
+            ArrayList<Attribute> attributes = new ArrayList<>();
+            attributes.add(new Attribute("team1_winPercentage"));
+            attributes.add(new Attribute("team1_totalGoals"));
+            attributes.add(new Attribute("team1_totalMatches"));
+            attributes.add(new Attribute("team1_totalWinMatches"));
+            attributes.add(new Attribute("team1_totalCleanSheets"));
+            attributes.add(new Attribute("team1_totalGoalsConceded"));
+            attributes.add(new Attribute("team1_goalPercentage"));
+            attributes.add(new Attribute("team1_cleanSheetPercentage"));
+
+            attributes.add(new Attribute("team2_winPercentage"));
+            attributes.add(new Attribute("team2_totalGoals"));
+            attributes.add(new Attribute("team2_totalMatches"));
+            attributes.add(new Attribute("team2_totalWinMatches"));
+            attributes.add(new Attribute("team2_totalCleanSheets"));
+            attributes.add(new Attribute("team2_totalGoalsConceded"));
+            attributes.add(new Attribute("team2_goalPercentage"));
+            attributes.add(new Attribute("team2_cleanSheetPercentage"));
+
+            List<String> classValues = List.of("Team1 win", "Team2 win");
+            attributes.add(new Attribute("result", classValues));
+
+            Instances datasetStructure = new Instances("MatchPrediction", attributes, 0);
+            datasetStructure.setClassIndex(datasetStructure.numAttributes() - 1);
+
+
+            MatchPrediction.predictMatch("Barcelona", "Real Sociedad", parsedTeams, logisticModel, stats, datasetStructure);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+
     }
 }

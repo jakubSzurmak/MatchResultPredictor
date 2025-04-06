@@ -82,7 +82,6 @@ public class ParserEvent {
             for (String typer : possibleTypes) {
                 if (event.has(typer) && event.get(typer).has("outcome") && event.get(typer).get("outcome").has("name")) {
                     outcome = event.get(typer).get("outcome").get("name").asText();
-
                     break;
                 }
             }
