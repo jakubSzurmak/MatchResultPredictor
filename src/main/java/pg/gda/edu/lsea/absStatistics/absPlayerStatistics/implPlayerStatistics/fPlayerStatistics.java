@@ -40,7 +40,6 @@ public class fPlayerStatistics extends PlayerStatistics {
      * @param totalAssists is the number of assists provided
      * @param totalPasses is the number of passes completed
      * @param totalBallLooses is the number of ball losses
-     * @param totalStartingEleven is the number of appearances in starting eleven
      * @param totalDuelWins is the number of duels won
      * @param totalDuel is the total number of duels engaged in
      * @param totalShots is the number of shots taken

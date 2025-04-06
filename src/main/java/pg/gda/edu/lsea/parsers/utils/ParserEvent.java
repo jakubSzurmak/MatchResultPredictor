@@ -1,6 +1,6 @@
 package pg.gda.edu.lsea.parsers.utils;
 
-import pg.gda.edu.lsea.Event;
+import pg.gda.edu.lsea.event.Event;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;

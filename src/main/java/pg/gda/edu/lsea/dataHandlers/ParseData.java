@@ -1,11 +1,16 @@
-package pg.gda.edu.lsea;
+package pg.gda.edu.lsea.dataHandlers;
 
+import pg.gda.edu.lsea.absStatistics.absPlayerStatistics.PlayerStatistics;
+import pg.gda.edu.lsea.absStatistics.absPlayerStatistics.implPlayerStatistics.fPlayerStatistics;
+import pg.gda.edu.lsea.analysis.Correlation;
+import pg.gda.edu.lsea.event.Event;
 import pg.gda.edu.lsea.absPerson.implPerson.Player;
 import pg.gda.edu.lsea.absPerson.implPerson.coach.Coach;
 import pg.gda.edu.lsea.absStatistics.Statistics;
 import pg.gda.edu.lsea.match.Match;
 import pg.gda.edu.lsea.absPerson.implPerson.referee.Referee;
 import pg.gda.edu.lsea.parsers.utils.*;
+import pg.gda.edu.lsea.absStatistics.statisticHandlers.ConvertStatistics;
 import pg.gda.edu.lsea.team.Team;
 
 import java.util.concurrent.CountDownLatch;
@@ -213,6 +218,37 @@ public class ParseData {
         Map<UUID, Statistics> stats = new HashMap<>();
         convertStatistics.getPlayerStat(parsedPlayers, parsedEvents,stats);
         convertStatistics.getTeamCoachStats(stats, matches);
-        System.out.println("Done");
+
+
+        List<Integer> goals = new ArrayList<>();
+        List<Integer> shots = new ArrayList<>();
+        List<Integer> passes = new ArrayList<>();
+        List<Integer> assists = new ArrayList<>();
+        List<Integer> wonDuels = new ArrayList<>();
+        List<Integer> wonMatches = new ArrayList<>();
+
+
+        for (Player player : parsedPlayers){
+            if( !player.getPositions().contains("Goalkeeper") && stats.get(player.getId()) instanceof PlayerStatistics){
+                fPlayerStatistics pStatistics = (fPlayerStatistics) stats.get(player.getId());
+                if(pStatistics != null) {
+                    shots.add(pStatistics.getTotalShots());
+                    goals.add(pStatistics.getGoalsScored());
+                    passes.add(pStatistics.getTotalPasses());
+                    assists.add(pStatistics.getTotalDuelWins());
+                    wonDuels.add(pStatistics.getTotalDuelWins());
+                    wonMatches.add(pStatistics.getGamesWon());
+                }
+            }
+        }
+        double shotsGoalsCorrelation = Correlation.calculatePearson(shots, goals);
+        double passesGoalsCorrelation = Correlation.calculatePearson(passes, goals);
+        double assistPassesCorrelation = Correlation.calculatePearson(assists, passes);
+        double wonDuelWonMatchesCorrelation = Correlation.calculatePearson(wonDuels, wonMatches);
+
+        System.out.println("Shots Goals Correlation:" + shotsGoalsCorrelation);
+        System.out.println("Passes Goals Correlation:" + passesGoalsCorrelation);
+        System.out.println("Assists Passes Correlation:" + assistPassesCorrelation);
+        System.out.println("Won duels won matches Correlation:" + wonDuelWonMatchesCorrelation);
     }
 }

@@ -1,5 +1,6 @@
-package pg.gda.edu.lsea;
+package pg.gda.edu.lsea.absStatistics.statisticHandlers;
 
+import pg.gda.edu.lsea.event.Event;
 import pg.gda.edu.lsea.absPerson.implPerson.Player;
 import pg.gda.edu.lsea.absStatistics.Statistics;
 import pg.gda.edu.lsea.absStatistics.absPlayerStatistics.PlayerStatistics;
@@ -10,8 +11,6 @@ import pg.gda.edu.lsea.absStatistics.implStatistics.TeamStatistics;
 import pg.gda.edu.lsea.match.Match;
 
 import java.util.*;
-
-
 
 
 public class ConvertStatistics {
@@ -194,15 +193,6 @@ public class ConvertStatistics {
     };
 
 
-    private static void diffBetweenGoalsTeam(Map<UUID, Integer> goalDiff, Map<UUID, Integer> goalScored){
-        List<UUID> keys = new ArrayList<>(goalScored.keySet());
-        UUID keyA = keys.get(0);
-        UUID keyB = keys.get(1);
-        int difference = goalScored.get(keyA) - goalScored.get(keyB);
-        goalDiff.put(keyA, difference);
-        goalDiff.put(keyB, -difference);
-    }
-
     private static Integer goalConceedByTeam( Map<UUID, Integer> goalScored, UUID teamId){
         List<UUID> keys = new ArrayList<>(goalScored.keySet());
 
@@ -275,15 +265,13 @@ public class ConvertStatistics {
                     playerS.setGoalPerc();
                     playerS.setWinPerc();
                     stats.put(playerId, playerS);
-                    System.out.println("PLAYER" + playerS.toString());
                 }
             }
         }
-        System.out.println("Gole w meczu : " + goalScoredByTeam.toString());
     }
 
     public void getPlayerStat(HashSet<Player> players, List<Event> events, Map<UUID, Statistics> stats){
-        System.out.println("Converting statistics...");
+        //System.out.println("Converting statistics...");
         Map<UUID, Player> uniquePlayers = new HashMap<>();
 
         // I want to easily get player after ID, that is why I create hash map
@@ -306,13 +294,13 @@ public class ConvertStatistics {
             }
 
 
+
             // If events from particular match has finished we want to save players statistics
             if(event.getMatchID() != prevEvent.getMatchID()){
                 if(goalScoredByTeam.size()==2){
                 updatePlayerStatistics(prevEvent, stats, goalScoredByTeam);
                 }
                 goalScoredByTeam = new HashMap<>();
-           //     goalDiffBetweenTeam = new HashMap<>();
             }
 
             goalScoredByTeam.putIfAbsent(event.getIdPerformTeam(),0);
@@ -361,15 +349,7 @@ public class ConvertStatistics {
 
         }
 
-        for (Statistics statistics: stats.values()){
-            if(statistics instanceof PlayerStatistics && ((PlayerStatistics) statistics).getTotalAssists() > 10 ){
-                System.out.println(uniquePlayers.get(statistics.getId()) + " ilosc asyst " + ((PlayerStatistics) statistics).getTotalAssists() );
-                System.out.println(statistics.toString());
-            }
-            if(statistics.getGamesPlayed() > 10){
-                System.out.println("WIECEJ niz 10 meczow " + statistics.toString());
-            }
-        }
+
 
     }
 

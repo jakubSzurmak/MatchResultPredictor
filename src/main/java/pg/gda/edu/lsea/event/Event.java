@@ -1,4 +1,4 @@
-package pg.gda.edu.lsea;
+package pg.gda.edu.lsea.event;
 
 import java.time.LocalTime;
 import java.util.ArrayList;
