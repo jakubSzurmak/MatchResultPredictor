@@ -13,8 +13,18 @@ import java.nio.file.Paths;
 import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * Utility class for parsing referee data from JSON files into Referee objects.
+ */
 public class ParserReferee {
-
+    /**
+     * Parses referee data from JSON files in the
+     * "matches" directory and returns a set of
+     * Referee objects
+     *
+     * @return Set of parsed Referee objects
+     * @throws IOException if there is an error reading or accessing the files in the directory
+     */
     public Set<Referee> parseReferee() throws IOException {
         ObjectMapper objectMapper = new ObjectMapper();
         Set<Referee> referees = new HashSet<>();

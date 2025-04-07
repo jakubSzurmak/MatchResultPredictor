@@ -10,8 +10,19 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
+/**
+ * Utility class for parsing team data from JSON files into Team objects
+ */
 public class ParserTeam {
 
+    /**
+     * Parses team data from a JSON file and
+     * returns a list of unique Team objects
+     *
+     * @param filePath is Path to the JSON file containg team data
+     * @return List of unique parsed Team objects
+     * @throws IOException if there is an error reading or parsing the JSON file
+     */
     public static List<Team> parsing(String filePath) throws IOException {
         ObjectMapper objectMapper = new ObjectMapper();
         List<Team> parsedTeams = new ArrayList<>();
@@ -62,6 +73,12 @@ public class ParserTeam {
         return parsedTeams;
     }
 
+    /**
+     * Converts a string ID to a UUID
+     *
+     * @param id is String identifier to convert
+     * @return UUID generated from the input string
+     */
     private static UUID convertToUUID(String id) {
         return UUID.nameUUIDFromBytes(String.valueOf(id).getBytes(StandardCharsets.UTF_8));
     }

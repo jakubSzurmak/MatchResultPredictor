@@ -12,8 +12,19 @@ import java.nio.file.Paths;
 import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * Utility class for parsing coach data from JSON files
+ */
 public class ParserCoach {
 
+    /**
+     * Processes a set of ResultHolder objects to extract coach information
+     * and update the coaches map
+     *
+     * @param bothCoaches is set of ResultHolder objects containing coach data
+     * @param coaches is map storing coach objects with UUID as key
+     * @param isHome is boolean indicating whether to process home (true) or away (false) coaches
+     */
     private static void getCoaches(Set<ResultHolder> bothCoaches, Map<UUID, Coach> coaches, boolean isHome){
         for (ResultHolder resultHolder : bothCoaches) {
             UUID coachId;
@@ -47,6 +58,13 @@ public class ParserCoach {
         }
     }
 
+    /**
+     * Parses coach data from JSON files in the
+     * "matches" directory and returns a map of coaches
+     *
+     * @return map containing Coach objects with UUID as key
+     * @throws IOException if there is an error reading or parsing the JSON file
+     */
     public Map<UUID,Coach> parseCoache() throws IOException {
         ObjectMapper objectMapper = new ObjectMapper();
         Set<ResultHolder> bothCoaches = new HashSet<>();

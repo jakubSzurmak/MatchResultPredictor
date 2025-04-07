@@ -119,6 +119,12 @@ public class ParserPlayer {
         return parsedPlayers;
     }
 
+    /**
+     * Converts a String ID to UUID
+     *
+     * @param id is the string ID
+     * @return the converted UUID identifier
+     */
     private static UUID convertToUUID(String id) {
         return UUID.nameUUIDFromBytes(String.valueOf(id).getBytes(StandardCharsets.UTF_8));
     }

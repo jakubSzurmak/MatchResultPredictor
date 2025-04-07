@@ -12,8 +12,19 @@ import java.nio.charset.StandardCharsets;
 import java.time.LocalTime;
 import java.util.*;
 
+/**
+ * Utility class for parsing event data from JSON files into Event objects
+ */
 public class ParserEvent {
 
+    /**
+     * Populates a team's player IDs from a JSON node
+     * containing lineup information
+     *
+     * @param team is the map storing team UUIDs and their associated player UUIDs
+     * @param teamNode is JSON node containing the team's lineup information
+     * @param teamId is the UUID of the team being processed
+     */
     private static void setTeam(Map<UUID, ArrayList<UUID>> team, JsonNode teamNode, UUID teamId){
         ArrayList<UUID> teamIds = new ArrayList<>();
         for(JsonNode node : teamNode){
@@ -23,6 +34,15 @@ public class ParserEvent {
 
     }
 
+    /**
+     * Parses event data from a JSON file and
+     * returns a list of Event objects
+     *
+     * @param filePath is the Path to the JSON file containg event data
+     * @param matchId is the identifier for the match these events belong to
+     * @return the list of parsed Events objects
+     * @throws IOException if there's an error reading or parsing the JSON file
+     */
     public static List<Event> parsing(String filePath, int matchId) throws IOException {
         ObjectMapper objectMapper = new ObjectMapper();
         List<Event> parsedEvents = new ArrayList<>();
@@ -100,6 +120,12 @@ public class ParserEvent {
         return parsedEvents;
     }
 
+    /**
+     * Converts a string ID to a UUID
+     *
+     * @param id is String identifier to convert
+     * @return UUID generated from the input string
+     */
     private static UUID convertToUUID(String id) {
         return UUID.nameUUIDFromBytes(String.valueOf(id).getBytes(StandardCharsets.UTF_8));
     }

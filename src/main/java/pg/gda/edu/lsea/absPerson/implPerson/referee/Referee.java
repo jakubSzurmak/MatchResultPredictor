@@ -36,6 +36,12 @@ public class Referee extends Person {
         super(id, name, country);
     }
 
+    /**
+     * Compares this Referee with another object
+     *
+     * @param obj is the object to compare with this Referee
+     * @return true if the objects are equal, false otherwise
+     */
     @Override
     public boolean equals(Object obj) {
         if (obj instanceof Referee) {
@@ -45,6 +51,11 @@ public class Referee extends Person {
         return false;
     }
 
+    /**
+     * Calculates a hash code for this Referee
+     *
+     * @return a hash code value for this referee
+     */
     @Override
     public int hashCode() {
         return this.getId().hashCode();

@@ -12,9 +12,14 @@ import pg.gda.edu.lsea.match.Match;
 
 import java.util.*;
 
-
+/**
+ * Utility class to convert and update player, coach, and team statistics based on game events and match data
+ */
 public class ConvertStatistics {
 
+    /**
+     * Converts fPlayerStatistics to gPlayerStatistics
+     */
     private static gPlayerStatistics getGPlayerStatistics(UUID playerId, fPlayerStatistics tmp) {
         gPlayerStatistics convertToG = new gPlayerStatistics(playerId);
         convertToG.setTotalShots(tmp.getTotalShots());
@@ -29,6 +34,10 @@ public class ConvertStatistics {
         return convertToG;
     }
 
+    /**
+     * Updates statistics for a shot event
+     * Handles goals as well
+     */
     private static void checkForShot(Map<UUID, Statistics> playerS,UUID playerId, Integer flagScored, Player currPlayer){
         if(playerS.containsKey(playerId)){
             PlayerStatistics player = null;
@@ -54,6 +63,10 @@ public class ConvertStatistics {
         }
     }
 
+    /**
+     * Updates statistics for goalkeeper actions,
+     * including saves and goals conceded
+     */
     private static void checkForSave(Map<UUID, Statistics> playerS, UUID playerId, Integer flagSaved,
                               Integer flagGoalConceded, Map<UUID,Player>uniquePlayers, Player currPlayer){
         if(playerS.containsKey(playerId)){
@@ -84,7 +97,9 @@ public class ConvertStatistics {
     }
 
 
-
+    /**
+     * Updates statistics for passes and assists
+     */
     private static void checkForPasses(Map<UUID, Statistics> playerS, UUID playerId, Player currPlayer, int assistsFlag){
         if(playerS.containsKey(playerId)){
             PlayerStatistics player = (PlayerStatistics) playerS.get(playerId);
@@ -104,6 +119,9 @@ public class ConvertStatistics {
         }
     }
 
+    /**
+     * Updates statistics for ball losses
+     */
     private static void checkForBallLoose(Map<UUID, Statistics> playerS, UUID playerId, Player currPlayer){
         if(playerS.containsKey(playerId)){
             PlayerStatistics player = (PlayerStatistics) playerS.get(playerId);
@@ -122,6 +140,9 @@ public class ConvertStatistics {
         }
     }
 
+    /**
+     * Updates statistics for player duels
+     */
     private static void checkForDuel(Map<UUID, Statistics> playerS, UUID playerId, Player currPlayer, int duelFlag){
         if(playerS.containsKey(playerId) && playerS.get(playerId) instanceof fPlayerStatistics){
             fPlayerStatistics player = (fPlayerStatistics) playerS.get(playerId);
@@ -138,7 +159,9 @@ public class ConvertStatistics {
         }
     }
 
-
+    /**
+     * Updates team or coach statistics after a match
+     */
     private static void setCoachTeamStat(Map<UUID, Statistics> stats, UUID id, Integer rivalScore, Integer ourScore,
                                          Integer cleanSheetFlag, Integer gamesWonFlag, Class<?> classType ){
         if(stats.containsKey(id)){
@@ -193,6 +216,9 @@ public class ConvertStatistics {
     };
 
 
+    /**
+     * Gets goals conceded by a specific team
+     */
     private static Integer goalConceedByTeam( Map<UUID, Integer> goalScored, UUID teamId){
         List<UUID> keys = new ArrayList<>(goalScored.keySet());
 
@@ -218,6 +244,9 @@ public class ConvertStatistics {
 
     }
 
+    /**
+     * Determines if a team kept a clean sheet
+     */
     private static Integer teamCleanSheet(Map<UUID, Integer> goalScored, UUID teamId){
         List<UUID> keys = new ArrayList<>(goalScored.keySet());
         UUID keyA = keys.get(0);
@@ -244,7 +273,9 @@ public class ConvertStatistics {
         }
     }
 
-
+    /**
+     * Updates per-player statistics after a match
+     */
     private static void updatePlayerStatistics(Event prevEvent, Map<UUID, Statistics> stats,
                                                Map<UUID, Integer> goalScoredByTeam){
         for(UUID teamId: prevEvent.getTeam().keySet()){
@@ -270,6 +301,9 @@ public class ConvertStatistics {
         }
     }
 
+    /**
+     * Extracts and aggregates player statistics from a list of events
+     */
     public void getPlayerStat(HashSet<Player> players, List<Event> events, Map<UUID, Statistics> stats){
         //System.out.println("Converting statistics...");
         Map<UUID, Player> uniquePlayers = new HashMap<>();
@@ -353,6 +387,9 @@ public class ConvertStatistics {
 
     }
 
+    /**
+     * Updates coach and team statistics based on match results
+     */
     public void getTeamCoachStats(Map<UUID, Statistics> stats, List<Match> matches){
         for(Match match:matches){
             UUID homeTeamId = match.getHomeTeamId();

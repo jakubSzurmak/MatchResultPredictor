@@ -172,19 +172,36 @@ public abstract class Statistics {
         this.cleanSheetPerc =  ( (float) this.totalCleanSheets / (float) this.gamesPlayed);
     }
 
+    /**
+     * Calculates win rate percentage
+     */
     public void setWinPerc(){
         this.winPerc = ( (float)  this.gamesWon / (float)  this.gamesPlayed);
     }
 
-
+    /**
+     * Returns goal percentage
+     *
+     * @return goal percentage
+     */
     public float getGoalPerc(){
         return goalPerc;
     }
 
+    /**
+     * Returns clean sheet percentage
+     *
+     * @return clean sheet percentage
+     */
     public float getCleanSheetPerc(){
         return cleanSheetPerc;
     }
 
+    /**
+     * Returns a string representation of the Statistics object
+     *
+     * @return a string representation of this Statistics object
+     */
     @Override
     public String toString() {
         return "Statistics{" +

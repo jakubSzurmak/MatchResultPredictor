@@ -15,7 +15,16 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+/**
+ * Utility class for parsing match data from JSON files into Match objects
+ */
 public class ParserMatch {
+    /**
+     * Parses match data from JSON files in the "matches" directory
+     * and returns a list of Match objects
+     *
+     * @return List of parsed Match objects
+     */
     public List<Match> parseMatch() {
         ObjectMapper objectMapper = new ObjectMapper();
         List<Match> matches = new ArrayList<>();

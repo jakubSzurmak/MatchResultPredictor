@@ -238,18 +238,38 @@ public class Match implements Comparable<Match> {
         this.refereeId = refereeId;
     }
 
+    /**
+     * Returns home coach ID
+     *
+     * @return home coach ID
+     */
     public UUID getHomeCoachId() {
         return homeCoachId;
     }
 
+    /**
+     * Returns away coach ID
+     *
+     * @return away coach ID
+     */
     public UUID getAwayCoachId() {
         return awayCoachId;
     }
 
+    /**
+     * Sets home coach ID
+     *
+     * @param homeCoachId is the home coach ID
+     */
     public void setHomeCoachId(UUID homeCoachId) {
         this.homeCoachId = homeCoachId;
     }
 
+    /**
+     * Sets away coach ID
+     *
+     * @param awayCoachId is the away coach ID
+     */
     public void setAwayCoachId(UUID awayCoachId) {
         this.awayCoachId = awayCoachId;
     }
