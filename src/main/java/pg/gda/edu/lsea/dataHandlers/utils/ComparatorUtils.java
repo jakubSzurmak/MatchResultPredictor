@@ -1,6 +1,6 @@
 package pg.gda.edu.lsea.dataHandlers.utils;
 
-import pg.gda.edu.lsea.Match;
+import pg.gda.edu.lsea.match.Match;
 import pg.gda.edu.lsea.absPerson.Person;
 import pg.gda.edu.lsea.absPerson.implPerson.Player;
 
