@@ -1,6 +1,8 @@
-package pg.gda.edu.lsea;
+package pg.gda.edu.lsea.event;
 
-import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -16,7 +18,7 @@ public class Event {
     /** Half of the match (1st, 2nd) */
     private int half;
     /** Exact time when the event occurred */
-    private LocalDateTime timestamp;
+    private LocalTime timestamp;
     /** Pattern of play */
     private String playPattern;
     /** Identifier of the team that performed the action */
@@ -25,9 +27,14 @@ public class Event {
     private UUID idPerformPlayer;
     /** Body part used by the player */
     private String performBodyPart;
+    /** Type of event */
+    private String type;
     /** Outcome of the event (goal, miss, etc.) */
     private String outcome;
-
+    /** */
+    private boolean assist;
+    int matchID;
+    Map<UUID, ArrayList<UUID>> team;
 
     /**
      * Constructs an Event with some specified ID
@@ -39,7 +46,7 @@ public class Event {
     }
 
     /**
-     * Constructs an Event with some specified field attributes
+     * Constructs an Event with some specified field attributes.
      *
      * @param id is the unique identifier for this event
      * @param half is the half of the match
@@ -50,8 +57,9 @@ public class Event {
      * @param performBodyPart is the body part used by the player
      * @param outcome is the outcome of the event
      */
-    public Event(UUID id, int half, LocalDateTime timestamp, String playPattern,
-                 UUID idPerformTeam, UUID idPerformPlayer, String performBodyPart, String outcome) {
+    public Event(UUID id, int half, LocalTime timestamp, String playPattern,
+                 UUID idPerformTeam, UUID idPerformPlayer, String performBodyPart, String type, String outcome, boolean assist,
+                 Map<UUID, ArrayList<UUID>> team1, int matchID) {
         this.id = id;
         this.half = half;
         this.timestamp = timestamp;
@@ -59,7 +67,11 @@ public class Event {
         this.idPerformTeam = idPerformTeam;
         this.idPerformPlayer = idPerformPlayer;
         this.performBodyPart = performBodyPart;
+        this.type = type;
         this.outcome = outcome;
+        this.assist = assist;
+        this.team = team1;
+        this.matchID = matchID;
     }
 
     /**
@@ -94,7 +106,7 @@ public class Event {
      *
      * @return the exact time in which the event has occurred
      */
-    public LocalDateTime getTimestamp() {
+    public LocalTime getTimestamp() {
         return timestamp;
     }
 
@@ -103,7 +115,7 @@ public class Event {
      *
      * @param timestamp is the exact time to be set
      */
-    public void setTimestamp(LocalDateTime timestamp) {
+    public void setTimestamp(LocalTime timestamp) {
         this.timestamp = timestamp;
     }
 
@@ -180,6 +192,21 @@ public class Event {
     }
 
     /**
+     * Returns the type of the event
+     *
+     * @return the type of the vent
+     */
+    public String getType(){ return type;}
+
+    /**
+     * Sets the type of the event
+     *
+     * @param type is the type of the event
+     */
+    public void setType(String type){ this.type = type;}
+
+
+    /**
      * Returns the outcome of the event
      *
      * @return the outcome of the event
@@ -195,5 +222,45 @@ public class Event {
      */
     public void setOutcome(String outcome) {
         this.outcome = outcome;
+    }
+
+    /**
+     * Returns where the event is connected with an assist
+     *
+     * @return the assist of the event
+     */
+    public boolean getAssist(){return assist;}
+
+    /**
+     * Sets the assist of the event
+     *
+     * @param assist is the assist of the event
+     */
+    public void setAssist(boolean assist){ this.assist = assist;}
+
+    public int getMatchID(){return matchID;}
+
+    public void setMatchID(int matchID){this.matchID = matchID;}
+
+    public Map<UUID, ArrayList<UUID>> getTeam(){return team;}
+
+    public void setTeam(Map<UUID, ArrayList<UUID>> team){this.team = team;}
+
+    @Override
+    public String toString() {
+        return "Event{" +
+                "id=" + id +
+                ", half=" + half +
+                ", timestamp=" + timestamp +
+                ", playPattern='" + playPattern + '\'' +
+                ", idPerformTeam=" + idPerformTeam +
+                ", idPerformPlayer=" + idPerformPlayer +
+                ", performBodyPart='" + performBodyPart + '\'' +
+                ", type='" + type + '\'' +
+                ", outcome='" + outcome + '\'' +
+                ", assist=" + assist +
+                ", matchID=" + matchID +
+                ", team=" + team +
+                '}';
     }
 }

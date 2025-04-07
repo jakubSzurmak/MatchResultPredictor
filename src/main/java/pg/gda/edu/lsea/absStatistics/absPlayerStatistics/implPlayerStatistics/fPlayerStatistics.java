@@ -40,17 +40,16 @@ public class fPlayerStatistics extends PlayerStatistics {
      * @param totalAssists is the number of assists provided
      * @param totalPasses is the number of passes completed
      * @param totalBallLooses is the number of ball losses
-     * @param totalStartingEleven is the number of appearances in starting eleven
      * @param totalDuelWins is the number of duels won
      * @param totalDuel is the total number of duels engaged in
      * @param totalShots is the number of shots taken
      * @param totalGoalConceded is the number of goals conceded
      */
     public fPlayerStatistics(UUID id, int gamesPlayed, int gamesWon, int goalsScored, int totalCleanSheets,
-                             int totalAssists, int totalPasses, int totalBallLooses, int totalStartingEleven,
+                             int totalAssists, int totalPasses, int totalBallLooses,
                              int totalDuelWins, int totalDuel, int totalShots, int totalGoalConceded) {
         super(id, gamesPlayed, gamesWon, goalsScored, totalCleanSheets, totalAssists,
-                totalPasses, totalBallLooses, totalStartingEleven, totalShots, totalGoalConceded);
+                totalPasses, totalBallLooses, totalShots, totalGoalConceded);
         this.duelPercentage = (float) this.totalDuelWins / this.totalDuel;
         this.totalDuelWins = totalDuelWins;
         this.totalDuel = totalDuel;
@@ -100,5 +99,13 @@ public class fPlayerStatistics extends PlayerStatistics {
      */
     public float getDuelPercentage() {
         return duelPercentage;
+    }
+
+    /**
+     * Calculate win percentage within duels
+     *
+     */
+    public void setDuelPercentage() {
+        this.duelPercentage = (float) this.totalDuelWins / this.totalDuel;
     }
 }

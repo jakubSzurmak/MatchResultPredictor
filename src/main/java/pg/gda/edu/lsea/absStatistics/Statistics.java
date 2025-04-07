@@ -24,6 +24,10 @@ public abstract class Statistics {
     /** Number of goals conceded */
     private int totalGoalConceded;
 
+    private float goalPerc;
+
+    private float cleanSheetPerc;
+
     /**
      * Constructs Statistics with the specified ID
      *
@@ -52,7 +56,6 @@ public abstract class Statistics {
         this.totalCleanSheets = totalCleanSheets;
         this.id = id;
         this.totalGoalConceded = totalGoalConceded;
-        this.winPerc = (float) this.gamesWon / this.gamesPlayed;
     }
 
     /**
@@ -159,5 +162,58 @@ public abstract class Statistics {
      */
     public void setTotalCleanSheets(int totalCleanSheets) {
         this.totalCleanSheets = totalCleanSheets;
+    }
+
+    public void setGoalPerc(){
+        this.goalPerc = ( (float) this.goalsScored / (float) this.gamesPlayed);
+    }
+
+    public void setCleanSheetPerc(){
+        this.cleanSheetPerc =  ( (float) this.totalCleanSheets / (float) this.gamesPlayed);
+    }
+
+    /**
+     * Calculates win rate percentage
+     */
+    public void setWinPerc(){
+        this.winPerc = ( (float)  this.gamesWon / (float)  this.gamesPlayed);
+    }
+
+    /**
+     * Returns goal percentage
+     *
+     * @return goal percentage
+     */
+    public float getGoalPerc(){
+        return goalPerc;
+    }
+
+    /**
+     * Returns clean sheet percentage
+     *
+     * @return clean sheet percentage
+     */
+    public float getCleanSheetPerc(){
+        return cleanSheetPerc;
+    }
+
+    /**
+     * Returns a string representation of the Statistics object
+     *
+     * @return a string representation of this Statistics object
+     */
+    @Override
+    public String toString() {
+        return "Statistics{" +
+                "id=" + id +
+                ", winPerc=" + winPerc +
+                ", gamesPlayed=" + gamesPlayed +
+                ", gamesWon=" + gamesWon +
+                ", goalsScored=" + goalsScored +
+                ", totalCleanSheets=" + totalCleanSheets +
+                ", totalGoalConceded=" + totalGoalConceded +
+                ", goalPerc=" + goalPerc +
+                ", cleanSheetPerc=" + cleanSheetPerc +
+                '}';
     }
 }
