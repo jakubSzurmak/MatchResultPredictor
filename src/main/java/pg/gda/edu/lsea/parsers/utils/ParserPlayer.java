@@ -45,7 +45,7 @@ public class ParserPlayer {
                     dob = LocalDate.parse(ratingNode.get("dob").asText());
                 } catch (Exception e) {
                     // Keep default if parsing fails
-                    System.err.println("Failed to parse DOB for player: " + playerName);
+                    //System.err.println("Failed to parse DOB for player: " + playerName);
                 }
             }
 

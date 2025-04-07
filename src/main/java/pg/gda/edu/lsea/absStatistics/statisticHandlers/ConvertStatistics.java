@@ -285,7 +285,7 @@ public class ConvertStatistics {
         // Hash map which controls what is a goal difference between teams ina particular game
       //  Map<UUID, Integer> goalDiffBetweenTeam = new HashMap<>();
 
-        Event prevEvent = events.getFirst();
+        Event prevEvent = events.get(0);
 
 
         for(Event event:events){

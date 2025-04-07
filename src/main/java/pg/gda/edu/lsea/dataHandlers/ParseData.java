@@ -48,13 +48,13 @@ public class ParseData {
     }
 
 
-    private static List<Event> parseEvents() {
+    private static List<Event> parseEvents(int numThreads) {
         List<Event> parsedEvents = Collections.synchronizedList(new ArrayList<>());
         String directory = "events";
+        long startTime = System.currentTimeMillis();
 
         try {
             List<Path> pathsE = getFilePath(directory, 1);
-            int numThreads = 8;
             ExecutorService executor = Executors.newFixedThreadPool(numThreads);
             CountDownLatch eventLatch = new CountDownLatch(pathsE.size());
             for (Path path : pathsE) {
@@ -87,7 +87,21 @@ public class ParseData {
             e.printStackTrace();
         }
 
+        long endTime = System.currentTimeMillis();
+        System.out.printf(
+                "[Threads=%d] Parsed %d events in %d ms\n",
+                numThreads, parsedEvents.size(), (endTime - startTime)
+        );
+
         return parsedEvents;
+    }
+
+    public static void benchmarkEventParsing() {
+        int[] threadCounts = {1, 2, 3, 4, 5, 6, 7, 8};
+        for (int threads : threadCounts) {
+            System.gc();
+            parseEvents(threads);
+        }
     }
 
 
@@ -131,7 +145,107 @@ public class ParseData {
         t.start();
     }
 
+    public static void runSequential() {
+        long startTime = System.currentTimeMillis();
+
+        List<Match> matches = new ArrayList<>();
+        Set<Referee> referees = new HashSet<>();
+        Map<UUID, Coach> coaches = new HashMap<>();
+        List<Team> teams = new ArrayList<>();
+        Set<Player> players = new HashSet<>();
+        List<Event> events = new ArrayList<>();
+
+
+        matches.addAll(new ParserMatch().parseMatch());
+
+        try {
+            referees.addAll(new ParserReferee().parseReferee());
+        } catch (IOException e) {
+            System.err.println("Failed to parse referees: " + e.getMessage());
+        }
+
+        try {
+            coaches.putAll(new ParserCoach().parseCoache());
+        } catch (IOException e) {
+            System.err.println("Failed to parse coaches: " + e.getMessage());
+        }
+
+        teams.addAll(parseTeams());
+        players.addAll(parsePlayers());
+        events.addAll(parseEvents(1));
+
+        long endTime = System.currentTimeMillis();
+        System.out.printf("[Sequential] Time: %d ms | Events: %d\n",
+                (endTime - startTime), events.size());
+    }
+
+    public static void runParallel() throws InterruptedException {
+        long startTime = System.currentTimeMillis();
+
+        List<Match> matches = new ArrayList<>();
+        Set<Referee> referees = new HashSet<>();
+        Map<UUID, Coach> coaches = new HashMap<>();
+        List<Team> teams = new ArrayList<>();
+        Set<Player> players = new HashSet<>();
+        List<Event> events = Collections.synchronizedList(new ArrayList<>());
+
+        final CountDownLatch latch = new CountDownLatch(6);
+
+        new Thread(() -> {
+            matches.addAll(new ParserMatch().parseMatch());
+            latch.countDown();
+        }).start();
+
+        new Thread(() -> {
+            try {
+                referees.addAll(new ParserReferee().parseReferee());
+            } catch (IOException e) {
+                e.printStackTrace();
+            } finally {
+                latch.countDown();
+            }
+        }).start();
+
+        new Thread(() -> {
+            try {
+                coaches.putAll(new ParserCoach().parseCoache());
+            } catch (IOException e) {
+                e.printStackTrace();
+            } finally {
+                latch.countDown();
+            }
+        }).start();
+
+        new Thread(() -> {
+            teams.addAll(parseTeams());
+            latch.countDown();
+        }).start();
+
+        new Thread(() -> {
+            players.addAll(parsePlayers());
+            latch.countDown();
+        }).start();
+
+        new Thread(() -> {
+            events.addAll(parseEvents(4));
+            latch.countDown();
+        }).start();
+
+        latch.await();
+        long endTime = System.currentTimeMillis();
+        System.out.printf("[Parallel] Time: %d ms | Events: %d\n",
+                (endTime - startTime), events.size());
+    }
+
     public static void main(String[] args) throws Exception {
+
+        for(int i=0; i<12; i++)
+        {
+            benchmarkEventParsing();
+            runSequential();
+            runParallel();
+            System.out.println("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX");
+        }
         System.out.println("Parsing data...");
         final CountDownLatch latch = new CountDownLatch(6);
 
@@ -199,7 +313,7 @@ public class ParseData {
         });
         functionalThread(() -> {
             try {
-                parsedEvents.addAll(parseEvents());
+                parsedEvents.addAll(parseEvents(8));
                 System.out.println("Events parsing complete: " + parsedEvents.size());
             } finally {
                 latch.countDown();
