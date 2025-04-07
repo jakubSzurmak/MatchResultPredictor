@@ -8,16 +8,6 @@ stages:
 
 variables:
   MAVEN_CLI_OPTS: "--batch-mode --errors --fail-at-end --show-version"
-  WEKA_VERSION: "3-8-6"
-  WEKA_JAR_PATH: "/opt/weka/weka.jar"
-
-before_script:
-  - apt-get update && apt-get install -y wget unzip
-  - mkdir -p /opt/weka
-  - wget -q https://prdownloads.sourceforge.net/weka/weka-${WEKA_VERSION}.zip -O weka.zip
-  - unzip -q weka.zip -d /opt/weka
-  - export CLASSPATH=$WEKA_JAR_PATH:$CLASSPATH
-
 
 validate-project:
   stage: validate
