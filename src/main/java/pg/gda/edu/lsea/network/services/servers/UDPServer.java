@@ -24,8 +24,7 @@ public class UDPServer {
             String receivedMessage = new String(datagramPacket.getData(), 0, datagramPacket.getLength());
             System.out.println(receivedMessage);
 
-            String replyMessage = ".." + receivedMessage;
-            byte[] replyData = replyMessage.getBytes();
+            byte[] replyData = receivedMessage.getBytes();
             DatagramPacket replyDatagramPacket = new DatagramPacket(replyData, replyData.length,
                     datagramPacket.getAddress(), datagramPacket.getPort());
 
