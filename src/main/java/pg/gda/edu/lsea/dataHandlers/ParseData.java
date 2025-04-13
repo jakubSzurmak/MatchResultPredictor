@@ -131,17 +131,133 @@ public class ParseData {
         t.start();
     }
 
-    public static void main(String[] args) throws Exception {
+    public static Map<UUID, Statistics> getStats (HashSet<Player> parsedPlayers, List<Event> parsedEvents,List<Match> matches) {
+        ConvertStatistics convertStatistics = new ConvertStatistics();
+        Map<UUID, Statistics> stats = new HashMap<>();
+        convertStatistics.getPlayerStat(parsedPlayers, parsedEvents,stats);
+        convertStatistics.getTeamCoachStats(stats, matches);
+        return stats;
+    }
+
+
+    public static List<String> getCorreletion(Map<UUID, Statistics> stats, HashSet<Player> parsedPlayers){
+        Map<String, List<Integer>> statsList = new HashMap<>();
+
+        List<Integer> totalShots = new ArrayList<>();
+        List<Integer> totalPasses = new ArrayList<>();
+        List<Integer> totalAssists = new ArrayList<>();
+        List<Integer> totalDuelWins = new ArrayList<>();
+        List<Integer> wonMatches = new ArrayList<>();
+        List<Integer> gamesPlayed = new ArrayList<>();
+        List<Integer> goalsScored = new ArrayList<>();
+        List<Integer> totalCleanSheets = new ArrayList<>();
+        List<Integer> totalBallLosses = new ArrayList<>();
+        List<Integer> totalGoalConceded = new ArrayList<>();
+
+        statsList.put("totalShots", totalShots);
+        statsList.put("totalPasses", totalPasses);
+        statsList.put("totalAssists", totalAssists);
+        statsList.put("totalDuelWins", totalDuelWins);
+        statsList.put("wonMatches", wonMatches);
+        statsList.put("gamesPlayed", gamesPlayed);
+        statsList.put("goalsScored", goalsScored);
+        statsList.put("totalCleanSheets", totalCleanSheets);
+        statsList.put("totalBallLosses", totalBallLosses);
+        statsList.put("totalGoalConceded", totalGoalConceded);
+
+
+
+        for (Player player : parsedPlayers){
+            if( !player.getPositions().contains("Goalkeeper") && stats.get(player.getId()) instanceof PlayerStatistics){
+                fPlayerStatistics pStatistics = (fPlayerStatistics) stats.get(player.getId());
+                if(pStatistics != null) {
+                    totalShots.add(pStatistics.getTotalShots());
+                    totalPasses.add(pStatistics.getTotalPasses());
+                    totalAssists.add(pStatistics.getTotalAssists());
+                    totalDuelWins.add(pStatistics.getTotalDuelWins());
+                    wonMatches.add(pStatistics.getGamesWon());
+                    gamesPlayed.add(pStatistics.getGamesPlayed());
+                    goalsScored.add(pStatistics.getGoalsScored());
+                    totalCleanSheets.add(pStatistics.getTotalCleanSheets());
+                    totalBallLosses.add(pStatistics.getTotalBallLosses());
+                    totalGoalConceded.add(pStatistics.getTotalGoalConceded());
+
+                }
+            }
+        }
+
+        List<String> keys = new ArrayList<>(statsList.keySet());
+        List<String> finalCorr = new ArrayList<>();
+        for (int i = 0; i < keys.size(); i++) {
+            for (int j = i + 1; j < keys.size(); j++) {
+                String keyA = keys.get(i);
+                String keyB = keys.get(j);
+
+                List<Integer> listA = statsList.get(keyA);
+                List<Integer> listB = statsList.get(keyB);
+
+                double correlation = Correlation.calculatePearson(listA, listB);
+                finalCorr.add("Correlation between " + keyA + " and " + keyB + ": " + correlation + "\n");
+            }
+        }
+        return finalCorr;
+    }
+
+    public static String getPrediction(List<Match> matches,Map<UUID, Statistics> stats , List<Team> parsedTeams, String teamHome,
+                                     String teamAway) throws Exception {
+        System.out.println("Train data...");
+
+        Logistic logisticModel = new Logistic();
+        logisticModel = MatchPrediction.trainModel(matches, stats);
+
+        try {
+            ArrayList<Attribute> attributes = new ArrayList<>();
+            attributes.add(new Attribute("team1_winPercentage"));
+            attributes.add(new Attribute("team1_totalGoals"));
+            attributes.add(new Attribute("team1_totalMatches"));
+            attributes.add(new Attribute("team1_totalWinMatches"));
+            attributes.add(new Attribute("team1_totalCleanSheets"));
+            attributes.add(new Attribute("team1_totalGoalsConceded"));
+            attributes.add(new Attribute("team1_goalPercentage"));
+            attributes.add(new Attribute("team1_cleanSheetPercentage"));
+
+            attributes.add(new Attribute("team2_winPercentage"));
+            attributes.add(new Attribute("team2_totalGoals"));
+            attributes.add(new Attribute("team2_totalMatches"));
+            attributes.add(new Attribute("team2_totalWinMatches"));
+            attributes.add(new Attribute("team2_totalCleanSheets"));
+            attributes.add(new Attribute("team2_totalGoalsConceded"));
+            attributes.add(new Attribute("team2_goalPercentage"));
+            attributes.add(new Attribute("team2_cleanSheetPercentage"));
+
+            List<String> classValues = List.of("Team1 win", "Team2 win");
+            attributes.add(new Attribute("result", classValues));
+
+            Instances datasetStructure = new Instances("MatchPrediction", attributes, 0);
+            datasetStructure.setClassIndex(datasetStructure.numAttributes() - 1);
+
+
+            return MatchPrediction.predictMatch(teamHome, teamAway, parsedTeams, logisticModel, stats, datasetStructure);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return "Cannot get prediction";
+    }
+
+
+
+    public static void parseData(List<Match> matches, Set<Referee> referees, Map<UUID, Coach> coaches,
+                                 List<Team> parsedTeams, HashSet<Player> parsedPlayers, List<Event> parsedEvents) throws Exception {
         System.out.println("Parsing data...");
         final CountDownLatch latch = new CountDownLatch(6);
-
+    /*
         List<Match> matches = new ArrayList<>();
         Set<Referee> referees = new HashSet<>();
         Map<UUID, Coach> coaches = new HashMap<>();
         List<Team> parsedTeams = new ArrayList<>();
         HashSet<Player> parsedPlayers = new HashSet<>();
         List<Event> parsedEvents = Collections.synchronizedList(new ArrayList<>());
-
+*/
         functionalThread(() -> {
             try {
                 matches.addAll(new ParserMatch().parseMatch());
@@ -215,108 +331,9 @@ public class ParseData {
         System.out.println(parsedPlayers.size() + " - players in total");
         System.out.println(parsedEvents.size() + " - events in total");
 
-        ConvertStatistics convertStatistics = new ConvertStatistics();
-        Map<UUID, Statistics> stats = new HashMap<>();
-        convertStatistics.getPlayerStat(parsedPlayers, parsedEvents,stats);
-        convertStatistics.getTeamCoachStats(stats, matches);
-
-        Map<String, List<Integer>> statsList = new HashMap<>();
-
-        List<Integer> totalShots = new ArrayList<>();
-        List<Integer> totalPasses = new ArrayList<>();
-        List<Integer> totalAssists = new ArrayList<>();
-        List<Integer> totalDuelWins = new ArrayList<>();
-        List<Integer> wonMatches = new ArrayList<>();
-        List<Integer> gamesPlayed = new ArrayList<>();
-        List<Integer> goalsScored = new ArrayList<>();
-        List<Integer> totalCleanSheets = new ArrayList<>();
-        List<Integer> totalBallLosses = new ArrayList<>();
-        List<Integer> totalGoalConceded = new ArrayList<>();
-
-        statsList.put("totalShots", totalShots);
-        statsList.put("totalPasses", totalPasses);
-        statsList.put("totalAssists", totalAssists);
-        statsList.put("totalDuelWins", totalDuelWins);
-        statsList.put("wonMatches", wonMatches);
-        statsList.put("gamesPlayed", gamesPlayed);
-        statsList.put("goalsScored", goalsScored);
-        statsList.put("totalCleanSheets", totalCleanSheets);
-        statsList.put("totalBallLosses", totalBallLosses);
-        statsList.put("totalGoalConceded", totalGoalConceded);
-
-
-
-        for (Player player : parsedPlayers){
-            if( !player.getPositions().contains("Goalkeeper") && stats.get(player.getId()) instanceof PlayerStatistics){
-                fPlayerStatistics pStatistics = (fPlayerStatistics) stats.get(player.getId());
-                if(pStatistics != null) {
-                    totalShots.add(pStatistics.getTotalShots());
-                    totalPasses.add(pStatistics.getTotalPasses());
-                    totalAssists.add(pStatistics.getTotalAssists());
-                    totalDuelWins.add(pStatistics.getTotalDuelWins());
-                    wonMatches.add(pStatistics.getGamesWon());
-                    gamesPlayed.add(pStatistics.getGamesPlayed());
-                    goalsScored.add(pStatistics.getGoalsScored());
-                    totalCleanSheets.add(pStatistics.getTotalCleanSheets());
-                    totalBallLosses.add(pStatistics.getTotalBallLosses());
-                    totalGoalConceded.add(pStatistics.getTotalGoalConceded());
-
-                }
-            }
-        }
-
-        List<String> keys = new ArrayList<>(statsList.keySet());
-
-        for (int i = 0; i < keys.size(); i++) {
-            for (int j = i + 1; j < keys.size(); j++) {
-                String keyA = keys.get(i);
-                String keyB = keys.get(j);
-
-                List<Integer> listA = statsList.get(keyA);
-                List<Integer> listB = statsList.get(keyB);
-
-                double correlation = Correlation.calculatePearson(listA, listB);
-
-                System.out.println("Correlation between " + keyA + " and " + keyB + ": " + correlation);
-            }
-        }
-
-        System.out.println("Train data...");
-
-        Logistic logisticModel = new Logistic();
-        logisticModel = MatchPrediction.trainModel(matches, stats);
-
-        try {
-            ArrayList<Attribute> attributes = new ArrayList<>();
-            attributes.add(new Attribute("team1_winPercentage"));
-            attributes.add(new Attribute("team1_totalGoals"));
-            attributes.add(new Attribute("team1_totalMatches"));
-            attributes.add(new Attribute("team1_totalWinMatches"));
-            attributes.add(new Attribute("team1_totalCleanSheets"));
-            attributes.add(new Attribute("team1_totalGoalsConceded"));
-            attributes.add(new Attribute("team1_goalPercentage"));
-            attributes.add(new Attribute("team1_cleanSheetPercentage"));
-
-            attributes.add(new Attribute("team2_winPercentage"));
-            attributes.add(new Attribute("team2_totalGoals"));
-            attributes.add(new Attribute("team2_totalMatches"));
-            attributes.add(new Attribute("team2_totalWinMatches"));
-            attributes.add(new Attribute("team2_totalCleanSheets"));
-            attributes.add(new Attribute("team2_totalGoalsConceded"));
-            attributes.add(new Attribute("team2_goalPercentage"));
-            attributes.add(new Attribute("team2_cleanSheetPercentage"));
-
-            List<String> classValues = List.of("Team1 win", "Team2 win");
-            attributes.add(new Attribute("result", classValues));
-
-            Instances datasetStructure = new Instances("MatchPrediction", attributes, 0);
-            datasetStructure.setClassIndex(datasetStructure.numAttributes() - 1);
-
-
-            MatchPrediction.predictMatch("Barcelona", "Real Sociedad", parsedTeams, logisticModel, stats, datasetStructure);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+     //   Map<UUID, Statistics> stats = getStats(parsedPlayers, parsedEvents, matches);
+     //   getCorreletion(stats, parsedPlayers);
+       // getPrediction(matches, stats, parsedTeams, "Barcelona", "Real Madrid");
 
 
     }

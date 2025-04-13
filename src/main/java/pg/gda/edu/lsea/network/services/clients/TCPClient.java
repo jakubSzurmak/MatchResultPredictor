@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.util.Scanner;
 
 /**
  * TCP Client that establishes and manages connections to TCP Server over TCP/IP connection
@@ -15,18 +16,31 @@ public class TCPClient {
     public static void main(String[] args) throws IOException {
         Socket socket = new Socket("localhost", SERVER_PORT);
 
-        BufferedReader input = new BufferedReader(new InputStreamReader(System.in));
-        PrintWriter output = new PrintWriter(socket.getOutputStream(), true);
-        BufferedReader serverInput = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+        BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+        PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
+        Scanner scanner = new Scanner(System.in);
 
-        System.out.println("Connected to the server");
+        String fromServer;
+        while ((fromServer = in.readLine()) != null) {
+            System.out.println(fromServer);
+            if (fromServer.equals("Choose option:")) {
+                String userInput = scanner.nextLine();
+                out.println(userInput);
+            }
+            if (fromServer.equals("Choose home team to prediction: ")){
+                String userInput = scanner.nextLine();
+                out.println(userInput);
+            }
+            if (fromServer.equals("Choose away team to prediction: ")){
+                String userInput = scanner.nextLine();
+                out.println(userInput);
+            }
 
-        String userInput;
-        while ((userInput = input.readLine()) != null) {
-            output.println(userInput);
-            System.out.println("Received: " + serverInput.readLine());
         }
 
+        scanner.close();
+        in.close();
+        out.close();
         socket.close();
     }
 }
