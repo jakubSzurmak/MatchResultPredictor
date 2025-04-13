@@ -15,7 +15,6 @@ import java.util.*;
 
 /**
  * Service making handling and parsing the data for the analysis
- * TODO: Handle parsing the data as a service over TCP and UDP connections
  */
 public class ParseDataService {
     private List<Match> matches;
