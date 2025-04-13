@@ -282,7 +282,6 @@ public class ParseData {
             }
         });
 
-        // Similar pattern for other parsing tasks...
 
         functionalThread(() -> {
             try {
@@ -322,7 +321,6 @@ public class ParseData {
             }
         });
 
-        // Wait for all parsing operations to complete
         latch.await();
         System.out.println(matches.size() + " - matches in total");
         System.out.println(referees.size() + " - referees in total");
