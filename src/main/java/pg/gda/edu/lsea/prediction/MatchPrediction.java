@@ -15,19 +15,19 @@ import java.util.UUID;
 
 public class MatchPrediction {
 
-    public static void predictMatch(String team1Name, String team2Name, List<Team> teams,
+    public static String predictMatch(String team1Name, String team2Name, List<Team> teams,
                                     Logistic model, Map<UUID, Statistics> statistics, Instances datasetStructure) throws Exception {
         Team team1 = teams.stream().filter(t -> t.getName().equalsIgnoreCase(team1Name)).findFirst().orElse(null);
         Team team2 = teams.stream().filter(t -> t.getName().equalsIgnoreCase(team2Name)).findFirst().orElse(null);
 
         if (team1 == null || team2 == null) {
-            return;
+            return "Wrong team";
         }
 
         Statistics stats1 = statistics.get(team1.getId());
         Statistics stats2 = statistics.get(team2.getId());
         if (stats1 == null || stats2 == null) {
-            return;
+            return "Cannot get stats";
         }
 
         Instances testSet = new Instances(datasetStructure, 0);
@@ -35,8 +35,9 @@ public class MatchPrediction {
 
 
         double[] probabilities = model.distributionForInstance(instance);
-        System.out.println("Prawdopodobieństwo wygranej drużyny " + team1Name + ": " + probabilities[0]);
-        System.out.println("Prawdopodobieństwo wygranej drużyny " + team2Name + ": " + probabilities[1]);
+        return "Probability of winning " + team1Name + ": " + probabilities[0] + "\n" +
+                "Probability of winning " + team2Name + ": " + probabilities[1];
+
     }
 
 
