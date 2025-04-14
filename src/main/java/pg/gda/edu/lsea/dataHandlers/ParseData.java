@@ -131,95 +131,16 @@ public class ParseData {
         t.start();
     }
 
-    public static void main(String[] args) throws Exception {
-        System.out.println("Parsing data...");
-        final CountDownLatch latch = new CountDownLatch(6);
-
-        List<Match> matches = new ArrayList<>();
-        Set<Referee> referees = new HashSet<>();
-        Map<UUID, Coach> coaches = new HashMap<>();
-        List<Team> parsedTeams = new ArrayList<>();
-        HashSet<Player> parsedPlayers = new HashSet<>();
-        List<Event> parsedEvents = Collections.synchronizedList(new ArrayList<>());
-
-        functionalThread(() -> {
-            try {
-                matches.addAll(new ParserMatch().parseMatch());
-                System.out.println("Matches parsing complete: " + matches.size());
-            } catch (Exception e) {
-                e.printStackTrace();
-            } finally {
-                latch.countDown();
-            }
-        });
-
-        functionalThread(() -> {
-            try {
-                try {
-                    referees.addAll(new ParserReferee().parseReferee());
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-                System.out.println("Referees parsing complete: " + referees.size());
-            } finally {
-                latch.countDown();
-            }
-        });
-
-        // Similar pattern for other parsing tasks...
-
-        functionalThread(() -> {
-            try {
-                try {
-                    coaches.putAll(new ParserCoach().parseCoache());
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-                System.out.println("Coaches parsing complete: " + coaches.size());
-            } finally {
-                latch.countDown();
-            }
-        });
-
-        functionalThread(() -> {
-            try {
-                parsedTeams.addAll(parseTeams());
-                System.out.println("Teams parsing complete: " + parsedTeams.size());
-            } finally {
-                latch.countDown();
-            }
-        });
-        functionalThread(() -> {
-            try {
-                parsedPlayers.addAll(parsePlayers());
-                System.out.println("Players parsing complete: " + parsedPlayers.size());
-            } finally {
-                latch.countDown();
-            }
-        });
-        functionalThread(() -> {
-            try {
-                parsedEvents.addAll(parseEvents());
-                System.out.println("Events parsing complete: " + parsedEvents.size());
-            } finally {
-                latch.countDown();
-            }
-        });
-
-        // Wait for all parsing operations to complete
-        latch.await();
-        System.out.println(matches.size() + " - matches in total");
-        System.out.println(referees.size() + " - referees in total");
-        System.out.println(coaches.size() + " - coaches in total");
-        System.out.println(parsedTeams.size() + " - teams in total");
-        System.out.println(parsedPlayers.size() + " - players in total");
-        System.out.println(parsedEvents.size() + " - events in total");
-
+    public static Map<UUID, Statistics> getStats (HashSet<Player> parsedPlayers, List<Event> parsedEvents,List<Match> matches) {
         ConvertStatistics convertStatistics = new ConvertStatistics();
         Map<UUID, Statistics> stats = new HashMap<>();
         convertStatistics.getPlayerStat(parsedPlayers, parsedEvents,stats);
         convertStatistics.getTeamCoachStats(stats, matches);
+        return stats;
+    }
 
+
+    public static List<String> getCorreletion(Map<UUID, Statistics> stats, HashSet<Player> parsedPlayers){
         Map<String, List<Integer>> statsList = new HashMap<>();
 
         List<Integer> totalShots = new ArrayList<>();
@@ -266,7 +187,7 @@ public class ParseData {
         }
 
         List<String> keys = new ArrayList<>(statsList.keySet());
-
+        List<String> finalCorr = new ArrayList<>();
         for (int i = 0; i < keys.size(); i++) {
             for (int j = i + 1; j < keys.size(); j++) {
                 String keyA = keys.get(i);
@@ -276,11 +197,14 @@ public class ParseData {
                 List<Integer> listB = statsList.get(keyB);
 
                 double correlation = Correlation.calculatePearson(listA, listB);
-
-                System.out.println("Correlation between " + keyA + " and " + keyB + ": " + correlation);
+                finalCorr.add("Correlation between " + keyA + " and " + keyB + ": " + correlation + "\n");
             }
         }
+        return finalCorr;
+    }
 
+    public static String getPrediction(List<Match> matches,Map<UUID, Statistics> stats , List<Team> parsedTeams, String teamHome,
+                                     String teamAway) throws Exception {
         System.out.println("Train data...");
 
         Logistic logisticModel = new Logistic();
@@ -313,10 +237,101 @@ public class ParseData {
             datasetStructure.setClassIndex(datasetStructure.numAttributes() - 1);
 
 
-            MatchPrediction.predictMatch("Barcelona", "Real Sociedad", parsedTeams, logisticModel, stats, datasetStructure);
+            return MatchPrediction.predictMatch(teamHome, teamAway, parsedTeams, logisticModel, stats, datasetStructure);
         } catch (Exception e) {
             e.printStackTrace();
         }
+        return "Cannot get prediction";
+    }
+
+
+
+    public static void parseData(List<Match> matches, Set<Referee> referees, Map<UUID, Coach> coaches,
+                                 List<Team> parsedTeams, HashSet<Player> parsedPlayers, List<Event> parsedEvents) throws Exception {
+        System.out.println("Parsing data...");
+        final CountDownLatch latch = new CountDownLatch(6);
+    /*
+        List<Match> matches = new ArrayList<>();
+        Set<Referee> referees = new HashSet<>();
+        Map<UUID, Coach> coaches = new HashMap<>();
+        List<Team> parsedTeams = new ArrayList<>();
+        HashSet<Player> parsedPlayers = new HashSet<>();
+        List<Event> parsedEvents = Collections.synchronizedList(new ArrayList<>());
+*/
+        functionalThread(() -> {
+            try {
+                matches.addAll(new ParserMatch().parseMatch());
+                System.out.println("Matches parsing complete: " + matches.size());
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                latch.countDown();
+            }
+        });
+
+        functionalThread(() -> {
+            try {
+                try {
+                    referees.addAll(new ParserReferee().parseReferee());
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+                System.out.println("Referees parsing complete: " + referees.size());
+            } finally {
+                latch.countDown();
+            }
+        });
+
+
+        functionalThread(() -> {
+            try {
+                try {
+                    coaches.putAll(new ParserCoach().parseCoache());
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+                System.out.println("Coaches parsing complete: " + coaches.size());
+            } finally {
+                latch.countDown();
+            }
+        });
+
+        functionalThread(() -> {
+            try {
+                parsedTeams.addAll(parseTeams());
+                System.out.println("Teams parsing complete: " + parsedTeams.size());
+            } finally {
+                latch.countDown();
+            }
+        });
+        functionalThread(() -> {
+            try {
+                parsedPlayers.addAll(parsePlayers());
+                System.out.println("Players parsing complete: " + parsedPlayers.size());
+            } finally {
+                latch.countDown();
+            }
+        });
+        functionalThread(() -> {
+            try {
+                parsedEvents.addAll(parseEvents());
+                System.out.println("Events parsing complete: " + parsedEvents.size());
+            } finally {
+                latch.countDown();
+            }
+        });
+
+        latch.await();
+        System.out.println(matches.size() + " - matches in total");
+        System.out.println(referees.size() + " - referees in total");
+        System.out.println(coaches.size() + " - coaches in total");
+        System.out.println(parsedTeams.size() + " - teams in total");
+        System.out.println(parsedPlayers.size() + " - players in total");
+        System.out.println(parsedEvents.size() + " - events in total");
+
+     //   Map<UUID, Statistics> stats = getStats(parsedPlayers, parsedEvents, matches);
+     //   getCorreletion(stats, parsedPlayers);
+       // getPrediction(matches, stats, parsedTeams, "Barcelona", "Real Madrid");
 
 
     }
