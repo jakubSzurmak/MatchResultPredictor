@@ -2,6 +2,8 @@ package pg.gda.edu.lsea.absStatistics.implStatistics;
 
 import pg.gda.edu.lsea.absStatistics.Statistics;
 
+import javax.persistence.Entity;
+import javax.persistence.Table;
 import java.util.UUID;
 
 /**
@@ -10,7 +12,10 @@ import java.util.UUID;
  * This class inherits all attributes and methods from the Statistics class
  * and does not have any additional attributes or methods besides the constructors
  */
+@Entity
+@Table(name="TeamStats")
 public class TeamStatistics extends Statistics {
+
     /**
      * Constructs TeamStatistics with the specified ID
      *
@@ -34,4 +39,6 @@ public class TeamStatistics extends Statistics {
                           int totalCleanSheets, int totalGoalConceded) {
         super(id, gamesPlayed, gamesWon, goalsScored, totalCleanSheets, totalGoalConceded);
     }
+
+    protected TeamStatistics() {}
 }

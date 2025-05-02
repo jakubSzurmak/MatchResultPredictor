@@ -80,8 +80,8 @@ public class ParseData {
                     }
                 });
             }
-
-            eventLatch.await(); // Wait for all event parsing to complete
+            // Wait for all event parsing to complete
+            eventLatch.await();
             executor.shutdown();
         } catch (Exception e) {
             e.printStackTrace();
@@ -98,6 +98,7 @@ public class ParseData {
             List<Path> pathsL = getFilePath(directory, 2);
             for (Path path : pathsL) {
                 parsedTeams.addAll(ParserTeam.parsing(String.valueOf(path.toFile())));
+
             }
 
         } catch (Exception e) {

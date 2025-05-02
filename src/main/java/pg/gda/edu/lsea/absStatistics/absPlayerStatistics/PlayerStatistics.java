@@ -2,6 +2,7 @@ package pg.gda.edu.lsea.absStatistics.absPlayerStatistics;
 
 import pg.gda.edu.lsea.absStatistics.Statistics;
 
+import javax.persistence.MappedSuperclass;
 import java.util.UUID;
 
 /**
@@ -12,6 +13,7 @@ import java.util.UUID;
  * such as assists, passes, ball losses etc.
  * have been added to this class.
  */
+@MappedSuperclass
 public abstract class PlayerStatistics extends Statistics {
     /** Number of assists provided */
     private int totalAssists;

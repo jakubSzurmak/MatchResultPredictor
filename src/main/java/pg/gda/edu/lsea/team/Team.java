@@ -1,14 +1,22 @@
 package pg.gda.edu.lsea.team;
 
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
+import javax.persistence.Transient;
 import java.util.Map;
 import java.util.UUID;
 
+@Entity
+@Table(name="Teams")
 public class Team {
     /** Unique identifier of team */
+    @Id
     final private UUID id;
     /** Name of the team */
     private String name;
     /** Country which team is located in */
+    @Transient
     private Map<UUID, String> country;
 
     /**
@@ -32,6 +40,10 @@ public class Team {
         this.name = name;
         this.country = country;
     }
+    /**
+     * Nameless constructor for JPA sake. DO NOT USE
+     */
+    protected Team() {this.id = null;}
 
     /**
      * Returns the unique identifier of the team

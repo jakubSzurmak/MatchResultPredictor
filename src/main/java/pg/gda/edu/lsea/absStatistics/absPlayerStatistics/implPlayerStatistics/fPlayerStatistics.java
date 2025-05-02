@@ -2,6 +2,9 @@ package pg.gda.edu.lsea.absStatistics.absPlayerStatistics.implPlayerStatistics;
 
 import pg.gda.edu.lsea.absStatistics.absPlayerStatistics.PlayerStatistics;
 
+import javax.persistence.Entity;
+import javax.persistence.Table;
+import javax.persistence.Transient;
 import java.util.UUID;
 
 /**
@@ -10,12 +13,15 @@ import java.util.UUID;
  * This class has additional fields like duel, duel wins, and calculates the duel win percentage.
  * Those metrics are used for assessing the performance of these players
  */
+@Entity
+@Table(name="fPlayerStatistics")
 public class fPlayerStatistics extends PlayerStatistics {
     /** Total number of duels engaged in */
     private int totalDuel;
     /** Total number of duels won */
     private int totalDuelWins;
     /** Percentage of duels won */
+    @Transient
     private float duelPercentage;
 
 
@@ -55,6 +61,12 @@ public class fPlayerStatistics extends PlayerStatistics {
         this.totalDuel = totalDuel;
     }
 
+    /**
+     * Nameless and parameterless constructor for jpa requirements sake. DO NOT USE
+     */
+    protected fPlayerStatistics() {
+        super(null);
+    }
 
     /**
      * Returns the number of duels engaged in

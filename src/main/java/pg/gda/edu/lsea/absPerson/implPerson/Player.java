@@ -2,6 +2,10 @@ package pg.gda.edu.lsea.absPerson.implPerson;
 
 import pg.gda.edu.lsea.absPerson.Person;
 
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
+import javax.persistence.Transient;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -20,19 +24,30 @@ import java.util.UUID;
  * the Comparable interface which is used
  * to sort Players by their rating.
  */
+@Entity
+@Table(name="Players")
 public class Player extends Person implements Comparable<Player>, Cloneable {
     /** Nickname of the player */
+
+    @Transient
     private String nickname;
     /** Date of birth of the player */
+    @Transient
     private LocalDate dateOfBirth;
     /** Jersey number of the player */
+    @Transient
     private int jerseyNr;
     /** Current club of the player */
+    @Transient
     private String currClub;
     /** List of positions that the player plays */
+    @Transient
     private ArrayList<String> positions; //to discuss
     /** Rating of the player */
+    @Transient
     private int rating;
+    /** List of positions joined into one string seperated by ",". Empty-only for annotation mechanism */
+    private String positionsString;
 
     /**
      * Constructs a Player with some specified ID
@@ -68,6 +83,13 @@ public class Player extends Person implements Comparable<Player>, Cloneable {
     }
 
     /**
+     * Nameless and parameterless constructor for jpa requirements sake. DO NOT USE
+     */
+    public Player() {
+        super(null);
+    }
+
+    /**
      * Compares this player with another player based on their rating
      *
      * @param o the player to be compared
@@ -99,6 +121,15 @@ public class Player extends Person implements Comparable<Player>, Cloneable {
         } catch (CloneNotSupportedException e) {
             throw new RuntimeException("Cloning Player failed", e);
         }
+    }
+
+
+    protected String joinPositions(ArrayList<String> positions) {
+        return String.join(",", positions);
+    }
+
+    public String getPositionsString() {
+        return joinPositions(this.positions);
     }
 
     /**
