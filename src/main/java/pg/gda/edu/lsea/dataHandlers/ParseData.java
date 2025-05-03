@@ -9,7 +9,7 @@ import pg.gda.edu.lsea.absPerson.implPerson.coach.Coach;
 import pg.gda.edu.lsea.absStatistics.Statistics;
 import pg.gda.edu.lsea.match.Match;
 import pg.gda.edu.lsea.absPerson.implPerson.referee.Referee;
-import pg.gda.edu.lsea.parsers.utils.*;
+import pg.gda.edu.lsea.dataHandlers.parsers.*;
 import pg.gda.edu.lsea.absStatistics.statisticHandlers.ConvertStatistics;
 import pg.gda.edu.lsea.team.Team;
 import pg.gda.edu.lsea.prediction.MatchPrediction;
@@ -29,7 +29,6 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.stream.Collectors;
 import weka.classifiers.functions.Logistic;
 import weka.core.Attribute;
-import weka.core.DenseInstance;
 import weka.core.Instances;
 
 public class ParseData {
