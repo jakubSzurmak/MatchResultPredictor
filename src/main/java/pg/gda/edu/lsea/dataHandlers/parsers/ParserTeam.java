@@ -3,6 +3,7 @@ package pg.gda.edu.lsea.dataHandlers.parsers;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import pg.gda.edu.lsea.database.DbManager;
 import pg.gda.edu.lsea.team.Team;
 
 import java.io.File;
@@ -26,9 +27,9 @@ public class ParserTeam {
     public static List<Team> parsing(String filePath) throws IOException {
         ObjectMapper objectMapper = new ObjectMapper();
         List<Team> parsedTeams = new ArrayList<>();
+        DbManager dbManager = new DbManager();
 
-        List<JsonNode> teams = objectMapper.readValue(new File(filePath), new TypeReference<List<JsonNode>>() {});
-
+        List<JsonNode> teams = objectMapper.readValue(new File(filePath), new TypeReference<>() {});
         for (JsonNode team : teams) {
 
             JsonNode homeTeamNode = team.get("home_team");
@@ -47,6 +48,7 @@ public class ParserTeam {
 
                 if (parsedTeams.stream().noneMatch(t -> t.getId().equals(teamId))) {
                     parsedTeams.add(new Team(teamId, teamName, country));
+                    dbManager.saveToDb(parsedTeams.getLast());
                 }
             }
 
@@ -66,6 +68,8 @@ public class ParserTeam {
 
                 if (parsedTeams.stream().noneMatch(t -> t.getId().equals(teamIdTwo))) {
                     parsedTeams.add(new Team(teamIdTwo, teamNameTwo, countryTwo));
+                    dbManager.saveToDb(parsedTeams.getLast());
+
                 }
             }
         }

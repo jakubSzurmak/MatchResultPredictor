@@ -2,10 +2,9 @@ package pg.gda.edu.lsea.absPerson.implPerson;
 
 import pg.gda.edu.lsea.absPerson.Person;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
-import javax.persistence.Transient;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;

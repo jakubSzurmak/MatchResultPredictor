@@ -2,8 +2,8 @@ package pg.gda.edu.lsea.absStatistics.implStatistics;
 
 import pg.gda.edu.lsea.absStatistics.Statistics;
 
-import javax.persistence.Entity;
-import javax.persistence.Table;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
 import java.util.UUID;
 
 /**
@@ -21,6 +21,7 @@ public class TeamStatistics extends Statistics {
      *
      * @param id is the unique identifier for these team statistics
      */
+
     public TeamStatistics(UUID id) {
         super(id);
     }

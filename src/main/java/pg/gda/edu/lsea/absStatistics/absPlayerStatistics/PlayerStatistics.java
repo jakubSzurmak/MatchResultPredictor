@@ -2,7 +2,7 @@ package pg.gda.edu.lsea.absStatistics.absPlayerStatistics;
 
 import pg.gda.edu.lsea.absStatistics.Statistics;
 
-import javax.persistence.MappedSuperclass;
+import jakarta.persistence.MappedSuperclass;
 import java.util.UUID;
 
 /**

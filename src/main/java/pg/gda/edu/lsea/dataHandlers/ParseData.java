@@ -97,7 +97,6 @@ public class ParseData {
             List<Path> pathsL = getFilePath(directory, 2);
             for (Path path : pathsL) {
                 parsedTeams.addAll(ParserTeam.parsing(String.valueOf(path.toFile())));
-
             }
 
         } catch (Exception e) {

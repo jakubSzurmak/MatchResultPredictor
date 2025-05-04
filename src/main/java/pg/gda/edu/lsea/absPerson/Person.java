@@ -1,8 +1,8 @@
 package pg.gda.edu.lsea.absPerson;
 
-import javax.persistence.Id;
-import javax.persistence.MappedSuperclass;
-import javax.persistence.Transient;
+import jakarta.persistence.Id;
+import jakarta.persistence.MappedSuperclass;
+import jakarta.persistence.Transient;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -63,8 +63,8 @@ public abstract class Person implements Cloneable {
 
     /**
      *
-     * @return
-     * @throws CloneNotSupportedException
+     * @return Returns the cloned object
+     * @throws CloneNotSupportedException if cloning is prohibited
      */
     @Override
     protected Object clone() throws CloneNotSupportedException {
