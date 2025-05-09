@@ -42,4 +42,3 @@ deploy-to-production:
     - 'true'
   only:
     - master
-    - derbyInitORM
