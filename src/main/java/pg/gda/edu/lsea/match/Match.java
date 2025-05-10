@@ -2,10 +2,9 @@ package pg.gda.edu.lsea.match;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
-import jakarta.persistence.Transient;
+import jakarta.persistence.*;
+import pg.gda.edu.lsea.team.Team;
+
 import java.time.LocalDate;
 import java.util.Map;
 import java.util.UUID;
@@ -24,6 +23,7 @@ public class Match implements Comparable<Match> {
     @Id
     final private UUID id;
     /** Date when the match was played */
+    @Transient
     private LocalDate date;
     /** Identifier of the competition */
     @Transient
@@ -32,9 +32,13 @@ public class Match implements Comparable<Match> {
     @Transient
     private String season;
     /** Identifier of the home team */
-    private UUID homeTeamId;
+    @ManyToOne
+    @JoinColumn(name = "home_team_id")
+    private Team homeTeam;
     /** Identifier of the away team */
-    private UUID awayTeamId;
+    @ManyToOne
+    @JoinColumn(name = "away_team_id", referencedColumnName = "id")
+    private Team awayTeam;
     /** Score of the home team */
     private int homeScore;
     /** Score of the away team */
@@ -46,6 +50,10 @@ public class Match implements Comparable<Match> {
     private UUID homeCoachId;
     @Transient
     private UUID awayCoachId;
+    @Transient
+    private UUID homeTeamId;
+    @Transient
+    private UUID awayTeamId;
 
     /**
      * Constructs a Match with the specified ID.
@@ -311,4 +319,11 @@ public class Match implements Comparable<Match> {
         }
     }
 
+    public void setHomeTeam(Team homeTeam) {
+        this.homeTeam = homeTeam;
+    }
+
+    public void setAwayTeam(Team awayTeam) {
+        this.awayTeam = awayTeam;
+    }
 }

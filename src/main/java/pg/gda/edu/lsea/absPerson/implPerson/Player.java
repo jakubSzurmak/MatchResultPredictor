@@ -1,15 +1,12 @@
 package pg.gda.edu.lsea.absPerson.implPerson;
 
+import jakarta.persistence.*;
 import pg.gda.edu.lsea.absPerson.Person;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
-import jakarta.persistence.Transient;
+import pg.gda.edu.lsea.team.Team;
+
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 
 /**
@@ -48,6 +45,13 @@ public class Player extends Person implements Comparable<Player>, Cloneable {
     /** List of positions joined into one string seperated by ",". Empty-only for annotation mechanism */
     private String positionsString;
 
+    @ManyToMany
+    @JoinTable(
+            name = "player_teams",
+            joinColumns = @JoinColumn(name = "player_id"),
+            inverseJoinColumns = @JoinColumn(name = "team_id"))
+    private Set<Team> teamSet = new HashSet<>();
+
     /**
      * Constructs a Player with some specified ID
      *
@@ -79,6 +83,7 @@ public class Player extends Person implements Comparable<Player>, Cloneable {
         this.currClub = currClub;
         this.positions = positions;
         this.rating = rating;
+        this.positionsString = positions.toString();
     }
 
     /**
@@ -236,7 +241,9 @@ public class Player extends Person implements Comparable<Player>, Cloneable {
      * @param positions is the lsit of positions to set for this player
      */
     public void setPositions(ArrayList<String> positions) {
+
         this.positions = positions;
+        this.positionsString = positions.toString();
     }
 
 
@@ -263,5 +270,15 @@ public class Player extends Person implements Comparable<Player>, Cloneable {
     public int hashCode() {
         return getId().hashCode();
     }
+    private void ensureTeamSet() {
+        if (this.teamSet == null) {
+            this.teamSet = new HashSet<>();
+        }
+    }
 
+    public void setTeamSet (Set<Team> teamSet) { this.teamSet = teamSet; }
+    public void updateTeamSet(Team team) {
+        this.ensureTeamSet();
+        this.teamSet.add(team);
+    }
 }

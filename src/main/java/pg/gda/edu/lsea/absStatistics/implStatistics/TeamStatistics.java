@@ -1,9 +1,9 @@
 package pg.gda.edu.lsea.absStatistics.implStatistics;
 
+import jakarta.persistence.*;
 import pg.gda.edu.lsea.absStatistics.Statistics;
+import pg.gda.edu.lsea.team.Team;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
 import java.util.UUID;
 
 /**
@@ -15,7 +15,10 @@ import java.util.UUID;
 @Entity
 @Table(name="TeamStats")
 public class TeamStatistics extends Statistics {
-
+    @OneToOne
+    @MapsId
+    @JoinColumn(name = "id")
+    Team team;
     /**
      * Constructs TeamStatistics with the specified ID
      *
@@ -42,4 +45,8 @@ public class TeamStatistics extends Statistics {
     }
 
     protected TeamStatistics() {}
+
+    public void setTeam(Team team) {
+        this.team = team;
+    }
 }

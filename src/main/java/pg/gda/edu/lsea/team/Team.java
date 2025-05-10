@@ -1,10 +1,11 @@
 package pg.gda.edu.lsea.team;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
-import jakarta.persistence.Transient;
+import jakarta.persistence.*;
+import pg.gda.edu.lsea.absPerson.implPerson.Player;
+
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 @Entity
@@ -18,6 +19,10 @@ public class Team {
     /** Country which team is located in */
     @Transient
     private Map<UUID, String> country;
+
+    @ManyToMany(mappedBy = "teamSet")
+    private Set<Player> playerSet = new HashSet<>();
+
 
     /**
      * Constructs object with some specified ID
@@ -80,4 +85,15 @@ public class Team {
      */
     public void setCountry(Map<UUID, String> country){this.country = country;}
 
+
+    public void setPlayerSet(Set playerSet){this.playerSet = playerSet;}
+    public void ensurePlayerSet(){
+        if(playerSet == null){
+            playerSet = new HashSet<>();
+        }
+    }
+    public void updatePlayerSet(Player player){
+        this.ensurePlayerSet();
+        this.playerSet.add(player);
+    }
 }

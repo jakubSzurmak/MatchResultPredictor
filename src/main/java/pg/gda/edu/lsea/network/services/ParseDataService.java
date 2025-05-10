@@ -46,6 +46,7 @@ public class ParseDataService {
     private void initializeData() {
         try{
             ParseData.parseData(matches,referees,coaches,teams,players,events);
+            ParseData.handleManyToMany(players);
             this.statistics = ParseData.getStats(players,events,matches);
             System.out.println("Data initialization successful");
         } catch (Exception e) {

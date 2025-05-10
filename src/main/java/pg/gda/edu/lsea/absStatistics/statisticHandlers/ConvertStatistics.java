@@ -411,8 +411,8 @@ public class ConvertStatistics {
                 setCoachTeamStat(stats, awayCoachId, homeScore, awayScore, checkCleanSheet(homeScore),
                         checkWin(awayScore, homeScore), CoachStatistics.class);
             }
-
         }
+
     }
 
 }

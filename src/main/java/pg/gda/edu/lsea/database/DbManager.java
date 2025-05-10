@@ -3,6 +3,14 @@ package pg.gda.edu.lsea.database;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;
+import jakarta.persistence.TypedQuery;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Root;
+import pg.gda.edu.lsea.team.Team;
+
+import java.util.List;
+import java.util.UUID;
 
 public class DbManager {
 
@@ -21,6 +29,25 @@ public class DbManager {
         }finally{
             entityManager.close();
         }
+    }
+
+    public <C> C getTableById(UUID id, Class<C> classType)  {
+        EntityManager entityManager = entityManagerFactory.createEntityManager();
+        return entityManager.find(classType, id);
+    }
+
+    public <C> C getValueFromColumn(String name, Class<C> classType, String columnName) {
+        EntityManager entityManager = entityManagerFactory.createEntityManager();
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        CriteriaQuery<C> query = cb.createQuery(classType);
+        Root<C> root = query.from(classType);
+        query.where(cb.equal(root.get(columnName), name));
+        List<C> resultList = entityManager.createQuery(query).getResultList();
+
+        if (!resultList.isEmpty()) {
+            return resultList.get(0);
+        }
+        return null;
     }
 
     public Object getFromDB(String selectionTable, String conditionColumn, String conditionValue) {

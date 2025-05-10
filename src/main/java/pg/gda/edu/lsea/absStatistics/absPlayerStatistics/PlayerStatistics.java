@@ -1,5 +1,9 @@
 package pg.gda.edu.lsea.absStatistics.absPlayerStatistics;
 
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.MapsId;
+import jakarta.persistence.OneToOne;
+import pg.gda.edu.lsea.absPerson.implPerson.Player;
 import pg.gda.edu.lsea.absStatistics.Statistics;
 
 import jakarta.persistence.MappedSuperclass;
@@ -24,6 +28,11 @@ public abstract class PlayerStatistics extends Statistics {
     /** Number of shots taken */
     private int totalShots;
 
+ /*   @OneToOne
+    @MapsId
+    @JoinColumn(name = "id")
+    Player player;
+*/
     /**
      * Constructs PlayerStatistics with the specified ID
      *
@@ -129,4 +138,7 @@ public abstract class PlayerStatistics extends Statistics {
         this.totalBallLosses = totalBallLosses;
     }
 
+    public void setPlayer(Player player){
+       // this.player = player;
+    }
 }

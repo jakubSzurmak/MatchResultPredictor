@@ -1,16 +1,21 @@
 package pg.gda.edu.lsea.dataHandlers.parsers;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityManagerFactory;
 import pg.gda.edu.lsea.absPerson.implPerson.Player;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import pg.gda.edu.lsea.database.DbManager;
+import pg.gda.edu.lsea.team.Team;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.util.*;
+
 
 public class ParserPlayer {
 
@@ -65,7 +70,7 @@ public class ParserPlayer {
     public static HashSet<Player> parsing(String filePath, Map<String, PlayerData> playerDataMap) throws IOException {
         ObjectMapper objectMapper = new ObjectMapper();
         HashSet<Player> parsedPlayers = new HashSet<>();
-
+        DbManager dbManager = new DbManager();
         List<JsonNode> teams = objectMapper.readValue(new File(filePath), new TypeReference<>() {});
 
         for (JsonNode team: teams) {
@@ -111,6 +116,7 @@ public class ParserPlayer {
                     }
 
                     Player newPlayer = new Player(playerID, name, country, nickname, dateOfBirth, jerseyNumber, teamName, playerPositions, rating);
+                    newPlayer.setTeamSet(null);
                     parsedPlayers.add(newPlayer);
                 }
             }
