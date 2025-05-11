@@ -96,4 +96,8 @@ public class Team {
         this.ensurePlayerSet();
         this.playerSet.add(player);
     }
+
+    public Set<Player> getPlayerSet() {
+        return playerSet;
+    }
 }

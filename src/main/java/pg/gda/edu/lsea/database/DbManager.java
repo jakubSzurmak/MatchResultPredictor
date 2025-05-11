@@ -8,6 +8,7 @@ import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Root;
 import pg.gda.edu.lsea.team.Team;
+import pg.gda.edu.lsea.absPerson.implPerson.Player;
 
 import java.util.List;
 import java.util.UUID;
@@ -72,21 +73,63 @@ public class DbManager {
         }
     }
 
+    public Object getFromDBJPQL(String selectionTable, String conditionColumn, String conditionValue) {
+        if (!conditionColumn.isEmpty()) {
+            EntityManager entityManager = entityManagerFactory.createEntityManager();
+
+            Class<?> entityClass = switch (selectionTable.toLowerCase()) {
+                case "players" -> Player.class;
+                case "teams" -> Team.class;
+                default -> throw new IllegalArgumentException("Unknown table: " + selectionTable);
+            };
+
+            String entityName = entityClass.getSimpleName();
+
+            try {
+                if (conditionValue.equals("all")) {
+                    return entityManager.createQuery("SELECT e FROM " + entityName + " e", entityClass)
+                            .getResultList();
+                } else if (!conditionValue.isEmpty()) {
+                    return entityManager.createQuery(
+                                    "SELECT e FROM " + entityName + " e WHERE e." + conditionColumn + " LIKE :value", entityClass)
+                            .setParameter("value", "%" + conditionValue + "%")
+                            .getResultList();
+                } else {
+                    return entityManager.createQuery(
+                                    "SELECT e FROM " + entityName + " e WHERE e." + conditionColumn + " LIKE '*'", entityClass)
+                            .getResultList();
+                }
+            } finally {
+                entityManager.close();
+            }
+        } else {
+            return null;
+        }
+    }
+
+
     public void updateInDb(String table, String setColumn, String setValue, String conditionColumn, String conditionValue) {
         if (!conditionColumn.isEmpty()) {
             EntityManager entityManager = entityManagerFactory.createEntityManager();
             try {
                 entityManager.getTransaction().begin();
                 String query;
+
+
+                boolean isNumeric = setValue.matches("-?\\d+(\\.\\d+)?");
+
+                String formattedValue = isNumeric ? setValue : "'" + setValue + "'";
+
                 if (conditionValue.equals("all")) {
-                    query = "UPDATE " + table + " SET " + setColumn + " = '" + setValue + "'";
+                    query = "UPDATE " + table + " SET " + setColumn + " = " + formattedValue;
                 } else if (!conditionValue.isEmpty()) {
-                    query = "UPDATE " + table + " SET " + setColumn + " = '" + setValue + "' WHERE "
-                            + conditionColumn + " LIKE '%" + conditionValue + "%'";
+                    query = "UPDATE " + table + " SET " + setColumn + " = " + formattedValue +
+                            " WHERE " + conditionColumn + " LIKE '%" + conditionValue + "%'";
                 } else {
-                    query = "UPDATE " + table + " SET " + setColumn + " = '" + setValue + "' WHERE "
-                            + conditionColumn + " LIKE '*'";
+                    query = "UPDATE " + table + " SET " + setColumn + " = " + formattedValue +
+                            " WHERE " + conditionColumn + " LIKE '*'";
                 }
+
                 entityManager.createNativeQuery(query).executeUpdate();
                 entityManager.getTransaction().commit();
                 System.out.println("Update completed successfully.");
@@ -99,27 +142,49 @@ public class DbManager {
     }
 
 
-    public void deleteFromDb(String table, String conditionColumn, String conditionValue) {
-        if (!conditionColumn.isEmpty()) {
-            EntityManager entityManager = entityManagerFactory.createEntityManager();
-            try {
-                entityManager.getTransaction().begin();
-                String query;
-                if (conditionValue.equals("all")) {
-                    query = "DELETE FROM " + table;
-                } else if (!conditionValue.isEmpty()) {
-                    query = "DELETE FROM " + table + " WHERE " + conditionColumn + " LIKE '%" + conditionValue + "%'";
-                } else {
-                    query = "DELETE FROM " + table + " WHERE " + conditionColumn + " LIKE '*'";
+
+    public void deleteFromDb(String tableName, String conditionColumn, String conditionValue) {
+        EntityManager entityManager = entityManagerFactory.createEntityManager();
+
+        try {
+            entityManager.getTransaction().begin();
+
+            Object result = getFromDBJPQL(tableName, conditionColumn, conditionValue);
+
+            if (result instanceof List<?> list && !list.isEmpty()) {
+                for (Object obj : list) {
+                    if (obj instanceof Player player) {
+                        player.getTeamSet().clear();
+                        entityManager.merge(player);
+
+                        entityManager.remove(entityManager.contains(player) ? player : entityManager.merge(player));
+
+                    } else if (obj instanceof Team team) {
+                        team.getPlayerSet().clear();
+                        entityManager.merge(team);
+
+                        entityManager.remove(entityManager.contains(team) ? team : entityManager.merge(team));
+
+                    } else {
+                        entityManager.remove(entityManager.contains(obj) ? obj : entityManager.merge(obj));
+                    }
                 }
-                entityManager.createNativeQuery(query).executeUpdate();
-                entityManager.getTransaction().commit();
-                System.out.println("Delete completed successfully.");
-            } catch (Exception e) {
-                System.out.println("Something went wrong during delete: " + e.getMessage());
-            } finally {
-                entityManager.close();
+            } else {
+                System.out.println("No object found to delete.");
             }
+
+            entityManager.getTransaction().commit();
+        } catch (Exception e) {
+            if (entityManager.getTransaction().isActive()) {
+                entityManager.getTransaction().rollback();
+            }
+            System.err.println("Something went wrong during delete: " + e.getMessage());
+            e.printStackTrace();
+        } finally {
+            entityManager.close();
         }
     }
+
+
+
 }

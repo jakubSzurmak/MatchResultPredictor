@@ -26,17 +26,46 @@ public class Main {
     }
 
     public static void main(String[] args) {
-
         DbManager dbManager = new DbManager();
+        Scanner scanner = new Scanner(System.in);
 
-        displayTeams(dbManager);
+        System.out.println("Choose an operation: [delete] or [update]");
+        String choice = scanner.nextLine().trim().toLowerCase();
 
-        String nameToDelete = "Bolton Wanderers";
-        dbManager.deleteFromDb("teams", "name", nameToDelete);
+        if (choice.equals("delete")) {
+            System.out.print("Enter table name: ");
+            String table = scanner.nextLine().trim();
 
-        dbManager.updateInDb("teams", "name", "Fulham FC", "name", "Fulham");
+            System.out.print("Enter condition column: ");
+            String conditionColumn = scanner.nextLine().trim();
 
-        displayTeams(dbManager);
+            System.out.print("Enter condition value (or type 'all'): ");
+            String conditionValue = scanner.nextLine().trim();
 
+            dbManager.deleteFromDb(table, conditionColumn, conditionValue);
+
+        } else if (choice.equals("update")) {
+            System.out.print("Enter table name: ");
+            String table = scanner.nextLine().trim();
+
+            System.out.print("Enter column to update: ");
+            String setColumn = scanner.nextLine().trim();
+
+            System.out.print("Enter new value for that column: ");
+            String setValue = scanner.nextLine().trim();
+
+            System.out.print("Enter condition column: ");
+            String conditionColumn = scanner.nextLine().trim();
+
+            System.out.print("Enter condition value (or type 'all'): ");
+            String conditionValue = scanner.nextLine().trim();
+
+            dbManager.updateInDb(table, setColumn, setValue, conditionColumn, conditionValue);
+
+        } else {
+            System.out.println("Invalid option. Please choose 'delete' or 'update'.");
+        }
+
+        scanner.close();
     }
 }
