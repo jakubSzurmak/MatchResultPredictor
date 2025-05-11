@@ -61,7 +61,7 @@ public class ParseData {
 
         try {
             List<Path> pathsE = getFilePath(directory, 1);
-            int numThreads = 1;
+            int numThreads = 8;
             ExecutorService executor = Executors.newFixedThreadPool(numThreads);
             CountDownLatch eventLatch = new CountDownLatch(pathsE.size());
             for (Path path : pathsE) {
@@ -101,6 +101,8 @@ public class ParseData {
     private static List<Team> parseTeams() {
         String directory = "matches";
         List<Team> parsedTeams = new ArrayList<>();
+        Set<Team> hashTeam = new HashSet<>();
+        DbManager dbManager = new DbManager();
         try {
             List<Path> pathsL = getFilePath(directory, 2);
             for (Path path : pathsL) {
@@ -110,7 +112,12 @@ public class ParseData {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
+        hashTeam.addAll(parsedTeams);
+        System.out.println(hashTeam.size() + " size unique teams");
+        for(Team team:parsedTeams){
+            team.setPlayerSet(null);
+            dbManager.saveToDb(team);
+        }
 
         return parsedTeams;
     }
@@ -147,6 +154,7 @@ public class ParseData {
         DbManager dbManager = new DbManager();
         convertStatistics.getPlayerStat(parsedPlayers, parsedEvents,stats);
         convertStatistics.getTeamCoachStats(stats, matches);
+        // Pakowanie do bazy team statistics, player statistics, goalkeeper statistics
         for(Map.Entry<UUID, Statistics> stat: stats.entrySet()) {
             if (stat.getValue() instanceof TeamStatistics teamS) {
                 Team team = dbManager.getTableById(stat.getKey(), Team.class);
@@ -197,10 +205,21 @@ public class ParseData {
         Object result = dbManager.getFromDB("fplayerstatistics", "all", "all");
 
         List<Object[]> resultList = (List<Object[]>) result;
-
+        // Liczenie korelacji z bazą - do testowania
         for (Object[] row : resultList) {
-            System.out.println(row);
+          //  System.out.println(Arrays.toString(row));
+            gamesPlayed.add((Integer) row[0]);
+            wonMatches.add((Integer) row[1]);
+            goalsScored.add((Integer) row[2]);
+            totalAssists.add((Integer) row[4]);
+            totalBallLosses.add((Integer) row[5]);
+            totalCleanSheets.add((Integer) row[6]);
+            totalDuelWins.add((Integer) row[8]);
+            totalGoalConceded.add((Integer) row[9]);
+            totalPasses.add((Integer) row[10]);
+            totalShots.add((Integer) row[11]);
         }
+/*      Liczenie korelacji bez korzystania z bazy - do testowania info
 
         for (Player player : parsedPlayers){
             if( !player.getPositions().contains("Goalkeeper") && stats.get(player.getId()) instanceof PlayerStatistics){
@@ -219,7 +238,7 @@ public class ParseData {
 
                 }
             }
-        }
+        }*/
 
         List<String> keys = new ArrayList<>(statsList.keySet());
         List<String> finalCorr = new ArrayList<>();
@@ -235,6 +254,7 @@ public class ParseData {
                 finalCorr.add("Correlation between " + keyA + " and " + keyB + ": " + correlation + "\n");
             }
         }
+        System.out.println(finalCorr);
         return finalCorr;
     }
 
@@ -280,6 +300,7 @@ public class ParseData {
     }
 
     public static void handleManyToMany(HashSet<Player>players){
+        // Pakowanie playersow do bazy przy jednoczesnym zajęciem się relacją wiele do wiele między teams a players
         DbManager dbManager = new DbManager();
         for(Player player:players){
             Team team = dbManager.getValueFromColumn(player.getCurrClub(), Team.class, "name" );

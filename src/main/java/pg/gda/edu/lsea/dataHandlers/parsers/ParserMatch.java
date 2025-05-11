@@ -52,7 +52,7 @@ public class ParserMatch {
             match.setHomeTeam(homeTeam);
             match.setAwayTeam(awayTeam);
 
-
+            //Dodawanie do bazy
             dbManager.saveToDb(match);
         }
         return matches;

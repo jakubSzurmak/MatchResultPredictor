@@ -50,7 +50,8 @@ public class ParserTeam {
                     parsedTeams.add(new Team(teamId, teamName, country));
                     Team teamToDb = parsedTeams.get(parsedTeams.size() - 1);
                     teamToDb.setPlayerSet(null);
-                    dbManager.saveToDb(teamToDb);
+                    //Dodawanie do bazy
+                  //  dbManager.saveToDb(teamToDb);
                 }
             }
 
@@ -72,7 +73,8 @@ public class ParserTeam {
                     parsedTeams.add(new Team(teamIdTwo, teamNameTwo, countryTwo));
                     Team teamToDb = parsedTeams.get(parsedTeams.size() - 1);
                     teamToDb.setPlayerSet(null);
-                    dbManager.saveToDb(teamToDb);
+                    //Dodawanie do bazy
+                 //   dbManager.saveToDb(teamToDb);
                 }
             }
         }

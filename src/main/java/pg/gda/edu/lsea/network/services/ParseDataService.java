@@ -48,6 +48,9 @@ public class ParseDataService {
             ParseData.parseData(matches,referees,coaches,teams,players,events);
             ParseData.handleManyToMany(players);
             this.statistics = ParseData.getStats(players,events,matches);
+            // Do testowania jak działa liczenie statystyk i predykcji
+            //ParseData.getCorreletion(statistics, players);
+           // System.out.println(ParseData.getPrediction(matches, statistics, teams, "Barcelona", "Borussia Dortmund"));
             System.out.println("Data initialization successful");
         } catch (Exception e) {
             System.err.println("Error initializing data: " + e.getMessage());
