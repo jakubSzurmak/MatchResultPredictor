@@ -72,6 +72,7 @@ public class DbManager {
         }
     }
 
+
     public void updateInDb(String table, String setColumn, String setValue, String conditionColumn, String conditionValue) {
         if (!conditionColumn.isEmpty()) {
             EntityManager entityManager = entityManagerFactory.createEntityManager();
@@ -96,6 +97,76 @@ public class DbManager {
                 entityManager.close();
             }
         }
+    }
+
+
+    /**
+     * Updates multiple rows in a single transaction
+     * @param table The database table to update
+     * @param setColumn The column to update
+     * @param baseValue The base value to set (will be appended with row number)
+     * @param conditionColumn The column to use in WHERE clause
+     * @param conditionValues List of values to update (one per row)
+     */
+    public void updateMultipleRowsSingleTransaction(String table, String setColumn, String baseValue,
+                                                    String conditionColumn, List<String> conditionValues) {
+        EntityManager entityManager = entityManagerFactory.createEntityManager();
+        try {
+            // One transaction for all updates
+            entityManager.getTransaction().begin();
+
+            for (int i = 0; i < conditionValues.size(); i++) {
+                String query = "UPDATE " + table + " SET " + setColumn + " = '" + baseValue + "_" + i + "' WHERE "
+                        + conditionColumn + " = '" + conditionValues.get(i) + "'";
+                entityManager.createNativeQuery(query).executeUpdate();
+            }
+
+            entityManager.getTransaction().commit();
+            System.out.println("Batch transaction completed for " + conditionValues.size() + " rows.");
+        } catch (Exception e) {
+            if (entityManager.getTransaction().isActive()) {
+                entityManager.getTransaction().rollback();
+            }
+            System.out.println("Error in batch transaction: " + e.getMessage());
+        } finally {
+            entityManager.close();
+        }
+    }
+
+    /**
+     * Updates multiple rows using a separate transaction for each row
+     * @param table The database table to update
+     * @param setColumn The column to update
+     * @param baseValue The base value to set (will be appended with row number)
+     * @param conditionColumn The column to use in WHERE clause
+     * @param conditionValues List of values to update (one per row)
+     */
+    public void updateMultipleRowsMultipleTransactions(String table, String setColumn, String baseValue,
+                                                       String conditionColumn, List<String> conditionValues) {
+        System.out.println("Starting multiple transactions for " + conditionValues.size() + " rows.");
+
+        for (int i = 0; i < conditionValues.size(); i++) {
+            EntityManager entityManager = entityManagerFactory.createEntityManager();
+            try {
+                // New transaction for each update
+                entityManager.getTransaction().begin();
+
+                String query = "UPDATE " + table + " SET " + setColumn + " = '" + baseValue + "_" + i + "' WHERE "
+                        + conditionColumn + " = '" + conditionValues.get(i) + "'";
+                entityManager.createNativeQuery(query).executeUpdate();
+
+                entityManager.getTransaction().commit();
+            } catch (Exception e) {
+                if (entityManager.getTransaction().isActive()) {
+                    entityManager.getTransaction().rollback();
+                }
+                System.out.println("Error in transaction " + i + ": " + e.getMessage());
+            } finally {
+                entityManager.close();
+            }
+        }
+
+        System.out.println("All separate transactions completed.");
     }
 
 
