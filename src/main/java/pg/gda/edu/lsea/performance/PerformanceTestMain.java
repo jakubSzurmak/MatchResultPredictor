@@ -53,9 +53,7 @@ public class PerformanceTestMain {
         }
     }
 
-    /**
-     * Runs a comprehensive set of database performance tests
-     */
+
     private static void runDatabasePerformanceTests(
             List<Team> teams, HashSet<Player> players, List<Event> events, List<Match> matches) {
 
@@ -75,7 +73,7 @@ public class PerformanceTestMain {
         writeResults.forEach(System.out::println);
 
         System.out.println("\n== Testing Specific Query Performance ==");
-        // Add custom queries to test here
+
         PerformanceTestUtil.PerformanceResult teamsByNameQuery = PerformanceTestUtil.measurePerformance(
                 "Search Teams by Name Pattern",
                 () -> dbManager.getFromDB("teams", "name", "Man%"),
@@ -113,11 +111,11 @@ public class PerformanceTestMain {
      * Performs multiple updates within a single transaction
      */
     private static void performMultipleUpdatesInSingleTransaction(DbManager dbManager) {
-        // Create list of team names to update
-        final int ROW_COUNT = 10; // Adjust based on your test needs
+
+        final int ROW_COUNT = 10;
         List<String> testTeamNames = new ArrayList<>();
 
-        // Generate test team names - make sure these exist in your database
+
         for (int i = 0; i < ROW_COUNT; i++) {
             testTeamNames.add("Test_Team_" + i);
         }
@@ -136,10 +134,10 @@ public class PerformanceTestMain {
      */
     private static void performMultipleUpdatesWithSeparateTransactions(DbManager dbManager) {
         // Create list of team names to update
-        final int ROW_COUNT = 10; // Adjust based on your test needs
+        final int ROW_COUNT = 10;
         List<String> testTeamNames = new ArrayList<>();
 
-        // Generate test team names - make sure these exist in your database
+
         for (int i = 0; i < ROW_COUNT; i++) {
             testTeamNames.add("Test_Team_" + i);
         }
@@ -168,7 +166,7 @@ public class PerformanceTestMain {
                 out.print(csvContent);
             }
 
-            // Export as formatted text for the report
+
             try (BufferedWriter writer = new BufferedWriter(new FileWriter("performance_report_" + timestamp + ".txt"))) {
                 writer.write("DATABASE PERFORMANCE TEST REPORT\n");
                 writer.write("===============================\n\n");
@@ -216,9 +214,7 @@ public class PerformanceTestMain {
     }
 
 
-    /**
-     * Tests the performance of data analytics operations
-     */
+
     private static void runAnalyticsPerformanceTests(
             List<Team> teams, HashSet<Player> players, List<Event> events, List<Match> matches) {
 

@@ -21,7 +21,6 @@ import java.util.List;
 
 /**
  * Utility class for generating performance graphs from test results
- * Requires JFreeChart library in the project dependencies
  */
 public class GraphGenerator {
 
@@ -127,7 +126,7 @@ public class GraphGenerator {
         renderer.setFillBox(true);
         renderer.setSeriesPaint(0, new Color(79, 129, 189)); // Blue boxes
 
-        // Rotate labels if there are many operations
+
         CategoryAxis domainAxis = plot.getDomainAxis();
         if (results.size() > 5) {
             domainAxis.setCategoryLabelPositions(
@@ -201,71 +200,4 @@ public class GraphGenerator {
         System.out.println("Memory usage chart saved to: " + file.getAbsolutePath());
     }
 
-    /**
-     * Generates a comparative bar chart showing database operations vs analytics operations
-     *
-     * @param dbResults List of database performance results
-     * @param analyticsResults List of analytics performance results
-     * @param title Chart title
-     * @param fileName File name for the saved chart
-     * @throws IOException If file writing fails
-     */
-    public static void generateComparativeBarChart(
-            List<PerformanceTestUtil.PerformanceResult> dbResults,
-            List<PerformanceTestUtil.PerformanceResult> analyticsResults,
-            String title,
-            String fileName) throws IOException {
-
-        DefaultCategoryDataset dataset = new DefaultCategoryDataset();
-
-        // Add database operation data points
-        for (PerformanceTestUtil.PerformanceResult result : dbResults) {
-            dataset.addValue(
-                    result.getAverageExecutionTime(),
-                    "Database Operations",
-                    result.getOperationName());
-        }
-
-        // Add analytics operation data points
-        for (PerformanceTestUtil.PerformanceResult result : analyticsResults) {
-            dataset.addValue(
-                    result.getAverageExecutionTime(),
-                    "Analytics Operations",
-                    result.getOperationName());
-        }
-
-        // Create chart
-        JFreeChart chart = ChartFactory.createBarChart(
-                title,
-                "Operation",
-                "Average Execution Time (ms)",
-                dataset,
-                PlotOrientation.VERTICAL,
-                true,
-                true,
-                false
-        );
-
-        // Customize appearance
-        CategoryPlot plot = chart.getCategoryPlot();
-        plot.setBackgroundPaint(Color.white);
-        plot.setRangeGridlinePaint(Color.lightGray);
-
-        // Adjust bar renderer
-        BarRenderer renderer = (BarRenderer) plot.getRenderer();
-        renderer.setSeriesPaint(0, new Color(79, 129, 189)); // Blue bars for DB
-        renderer.setSeriesPaint(1, new Color(192, 80, 77));  // Red bars for Analytics
-
-        // Rotate labels
-        CategoryAxis domainAxis = plot.getDomainAxis();
-        domainAxis.setCategoryLabelPositions(
-                org.jfree.chart.axis.CategoryLabelPositions.UP_45);
-
-        // Save to file
-        String timestamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-        File file = new File(fileName + "_" + timestamp + ".png");
-        ChartUtils.saveChartAsPNG(file, chart, 1000, 600);
-
-        System.out.println("Comparative chart saved to: " + file.getAbsolutePath());
-    }
 }
