@@ -48,7 +48,10 @@ public class ParserTeam {
 
                 if (parsedTeams.stream().noneMatch(t -> t.getId().equals(teamId))) {
                     parsedTeams.add(new Team(teamId, teamName, country));
-                    dbManager.saveToDb(parsedTeams.getLast());
+                    Team teamToDb = parsedTeams.get(parsedTeams.size() - 1);
+                    teamToDb.setPlayerSet(null);
+                    //Dodawanie do bazy
+                  //  dbManager.saveToDb(teamToDb);
                 }
             }
 
@@ -68,8 +71,10 @@ public class ParserTeam {
 
                 if (parsedTeams.stream().noneMatch(t -> t.getId().equals(teamIdTwo))) {
                     parsedTeams.add(new Team(teamIdTwo, teamNameTwo, countryTwo));
-                    dbManager.saveToDb(parsedTeams.getLast());
-
+                    Team teamToDb = parsedTeams.get(parsedTeams.size() - 1);
+                    teamToDb.setPlayerSet(null);
+                    //Dodawanie do bazy
+                 //   dbManager.saveToDb(teamToDb);
                 }
             }
         }

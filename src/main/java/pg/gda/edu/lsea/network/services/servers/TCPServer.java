@@ -12,7 +12,7 @@ import java.util.concurrent.Executors;
  * TCP Server that accepts and handles clients connection and communication over TCP/IP
  * Supports serialized object transfer for football match analysis functionality
  */
-public class TCPServer {
+public class  TCPServer {
     // Initialize Server Port
     private static final int SERVER_PORT = 6666;
     // Initialize welcome message

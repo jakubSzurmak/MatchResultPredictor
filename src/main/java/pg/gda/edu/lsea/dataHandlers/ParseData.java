@@ -2,7 +2,10 @@ package pg.gda.edu.lsea.dataHandlers;
 
 import pg.gda.edu.lsea.absStatistics.absPlayerStatistics.PlayerStatistics;
 import pg.gda.edu.lsea.absStatistics.absPlayerStatistics.implPlayerStatistics.fPlayerStatistics;
+import pg.gda.edu.lsea.absStatistics.absPlayerStatistics.implPlayerStatistics.gPlayerStatistics;
+import pg.gda.edu.lsea.absStatistics.implStatistics.TeamStatistics;
 import pg.gda.edu.lsea.analysis.Correlation;
+import pg.gda.edu.lsea.database.DbManager;
 import pg.gda.edu.lsea.event.Event;
 import pg.gda.edu.lsea.absPerson.implPerson.Player;
 import pg.gda.edu.lsea.absPerson.implPerson.coach.Coach;
@@ -13,7 +16,9 @@ import pg.gda.edu.lsea.dataHandlers.parsers.*;
 import pg.gda.edu.lsea.absStatistics.statisticHandlers.ConvertStatistics;
 import pg.gda.edu.lsea.team.Team;
 import pg.gda.edu.lsea.prediction.MatchPrediction;
-
+import java.util.function.Function;
+import java.lang.invoke.MethodHandles;
+import java.nio.charset.StandardCharsets;
 import java.util.concurrent.CountDownLatch;
 
 import java.io.IOException;
@@ -32,6 +37,9 @@ import weka.core.Attribute;
 import weka.core.Instances;
 
 public class ParseData {
+    private static UUID convertToUUID(String id) {
+        return UUID.nameUUIDFromBytes(String.valueOf(id).getBytes(StandardCharsets.UTF_8));
+    }
 
     // Read-write lock for synchronizing access to shared collections
     private static final ReadWriteLock eventsLock = new ReentrantReadWriteLock();
@@ -93,6 +101,8 @@ public class ParseData {
     private static List<Team> parseTeams() {
         String directory = "matches";
         List<Team> parsedTeams = new ArrayList<>();
+        Set<Team> hashTeam = new HashSet<>();
+        DbManager dbManager = new DbManager();
         try {
             List<Path> pathsL = getFilePath(directory, 2);
             for (Path path : pathsL) {
@@ -101,6 +111,12 @@ public class ParseData {
 
         } catch (Exception e) {
             e.printStackTrace();
+        }
+        hashTeam.addAll(parsedTeams);
+        System.out.println(hashTeam.size() + " size unique teams");
+        for(Team team:parsedTeams){
+            team.setPlayerSet(null);
+            dbManager.saveToDb(team);
         }
 
         return parsedTeams;
@@ -122,6 +138,8 @@ public class ParseData {
         } catch (Exception e) {
             e.printStackTrace();
         }
+
+
         return parsedPlayers;
     }
 
@@ -133,15 +151,35 @@ public class ParseData {
     public static Map<UUID, Statistics> getStats (HashSet<Player> parsedPlayers, List<Event> parsedEvents,List<Match> matches) {
         ConvertStatistics convertStatistics = new ConvertStatistics();
         Map<UUID, Statistics> stats = new HashMap<>();
+        DbManager dbManager = new DbManager();
         convertStatistics.getPlayerStat(parsedPlayers, parsedEvents,stats);
         convertStatistics.getTeamCoachStats(stats, matches);
+        // Pakowanie do bazy team statistics, player statistics, goalkeeper statistics
+        for(Map.Entry<UUID, Statistics> stat: stats.entrySet()) {
+            if (stat.getValue() instanceof TeamStatistics teamS) {
+                Team team = dbManager.getTableById(stat.getKey(), Team.class);
+                teamS.setTeam(team);
+               dbManager.saveToDb(teamS);
+            } else if (stat.getValue() instanceof fPlayerStatistics) {
+                Player player = dbManager.getTableById(stat.getKey(), Player.class);
+                fPlayerStatistics playerS = (fPlayerStatistics) stat.getValue();
+                playerS.setPlayer(player);
+                dbManager.saveToDb(playerS);
+            } else if (stat.getValue() instanceof gPlayerStatistics){
+                Player player = dbManager.getTableById(stat.getKey(), Player.class);
+                gPlayerStatistics playerS = (gPlayerStatistics) stat.getValue();
+                playerS.setPlayer(player);
+                dbManager.saveToDb(playerS);
+            }
+        }
         return stats;
+
     }
 
 
     public static List<String> getCorreletion(Map<UUID, Statistics> stats, HashSet<Player> parsedPlayers){
         Map<String, List<Integer>> statsList = new HashMap<>();
-
+        DbManager dbManager = new DbManager();
         List<Integer> totalShots = new ArrayList<>();
         List<Integer> totalPasses = new ArrayList<>();
         List<Integer> totalAssists = new ArrayList<>();
@@ -164,7 +202,26 @@ public class ParseData {
         statsList.put("totalBallLosses", totalBallLosses);
         statsList.put("totalGoalConceded", totalGoalConceded);
 
+        Object result = dbManager.getFromDB("fplayerstatistics", "all", "all");
 
+        List<Object[]> resultList = (List<Object[]>) result;
+        // Liczenie korelacji z bazą - do testowania
+        for (Object[] row : resultList) {
+          //  System.out.println(Arrays.toString(row));
+            gamesPlayed.add((Integer) row[0]);
+            wonMatches.add((Integer) row[1]);
+            goalsScored.add((Integer) row[2]);
+            totalAssists.add((Integer) row[4]);
+            totalBallLosses.add((Integer) row[5]);
+            totalCleanSheets.add((Integer) row[6]);
+            totalDuelWins.add((Integer) row[8]);
+            totalGoalConceded.add((Integer) row[9]);
+            totalPasses.add((Integer) row[10]);
+            totalShots.add((Integer) row[11]);
+        }
+
+ /*
+   // Liczenie korelacji bez korzystania z bazy - do testowania info
 
         for (Player player : parsedPlayers){
             if( !player.getPositions().contains("Goalkeeper") && stats.get(player.getId()) instanceof PlayerStatistics){
@@ -185,6 +242,8 @@ public class ParseData {
             }
         }
 
+
+  */
         List<String> keys = new ArrayList<>(statsList.keySet());
         List<String> finalCorr = new ArrayList<>();
         for (int i = 0; i < keys.size(); i++) {
@@ -199,6 +258,7 @@ public class ParseData {
                 finalCorr.add("Correlation between " + keyA + " and " + keyB + ": " + correlation + "\n");
             }
         }
+        System.out.println(finalCorr);
         return finalCorr;
     }
 
@@ -243,11 +303,21 @@ public class ParseData {
         return "Cannot get prediction";
     }
 
-
+    public static void handleManyToMany(HashSet<Player>players){
+        // Pakowanie playersow do bazy przy jednoczesnym zajęciem się relacją wiele do wiele między teams a players
+        DbManager dbManager = new DbManager();
+        for(Player player:players){
+            Team team = dbManager.getValueFromColumn(player.getCurrClub(), Team.class, "name" );
+            player.updateTeamSet(team);
+            team.updatePlayerSet(player);
+            dbManager.saveToDb(player);
+        }
+    }
 
     public static void parseData(List<Match> matches, Set<Referee> referees, Map<UUID, Coach> coaches,
                                  List<Team> parsedTeams, HashSet<Player> parsedPlayers, List<Event> parsedEvents) throws Exception {
         System.out.println("Parsing data...");
+
         final CountDownLatch latch = new CountDownLatch(6);
     /*
         List<Match> matches = new ArrayList<>();
@@ -257,16 +327,7 @@ public class ParseData {
         HashSet<Player> parsedPlayers = new HashSet<>();
         List<Event> parsedEvents = Collections.synchronizedList(new ArrayList<>());
 */
-        functionalThread(() -> {
-            try {
-                matches.addAll(new ParserMatch().parseMatch());
-                System.out.println("Matches parsing complete: " + matches.size());
-            } catch (Exception e) {
-                e.printStackTrace();
-            } finally {
-                latch.countDown();
-            }
-        });
+
 
         functionalThread(() -> {
             try {
@@ -303,6 +364,19 @@ public class ParseData {
                 latch.countDown();
             }
         });
+
+        functionalThread(() -> {
+            try {
+                matches.addAll(new ParserMatch().parseMatch());
+                System.out.println("Matches parsing complete: " + matches.size());
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                latch.countDown();
+            }
+        });
+
+
         functionalThread(() -> {
             try {
                 parsedPlayers.addAll(parsePlayers());
@@ -327,6 +401,7 @@ public class ParseData {
         System.out.println(parsedTeams.size() + " - teams in total");
         System.out.println(parsedPlayers.size() + " - players in total");
         System.out.println(parsedEvents.size() + " - events in total");
+
 
      //   Map<UUID, Statistics> stats = getStats(parsedPlayers, parsedEvents, matches);
      //   getCorreletion(stats, parsedPlayers);

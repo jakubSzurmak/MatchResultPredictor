@@ -1,8 +1,9 @@
 package pg.gda.edu.lsea.absStatistics;
 
 import jakarta.persistence.*;
-import java.util.UUID;
+import pg.gda.edu.lsea.absPerson.implPerson.Player;
 
+import java.util.UUID;
 /**
  * Statistics is an abstract class that provides the foundation for tracking
  * various performance metrics in the football system
@@ -15,6 +16,7 @@ public abstract class Statistics {
     /** Unique identifier for these statistics */
     @Id
     private final UUID id;
+
 
     /** Winning percentage */
     @Transient

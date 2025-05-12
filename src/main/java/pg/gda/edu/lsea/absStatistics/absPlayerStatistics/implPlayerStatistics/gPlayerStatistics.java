@@ -1,6 +1,9 @@
 package pg.gda.edu.lsea.absStatistics.absPlayerStatistics.implPlayerStatistics;
 
+import jakarta.persistence.*;
+import pg.gda.edu.lsea.absPerson.implPerson.Player;
 import pg.gda.edu.lsea.absStatistics.absPlayerStatistics.PlayerStatistics;
+import pg.gda.edu.lsea.team.Team;
 
 import java.util.UUID;
 
@@ -11,10 +14,15 @@ import java.util.UUID;
  * such as total saves, which will be a key performance metric for the goalkeepers.
  *
  */
+@Entity
+@Table(name="gPlayerStatistics")
 public class gPlayerStatistics extends PlayerStatistics {
     /** Total number of saves made by the goalkeeper */
     private int totalSaves;
-
+    @OneToOne
+    @MapsId
+    @JoinColumn(name = "id")
+    Player player;
     /**
      * Constructs gPlayerStatistics with the specified ID
      *
@@ -48,6 +56,14 @@ public class gPlayerStatistics extends PlayerStatistics {
     }
 
     /**
+     * Nameless and parameterless constructor for jpa requirements sake. DO NOT USE
+     */
+    protected gPlayerStatistics() {
+        super(null);
+    }
+
+
+    /**
      * Returns the total number of saves made
      *
      * @return the total number of saves
@@ -63,5 +79,8 @@ public class gPlayerStatistics extends PlayerStatistics {
      */
     public void setTotalSaves(int totalSaves) {
         this.totalSaves = totalSaves;
+    }
+    public void setPlayer(Player player) {
+        this.player = player;
     }
 }

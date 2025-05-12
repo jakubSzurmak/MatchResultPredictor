@@ -1,5 +1,7 @@
 package pg.gda.edu.lsea.prediction;
 
+import pg.gda.edu.lsea.absStatistics.implStatistics.TeamStatistics;
+import pg.gda.edu.lsea.database.DbManager;
 import pg.gda.edu.lsea.match.Match;
 import pg.gda.edu.lsea.team.Team;
 import pg.gda.edu.lsea.absStatistics.*;
@@ -8,24 +10,40 @@ import weka.core.Attribute;
 import weka.core.DenseInstance;
 import weka.core.Instances;
 
+import javax.sound.midi.SysexMessage;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
 public class MatchPrediction {
+    private static UUID convertToUUID(String id) {
+        return UUID.fromString(id);
+    }
 
     public static String predictMatch(String team1Name, String team2Name, List<Team> teams,
                                     Logistic model, Map<UUID, Statistics> statistics, Instances datasetStructure) throws Exception {
-        Team team1 = teams.stream().filter(t -> t.getName().equalsIgnoreCase(team1Name)).findFirst().orElse(null);
-        Team team2 = teams.stream().filter(t -> t.getName().equalsIgnoreCase(team2Name)).findFirst().orElse(null);
+        DbManager dbManager = new DbManager();
+
+        //Baza
+        Team team1 = dbManager.getValueFromColumn(team1Name, Team.class, "name");
+        Team team2 = dbManager.getValueFromColumn(team2Name, Team.class, "name");
+
+        //Nie Baza
+       // Team team1 = teams.stream().filter(t -> t.getName().equalsIgnoreCase(team1Name)).findFirst().orElse(null);
+       // Team team2 = teams.stream().filter(t -> t.getName().equalsIgnoreCase(team2Name)).findFirst().orElse(null);
 
         if (team1 == null || team2 == null) {
             return "Wrong team";
         }
+        //Baza
+       Statistics stats1 = dbManager.getTableById(team1.getId(), TeamStatistics.class);
+       Statistics stats2 = dbManager.getTableById(team2.getId(), TeamStatistics.class);
 
-        Statistics stats1 = statistics.get(team1.getId());
-        Statistics stats2 = statistics.get(team2.getId());
+        //Nie baza
+        //Statistics stats1 = statistics.get(team1.getId());
+        //Statistics stats2 = statistics.get(team2.getId());
         if (stats1 == null || stats2 == null) {
             return "Cannot get stats";
         }
@@ -45,6 +63,52 @@ public class MatchPrediction {
         ArrayList<Attribute> attributes = defineAttributes();
         Instances dataset = new Instances("MatchPrediction", attributes, matches.size());
         dataset.setClassIndex(dataset.numAttributes() - 1);
+
+        DbManager dbManager = new DbManager();
+
+        Object result = dbManager.getFromDB("matches", "all", "all");
+
+        List<Object[]> resultList = (List<Object[]>) result;
+        System.out.println("Len: " + resultList.size());
+        // Model się uczy z bazy danych
+        int counter = 0;
+        for (Object[] row : resultList) {
+            String stringHomeId = (String) row[4];
+            String stringAwayId = (String) row[3];
+            if(stringAwayId == null || stringHomeId ==null){
+                System.out.println("Brak id dla zespołu, pomijam mecz.");  //Duzo pomija / dużo więcej niż w przypadku nie z bazy danych, teamy mogą się źle wrzcuać do bazy danych
+                counter++;
+                continue;
+            }
+            UUID homeTeamId = convertToUUID(stringHomeId);
+            UUID awayTeamId = convertToUUID(stringAwayId);
+            Statistics homeStats = dbManager.getTableById(homeTeamId, TeamStatistics.class);
+            Statistics awayStats = dbManager.getTableById(awayTeamId, TeamStatistics.class);
+            if (homeStats == null || awayStats == null) {
+                System.out.println("Brak statystyk dla jednego z zespołów, pomijam mecz."); //Duzo pomija / dużo więcej niż w przypadku nie z bazy danych, teamy mogą się źle wrzcuać do bazy danych ten sam powód;
+                counter++;
+                continue;
+            }
+
+            DenseInstance instance = createInstance(homeStats, awayStats, dataset);
+
+            Integer homeScore = (Integer) row[2];
+            Integer awayScore = (Integer) row[1];
+            if(homeScore > awayScore){
+                instance.setValue(attributes.get(16), "Team1 win");
+            }
+            else if(homeScore < awayScore){
+                instance.setValue(attributes.get(16), "Team2 win");
+            }else{
+                continue;
+            }
+            dataset.add(instance);
+
+        }
+
+
+/*
+        // Model NIE uczy się z bazy danych - do testów
 
         for (Match match : matches) {
             UUID homeTeamId = match.getHomeTeamId();
@@ -70,6 +134,8 @@ public class MatchPrediction {
 
             dataset.add(instance);
         }
+
+ */
 
         Logistic logistic = new Logistic();
         logistic.buildClassifier(dataset);
@@ -101,7 +167,6 @@ public class MatchPrediction {
 
         return attributes;
     }
-
 
     private static DenseInstance createInstance(Statistics stats1, Statistics stats2, Instances dataset) {
         DenseInstance instance = new DenseInstance(dataset.numAttributes());

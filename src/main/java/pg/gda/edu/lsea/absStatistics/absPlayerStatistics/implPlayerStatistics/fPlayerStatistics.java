@@ -1,10 +1,9 @@
 package pg.gda.edu.lsea.absStatistics.absPlayerStatistics.implPlayerStatistics;
 
+import jakarta.persistence.*;
+import pg.gda.edu.lsea.absPerson.implPerson.Player;
 import pg.gda.edu.lsea.absStatistics.absPlayerStatistics.PlayerStatistics;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
-import jakarta.persistence.Transient;
 import java.util.UUID;
 
 /**
@@ -24,6 +23,10 @@ public class fPlayerStatistics extends PlayerStatistics {
     @Transient
     private float duelPercentage;
 
+    @OneToOne
+    @MapsId
+    @JoinColumn(name = "id")
+    Player player;
 
     /**
      * Constructs fPlayerStatistics with the specified ID
@@ -119,5 +122,10 @@ public class fPlayerStatistics extends PlayerStatistics {
      */
     public void setDuelPercentage() {
         this.duelPercentage = (float) this.totalDuelWins / this.totalDuel;
+    }
+
+
+    public void setPlayer(Player player) {
+        this.player = player;
     }
 }
