@@ -1,5 +1,8 @@
 package pg.gda.edu.lsea.absPerson;
 
+import jakarta.persistence.Id;
+import jakarta.persistence.MappedSuperclass;
+import jakarta.persistence.Transient;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -12,12 +15,16 @@ import java.util.UUID;
  *
  * @author TeamOrange
  */
+@MappedSuperclass
 public abstract class Person implements Cloneable {
     /** Unique identifier for the person */
+    @Id
     final private UUID id;
     /** Name of the Person */
+    @Transient
     private String name;
     /** Person's country of origin done by UUID mapping */
+    @Transient
     private Map<UUID, String> country;
 
     /**
@@ -56,8 +63,8 @@ public abstract class Person implements Cloneable {
 
     /**
      *
-     * @return
-     * @throws CloneNotSupportedException
+     * @return Returns the cloned object
+     * @throws CloneNotSupportedException if cloning is prohibited
      */
     @Override
     protected Object clone() throws CloneNotSupportedException {

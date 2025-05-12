@@ -1,17 +1,25 @@
 package pg.gda.edu.lsea.absStatistics;
 
-import java.util.UUID;
+import jakarta.persistence.*;
+import pg.gda.edu.lsea.absPerson.implPerson.Player;
 
+import java.util.UUID;
 /**
  * Statistics is an abstract class that provides the foundation for tracking
  * various performance metrics in the football system
  *
  * Core statistical attributes and methods have been implemented in it.
  */
+
+@MappedSuperclass
 public abstract class Statistics {
     /** Unique identifier for these statistics */
+    @Id
     private final UUID id;
+
+
     /** Winning percentage */
+    @Transient
     private float winPerc;
     /** Number of games played */
     private int gamesPlayed;
@@ -24,8 +32,9 @@ public abstract class Statistics {
     /** Number of goals conceded */
     private int totalGoalConceded;
 
+    @Transient
     private float goalPerc;
-
+    @Transient
     private float cleanSheetPerc;
 
     /**
@@ -56,6 +65,13 @@ public abstract class Statistics {
         this.totalCleanSheets = totalCleanSheets;
         this.id = id;
         this.totalGoalConceded = totalGoalConceded;
+    }
+
+    /**
+     * Nameless constructor for JPA sake. DO NOT USE
+     */
+    protected Statistics() {
+        this.id = null;
     }
 
     /**

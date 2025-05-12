@@ -2,6 +2,9 @@ package pg.gda.edu.lsea.match;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
+import jakarta.persistence.*;
+import pg.gda.edu.lsea.team.Team;
+
 import java.time.LocalDate;
 import java.util.Map;
 import java.util.UUID;
@@ -12,29 +15,45 @@ import java.util.UUID;
  * This class implements the Comparable interface to allow matches to be compared based on their date
  */
 
-
+@Entity
+@Table(name="Matches")
 @JsonDeserialize(using = MatchDeserializer.class)
 public class Match implements Comparable<Match> {
     /** Unique identifier for this match */
+    @Id
     final private UUID id;
     /** Date when the match was played */
+    @Transient
     private LocalDate date;
     /** Identifier of the competition */
+    @Transient
     private Map<UUID, String> compt;
     /** Season when the match was played */
+    @Transient
     private String season;
     /** Identifier of the home team */
-    private UUID homeTeamId;
+    @ManyToOne
+    @JoinColumn(name = "home_team_id")
+    private Team homeTeam;
     /** Identifier of the away team */
-    private UUID awayTeamId;
+    @ManyToOne
+    @JoinColumn(name = "away_team_id", referencedColumnName = "id")
+    private Team awayTeam;
     /** Score of the home team */
     private int homeScore;
     /** Score of the away team */
     private int awayScore;
     /** Identifier of the referee */
+    @Transient
     private UUID refereeId;
+    @Transient
     private UUID homeCoachId;
+    @Transient
     private UUID awayCoachId;
+    @Transient
+    private UUID homeTeamId;
+    @Transient
+    private UUID awayTeamId;
 
     /**
      * Constructs a Match with the specified ID.
@@ -71,6 +90,22 @@ public class Match implements Comparable<Match> {
         this.refereeId = refereeId;
         this.homeCoachId = homeCoachId;
         this.awayCoachId = awayCoachId;
+    }
+    /**
+     * Nameless and parameterless constructor for jpa requirements sake. DO NOT USE
+     */
+    protected Match() {
+        this.id = null;
+        this.date = null;
+        this.compt = null;
+        this.season = null;
+        this.homeTeamId = null;
+        this.awayTeamId = null;
+        this.homeScore = -1;
+        this.awayScore = -1;
+        this.refereeId = null;
+        this.homeCoachId = null;
+        this.awayCoachId = null;
     }
 
     /**
@@ -284,4 +319,11 @@ public class Match implements Comparable<Match> {
         }
     }
 
+    public void setHomeTeam(Team homeTeam) {
+        this.homeTeam = homeTeam;
+    }
+
+    public void setAwayTeam(Team awayTeam) {
+        this.awayTeam = awayTeam;
+    }
 }

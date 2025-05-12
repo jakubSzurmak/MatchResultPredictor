@@ -1,6 +1,8 @@
 package pg.gda.edu.lsea.absStatistics.implStatistics;
 
+import jakarta.persistence.*;
 import pg.gda.edu.lsea.absStatistics.Statistics;
+import pg.gda.edu.lsea.team.Team;
 
 import java.util.UUID;
 
@@ -10,12 +12,19 @@ import java.util.UUID;
  * This class inherits all attributes and methods from the Statistics class
  * and does not have any additional attributes or methods besides the constructors
  */
+@Entity
+@Table(name="TeamStats")
 public class TeamStatistics extends Statistics {
+    @OneToOne
+    @MapsId
+    @JoinColumn(name = "id")
+    Team team;
     /**
      * Constructs TeamStatistics with the specified ID
      *
      * @param id is the unique identifier for these team statistics
      */
+
     public TeamStatistics(UUID id) {
         super(id);
     }
@@ -33,5 +42,11 @@ public class TeamStatistics extends Statistics {
     public TeamStatistics(UUID id, int gamesPlayed, int gamesWon, int goalsScored,
                           int totalCleanSheets, int totalGoalConceded) {
         super(id, gamesPlayed, gamesWon, goalsScored, totalCleanSheets, totalGoalConceded);
+    }
+
+    protected TeamStatistics() {}
+
+    public void setTeam(Team team) {
+        this.team = team;
     }
 }

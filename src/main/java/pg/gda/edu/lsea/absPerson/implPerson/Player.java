@@ -1,12 +1,12 @@
 package pg.gda.edu.lsea.absPerson.implPerson;
 
+import jakarta.persistence.*;
 import pg.gda.edu.lsea.absPerson.Person;
 
+import pg.gda.edu.lsea.team.Team;
+
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 
 /**
@@ -20,19 +20,37 @@ import java.util.UUID;
  * the Comparable interface which is used
  * to sort Players by their rating.
  */
+@Entity
+@Table(name="Players")
 public class Player extends Person implements Comparable<Player>, Cloneable {
     /** Nickname of the player */
+
+    @Transient
     private String nickname;
     /** Date of birth of the player */
+    @Transient
     private LocalDate dateOfBirth;
     /** Jersey number of the player */
+    @Transient
     private int jerseyNr;
     /** Current club of the player */
+    @Transient
     private String currClub;
     /** List of positions that the player plays */
+    @Transient
     private ArrayList<String> positions; //to discuss
     /** Rating of the player */
+    @Transient
     private int rating;
+    /** List of positions joined into one string seperated by ",". Empty-only for annotation mechanism */
+    private String positionsString;
+
+    @ManyToMany
+    @JoinTable(
+            name = "player_teams",
+            joinColumns = @JoinColumn(name = "player_id"),
+            inverseJoinColumns = @JoinColumn(name = "team_id"))
+    private Set<Team> teamSet = new HashSet<>();
 
     /**
      * Constructs a Player with some specified ID
@@ -65,6 +83,14 @@ public class Player extends Person implements Comparable<Player>, Cloneable {
         this.currClub = currClub;
         this.positions = positions;
         this.rating = rating;
+        this.positionsString = positions.toString();
+    }
+
+    /**
+     * Nameless and parameterless constructor for jpa requirements sake. DO NOT USE
+     */
+    public Player() {
+        super(null);
     }
 
     /**
@@ -99,6 +125,15 @@ public class Player extends Person implements Comparable<Player>, Cloneable {
         } catch (CloneNotSupportedException e) {
             throw new RuntimeException("Cloning Player failed", e);
         }
+    }
+
+
+    protected String joinPositions(ArrayList<String> positions) {
+        return String.join(",", positions);
+    }
+
+    public String getPositionsString() {
+        return joinPositions(this.positions);
     }
 
     /**
@@ -206,7 +241,9 @@ public class Player extends Person implements Comparable<Player>, Cloneable {
      * @param positions is the lsit of positions to set for this player
      */
     public void setPositions(ArrayList<String> positions) {
+
         this.positions = positions;
+        this.positionsString = positions.toString();
     }
 
 
@@ -233,5 +270,19 @@ public class Player extends Person implements Comparable<Player>, Cloneable {
     public int hashCode() {
         return getId().hashCode();
     }
+    private void ensureTeamSet() {
+        if (this.teamSet == null) {
+            this.teamSet = new HashSet<>();
+        }
+    }
 
+    public void setTeamSet (Set<Team> teamSet) { this.teamSet = teamSet; }
+    public void updateTeamSet(Team team) {
+        this.ensureTeamSet();
+        this.teamSet.add(team);
+    }
+
+    public Set<Team> getTeamSet() {
+        return teamSet;
+    }
 }
