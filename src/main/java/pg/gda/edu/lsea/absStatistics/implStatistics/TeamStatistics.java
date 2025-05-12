@@ -15,7 +15,7 @@ import java.util.UUID;
 @Entity
 @Table(name="TeamStats")
 public class TeamStatistics extends Statistics {
-    @OneToOne(cascade = CascadeType.REMOVE)
+    @OneToOne
     @MapsId
     @JoinColumn(name = "id")
     Team team;

@@ -9,6 +9,10 @@ import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Root;
 import pg.gda.edu.lsea.team.Team;
 import pg.gda.edu.lsea.absPerson.implPerson.Player;
+import pg.gda.edu.lsea.absStatistics.absPlayerStatistics.implPlayerStatistics.fPlayerStatistics;
+import pg.gda.edu.lsea.absStatistics.absPlayerStatistics.implPlayerStatistics.gPlayerStatistics;
+import pg.gda.edu.lsea.absStatistics.implStatistics.TeamStatistics;
+import pg.gda.edu.lsea.match.Match;
 
 import java.util.List;
 import java.util.UUID;
@@ -80,6 +84,10 @@ public class DbManager {
             Class<?> entityClass = switch (selectionTable.toLowerCase()) {
                 case "players" -> Player.class;
                 case "teams" -> Team.class;
+                case "fplayerstatistics" -> fPlayerStatistics.class;
+                case "gplayerstatistics" -> gPlayerStatistics.class;
+                case "teamstats" -> TeamStatistics.class;
+                case "matches" -> Match.class;
                 default -> throw new IllegalArgumentException("Unknown table: " + selectionTable);
             };
 
@@ -160,6 +168,18 @@ public class DbManager {
                         entityManager.remove(entityManager.contains(player) ? player : entityManager.merge(player));
 
                     } else if (obj instanceof Team team) {
+                        List<Match> matches = entityManager.createQuery(
+                                        "SELECT m FROM Match m WHERE m.homeTeam = :team OR m.awayTeam = :team", Match.class)
+                                .setParameter("team", team)
+                                .getResultList();
+                        for (Match match : matches) {
+                            entityManager.remove(match);
+                        }
+
+                        TeamStatistics stats = entityManager.find(TeamStatistics.class, team.getId());
+                        if (stats != null) {
+                            entityManager.remove(stats);
+                        }
                         team.getPlayerSet().clear();
                         entityManager.merge(team);
 
