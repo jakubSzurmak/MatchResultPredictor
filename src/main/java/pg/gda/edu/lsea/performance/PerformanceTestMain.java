@@ -44,8 +44,8 @@ public class PerformanceTestMain {
 
             // Run the actual performance tests
             runDatabasePerformanceTests(teams, players, events, matches);
-           // runAnalyticsPerformanceTests(teams, players, events, matches);
-            //runComprehensivePerformanceTests(teams, players, events, matches);
+           runAnalyticsPerformanceTests(teams, players, events, matches);
+
 
         } catch (Exception e) {
             System.err.println("Error during performance testing: " + e.getMessage());
@@ -58,31 +58,43 @@ public class PerformanceTestMain {
             List<Team> teams, HashSet<Player> players, List<Event> events, List<Match> matches) {
 
         DbManager dbManager = new DbManager();
-        List<PerformanceTestUtil.PerformanceResult> allResults = new ArrayList<>();
+        List<PerformanceTestUtil.PerformanceResult> rResults = new ArrayList<>();
 
         System.out.println("\n== Testing Database Read Operations ==");
         List<PerformanceTestUtil.PerformanceResult> readResults =
                 PerformanceTestUtil.testDatabaseReads(dbManager, TEST_RUNS);
-        allResults.addAll(readResults);
+        rResults.addAll(readResults);
         readResults.forEach(System.out::println);
 
         System.out.println("\n== Testing Database Write Operations ==");
         List<PerformanceTestUtil.PerformanceResult> writeResults =
                 PerformanceTestUtil.testDatabaseWrites(dbManager, TEST_RUNS);
-        allResults.addAll(writeResults);
+        rResults.addAll(writeResults);
         writeResults.forEach(System.out::println);
 
+        exportResultsToFile(rResults, "Transaction operations");
+
+
         System.out.println("\n== Testing Specific Query Performance ==");
+
+        List<PerformanceTestUtil.PerformanceResult> qResults = new ArrayList<>();
+
 
         PerformanceTestUtil.PerformanceResult teamsByNameQuery = PerformanceTestUtil.measurePerformance(
                 "Search Teams by Name Pattern",
                 () -> dbManager.getFromDB("teams", "name", "Man%"),
                 1, TEST_RUNS);
         System.out.println(teamsByNameQuery);
-        allResults.add(teamsByNameQuery);
+        qResults.add(teamsByNameQuery);
+
+        exportResultsToFile(qResults, "Transaction operations");
+
 
         // Test transaction impact
         System.out.println("\n== Testing Transaction Impact ==");
+
+
+        List<PerformanceTestUtil.PerformanceResult> tResults = new ArrayList<>();
 
         // Test with transactions
         PerformanceTestUtil.PerformanceResult batchTransaction = PerformanceTestUtil.measurePerformance(
@@ -90,18 +102,18 @@ public class PerformanceTestMain {
                 () -> performMultipleUpdatesInSingleTransaction(dbManager),
                 1, TEST_RUNS);
         System.out.println(batchTransaction);
-        allResults.add(batchTransaction);
+        tResults.add(batchTransaction);
 
         PerformanceTestUtil.PerformanceResult multipleTransactions = PerformanceTestUtil.measurePerformance(
                 "Multiple Updates with Separate Transactions",
                 () -> performMultipleUpdatesWithSeparateTransactions(dbManager),
                 1, TEST_RUNS);
         System.out.println(multipleTransactions);
-        allResults.add(multipleTransactions);
+        tResults.add(multipleTransactions);
 
 
         // Export results to CSV for graphing
-        exportResultsToFile(allResults, "DB operations");
+        exportResultsToFile(tResults, "Transaction operations");
 
         System.out.println("Performance tests completed. Results exported.");
     }
@@ -112,13 +124,22 @@ public class PerformanceTestMain {
      */
     private static void performMultipleUpdatesInSingleTransaction(DbManager dbManager) {
 
-        final int ROW_COUNT = 10;
+
         List<String> testTeamNames = new ArrayList<>();
 
+        testTeamNames.add("Arsenal");
+        testTeamNames.add("Watford");
+        testTeamNames.add("Everton");
+        testTeamNames.add("Fulham");
+        testTeamNames.add("Argentina");
+        testTeamNames.add("Colombia");
+        testTeamNames.add("Canada");
+        testTeamNames.add("Uruguay");
+        testTeamNames.add("Panama");
+        testTeamNames.add("Peru");
 
-        for (int i = 0; i < ROW_COUNT; i++) {
-            testTeamNames.add("Test_Team_" + i);
-        }
+
+
 
         // Perform updates in a single transaction
         dbManager.updateMultipleRowsSingleTransaction(
@@ -134,13 +155,20 @@ public class PerformanceTestMain {
      */
     private static void performMultipleUpdatesWithSeparateTransactions(DbManager dbManager) {
         // Create list of team names to update
-        final int ROW_COUNT = 10;
         List<String> testTeamNames = new ArrayList<>();
 
 
-        for (int i = 0; i < ROW_COUNT; i++) {
-            testTeamNames.add("Test_Team_" + i);
-        }
+        testTeamNames.add("Athletic Club");
+        testTeamNames.add("Valencia");
+        testTeamNames.add("Las Palmas");
+        testTeamNames.add("Eibar");
+        testTeamNames.add("Real Betis");
+        testTeamNames.add("Villarreal");
+        testTeamNames.add("Levante UD");
+        testTeamNames.add("Espanyol");
+        testTeamNames.add("Celta Vigo");
+        testTeamNames.add("Getafe");
+
 
         // Perform updates with separate transactions
         dbManager.updateMultipleRowsMultipleTransactions(
@@ -223,22 +251,17 @@ public class PerformanceTestMain {
 
 
 
-        PerformanceTestUtil.PerformanceResult statsGeneration = PerformanceTestUtil.measurePerformance(
-                "Statistics Generation",
-                () -> ParseData.getStats(players, events, matches),
-                1, TEST_RUNS);
-        System.out.println(statsGeneration);
-        analysisResults.add(statsGeneration);
 
         Map<UUID, Statistics> stats = ParseData.getStats(players, events, matches);
 
 
         // Test prediction calculation performance
         PerformanceTestUtil.PerformanceResult predictionResult = PerformanceTestUtil.measurePerformance(
-                "Match Prediction",
+                "Match Prediction - No Database",
                 () -> {
                     try {
                         ParseData.getPrediction(matches, stats, teams, "Barcelona", "Real Madrid");
+                        System.out.println(ParseData.getPrediction(matches, stats, teams, "Barcelona", "Real Madrid"));
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -246,6 +269,19 @@ public class PerformanceTestMain {
                 1, TEST_RUNS);
         System.out.println(predictionResult);
         analysisResults.add(predictionResult);
+
+        PerformanceTestUtil.PerformanceResult correlationResult = PerformanceTestUtil.measurePerformance(
+                "Correlation - No Database",
+                () -> {
+                    try {
+                        ParseData.getCorreletion(stats,players);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                },
+                1, TEST_RUNS);
+        System.out.println(correlationResult);
+        analysisResults.add(correlationResult);
 
         // Export results to CSV for graphing
         exportResultsToFile(analysisResults, "Analysis");

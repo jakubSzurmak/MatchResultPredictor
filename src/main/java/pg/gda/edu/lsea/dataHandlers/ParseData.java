@@ -159,7 +159,7 @@ public class ParseData {
             if (stat.getValue() instanceof TeamStatistics teamS) {
                 Team team = dbManager.getTableById(stat.getKey(), Team.class);
                 teamS.setTeam(team);
-                dbManager.saveToDb(teamS);
+               dbManager.saveToDb(teamS);
             } else if (stat.getValue() instanceof fPlayerStatistics) {
                 Player player = dbManager.getTableById(stat.getKey(), Player.class);
                 fPlayerStatistics playerS = (fPlayerStatistics) stat.getValue();
@@ -219,7 +219,9 @@ public class ParseData {
             totalPasses.add((Integer) row[10]);
             totalShots.add((Integer) row[11]);
         }
-/*      Liczenie korelacji bez korzystania z bazy - do testowania info
+
+ /*
+   // Liczenie korelacji bez korzystania z bazy - do testowania info
 
         for (Player player : parsedPlayers){
             if( !player.getPositions().contains("Goalkeeper") && stats.get(player.getId()) instanceof PlayerStatistics){
@@ -238,8 +240,10 @@ public class ParseData {
 
                 }
             }
-        }*/
+        }
 
+
+  */
         List<String> keys = new ArrayList<>(statsList.keySet());
         List<String> finalCorr = new ArrayList<>();
         for (int i = 0; i < keys.size(); i++) {

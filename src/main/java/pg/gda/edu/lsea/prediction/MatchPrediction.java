@@ -31,19 +31,19 @@ public class MatchPrediction {
         Team team2 = dbManager.getValueFromColumn(team2Name, Team.class, "name");
 
         //Nie Baza
-     //   Team team1 = teams.stream().filter(t -> t.getName().equalsIgnoreCase(team1Name)).findFirst().orElse(null);
+       // Team team1 = teams.stream().filter(t -> t.getName().equalsIgnoreCase(team1Name)).findFirst().orElse(null);
        // Team team2 = teams.stream().filter(t -> t.getName().equalsIgnoreCase(team2Name)).findFirst().orElse(null);
 
         if (team1 == null || team2 == null) {
             return "Wrong team";
         }
         //Baza
-        Statistics stats1 = dbManager.getTableById(team1.getId(), TeamStatistics.class);
-        Statistics stats2 = dbManager.getTableById(team2.getId(), TeamStatistics.class);
+       Statistics stats1 = dbManager.getTableById(team1.getId(), TeamStatistics.class);
+       Statistics stats2 = dbManager.getTableById(team2.getId(), TeamStatistics.class);
 
         //Nie baza
-      //  Statistics stats1 = statistics.get(team1.getId());
-      //  Statistics stats2 = statistics.get(team2.getId());
+        //Statistics stats1 = statistics.get(team1.getId());
+        //Statistics stats2 = statistics.get(team2.getId());
         if (stats1 == null || stats2 == null) {
             return "Cannot get stats";
         }
@@ -63,6 +63,7 @@ public class MatchPrediction {
         ArrayList<Attribute> attributes = defineAttributes();
         Instances dataset = new Instances("MatchPrediction", attributes, matches.size());
         dataset.setClassIndex(dataset.numAttributes() - 1);
+
         DbManager dbManager = new DbManager();
 
         Object result = dbManager.getFromDB("matches", "all", "all");
@@ -105,8 +106,10 @@ public class MatchPrediction {
 
         }
 
-        // Model NIE uczy się z bazy danych - do testów
+
 /*
+        // Model NIE uczy się z bazy danych - do testów
+
         for (Match match : matches) {
             UUID homeTeamId = match.getHomeTeamId();
             UUID awayTeamId = match.getAwayTeamId();
@@ -130,11 +133,12 @@ public class MatchPrediction {
             }
 
             dataset.add(instance);
-        }*/
+        }
+
+ */
 
         Logistic logistic = new Logistic();
         logistic.buildClassifier(dataset);
-        System.out.println(counter);
         return logistic;
     }
 

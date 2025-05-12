@@ -281,4 +281,8 @@ public class Player extends Person implements Comparable<Player>, Cloneable {
         this.ensureTeamSet();
         this.teamSet.add(team);
     }
+
+    public Set<Team> getTeamSet() {
+        return teamSet;
+    }
 }
