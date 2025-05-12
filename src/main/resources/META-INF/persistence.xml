@@ -1,0 +1,26 @@
+<persistence xmlns="https://jakarta.ee/xml/ns/persistence"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xsi:schemaLocation="https://jakarta.ee/xml/ns/persistence
+                                 https://jakarta.ee/xml/ns/persistence/persistence_3_0.xsd"
+             version="3.0">
+
+    <persistence-unit name="pg.gda.edu.lsea" transaction-type="RESOURCE_LOCAL">
+        <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
+        <class>pg.gda.edu.lsea.team.Team</class>
+        <class>pg.gda.edu.lsea.absStatistics.implStatistics.TeamStatistics</class>
+        <class>pg.gda.edu.lsea.match.Match</class>
+        <class>pg.gda.edu.lsea.absPerson.implPerson.Player</class>
+        <class>pg.gda.edu.lsea.absStatistics.absPlayerStatistics.implPlayerStatistics.fPlayerStatistics</class>
+        <class>pg.gda.edu.lsea.absStatistics.absPlayerStatistics.implPlayerStatistics.gPlayerStatistics</class>
+        <!-- Automatically scanned annotated entities -->
+        <properties>
+            <!-- JDBC connection settings -->
+            <property name="jakarta.persistence.jdbc.driver" value="org.apache.derby.client.ClientAutoloadedDriver"/>
+            <property name="jakarta.persistence.jdbc.user" value="APP"/>
+            <property name="jakarta.persistence.jdbc.password" value="APP"/>
+            <property name="jakarta.persistence.jdbc.url" value="jdbc:derby://localhost:1527/LSEA_DB;create=true"/>
+            <property name="jakarta.persistence.schema-generation.database.action" value="create"/>
+
+        </properties>
+    </persistence-unit>
+</persistence>

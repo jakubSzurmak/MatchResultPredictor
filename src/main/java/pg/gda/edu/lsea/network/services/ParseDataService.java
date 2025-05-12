@@ -17,12 +17,12 @@ import java.util.*;
  * Service making handling and parsing the data for the analysis
  */
 public class ParseDataService {
-    private List<Match> matches;
-    private Set<Referee> referees;
-    private Map<UUID, Coach> coaches;
-    private List<Team> teams;
-    private HashSet<Player> players;
-    private List<Event> events;
+    private final List<Match> matches;
+    private final Set<Referee> referees;
+    private final Map<UUID, Coach> coaches;
+    private final List<Team> teams;
+    private final HashSet<Player> players;
+    private final List<Event> events;
     private Map<UUID, Statistics> statistics;
 
 
@@ -46,7 +46,11 @@ public class ParseDataService {
     private void initializeData() {
         try{
             ParseData.parseData(matches,referees,coaches,teams,players,events);
+            ParseData.handleManyToMany(players);
             this.statistics = ParseData.getStats(players,events,matches);
+            // Do testowania jak działa liczenie statystyk i predykcji
+            ParseData.getCorreletion(statistics, players);
+            System.out.println(ParseData.getPrediction(matches, statistics, teams, "Barcelona", "Borussia Dortmund"));
             System.out.println("Data initialization successful");
         } catch (Exception e) {
             System.err.println("Error initializing data: " + e.getMessage());

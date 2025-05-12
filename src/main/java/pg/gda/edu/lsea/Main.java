@@ -2,13 +2,70 @@ package pg.gda.edu.lsea;
 
 
 import java.io.IOException;
+import java.util.Scanner;
+import pg.gda.edu.lsea.database.DbManager;
+import java.util.List;
+
 
 
 /**
  * 1st entry point class
  */
 public class Main {
-    public static void main(String[] args) throws IOException {
-        System.out.println("Hello and welcome!");
+
+    private static void displayTeams(DbManager dbManager) {
+        Object result = dbManager.getFromDB("teams", "id", "all");
+
+        List<Object[]> resultList = (List<Object[]>) result;
+
+        System.out.println("Teams List:");
+        for (Object[] row : resultList) {
+            String teamName = (String) row[1];
+            System.out.println(teamName);
+        }
+    }
+
+    public static void main(String[] args) {
+        DbManager dbManager = new DbManager();
+        Scanner scanner = new Scanner(System.in);
+
+        System.out.println("Choose an operation: [delete] or [update]");
+        String choice = scanner.nextLine().trim().toLowerCase();
+
+        if (choice.equals("delete")) {
+            System.out.print("Enter table name: ");
+            String table = scanner.nextLine().trim();
+
+            System.out.print("Enter condition column: ");
+            String conditionColumn = scanner.nextLine().trim();
+
+            System.out.print("Enter condition value (or type 'all'): ");
+            String conditionValue = scanner.nextLine().trim();
+
+            dbManager.deleteFromDb(table, conditionColumn, conditionValue);
+
+        } else if (choice.equals("update")) {
+            System.out.print("Enter table name: ");
+            String table = scanner.nextLine().trim();
+
+            System.out.print("Enter column to update: ");
+            String setColumn = scanner.nextLine().trim();
+
+            System.out.print("Enter new value for that column: ");
+            String setValue = scanner.nextLine().trim();
+
+            System.out.print("Enter condition column: ");
+            String conditionColumn = scanner.nextLine().trim();
+
+            System.out.print("Enter condition value (or type 'all'): ");
+            String conditionValue = scanner.nextLine().trim();
+
+            dbManager.updateInDb(table, setColumn, setValue, conditionColumn, conditionValue);
+
+        } else {
+            System.out.println("Invalid option. Please choose 'delete' or 'update'.");
+        }
+
+        scanner.close();
     }
 }
