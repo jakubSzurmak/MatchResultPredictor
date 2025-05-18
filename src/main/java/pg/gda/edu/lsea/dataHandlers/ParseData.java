@@ -102,7 +102,7 @@ public class ParseData {
         String directory = "matches";
         List<Team> parsedTeams = new ArrayList<>();
         Set<Team> hashTeam = new HashSet<>();
-        DbManager dbManager = new DbManager();
+        DbManager dbManager = DbManager.getInstance();
         try {
             List<Path> pathsL = getFilePath(directory, 2);
             for (Path path : pathsL) {
@@ -151,7 +151,7 @@ public class ParseData {
     public static Map<UUID, Statistics> getStats (HashSet<Player> parsedPlayers, List<Event> parsedEvents,List<Match> matches) {
         ConvertStatistics convertStatistics = new ConvertStatistics();
         Map<UUID, Statistics> stats = new HashMap<>();
-        DbManager dbManager = new DbManager();
+        DbManager dbManager = DbManager.getInstance();
         convertStatistics.getPlayerStat(parsedPlayers, parsedEvents,stats);
         convertStatistics.getTeamCoachStats(stats, matches);
         // Pakowanie do bazy team statistics, player statistics, goalkeeper statistics
@@ -179,7 +179,7 @@ public class ParseData {
 
     public static List<String> getCorreletion(Map<UUID, Statistics> stats, HashSet<Player> parsedPlayers){
         Map<String, List<Integer>> statsList = new HashMap<>();
-        DbManager dbManager = new DbManager();
+        DbManager dbManager = DbManager.getInstance();
         List<Integer> totalShots = new ArrayList<>();
         List<Integer> totalPasses = new ArrayList<>();
         List<Integer> totalAssists = new ArrayList<>();
@@ -305,7 +305,7 @@ public class ParseData {
 
     public static void handleManyToMany(HashSet<Player>players){
         // Pakowanie playersow do bazy przy jednoczesnym zajęciem się relacją wiele do wiele między teams a players
-        DbManager dbManager = new DbManager();
+        DbManager dbManager = DbManager.getInstance();
         for(Player player:players){
             Team team = dbManager.getValueFromColumn(player.getCurrClub(), Team.class, "name" );
             player.updateTeamSet(team);

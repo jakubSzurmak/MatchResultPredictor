@@ -22,6 +22,22 @@ public class DbManager {
     private static EntityManagerFactory entityManagerFactory = Persistence.createEntityManagerFactory(
             "pg.gda.edu.lsea");
 
+    private static DbManager instance;
+
+    protected DbManager() {
+
+    }
+
+    public static DbManager getInstance() {
+        if (instance == null) {
+            instance = new DbManager();
+        }
+        return instance;
+    }
+
+    public static void setInstance(DbManager customInstance) {
+        instance = customInstance;
+    }
 
     public void saveToDb(Object entity) {
         EntityManager entityManager = entityManagerFactory.createEntityManager();

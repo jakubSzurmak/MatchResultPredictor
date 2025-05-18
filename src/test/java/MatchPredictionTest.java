@@ -11,6 +11,7 @@ import pg.gda.edu.lsea.match.Match;
 import pg.gda.edu.lsea.prediction.MatchPrediction;
 import pg.gda.edu.lsea.team.Team;
 import weka.classifiers.functions.Logistic;
+import weka.core.Attribute;
 import weka.core.Instance;
 import weka.core.Instances;
 
@@ -40,12 +41,17 @@ public class MatchPredictionTest {
     public void setUp() throws Exception {
         MockitoAnnotations.openMocks(this);
 
+        DbManager.setInstance(mockDbManager);
+
 
         mockMatches = new ArrayList<>();
         mockTeams = new ArrayList<>();
         mockStatistics = new HashMap<>();
         mockModel = mock(Logistic.class);
-        mockDatasetStructure = mock(Instances.class);
+
+        ArrayList<Attribute> attributes = defineAttributes();
+        mockDatasetStructure = new Instances("MatchPrediction", attributes, 0);
+        mockDatasetStructure.setClassIndex(mockDatasetStructure.numAttributes() - 1);
 
 
         team1 = new Team(UUID.randomUUID());
@@ -69,19 +75,46 @@ public class MatchPredictionTest {
 
 
         stats2 = new TeamStatistics(team2.getId());
-        stats1.setGoalsScored(38);
-        stats1.setGamesPlayed(20);
-        stats1.setGamesWon(13);
-        stats1.setTotalCleanSheets(8);
-        stats1.setTotalGoalConceded(15);
-        stats1.setGoalPerc();
-        stats1.setCleanSheetPerc();
-        stats1.setWinPerc();
+        stats2.setGoalsScored(38);
+        stats2.setGamesPlayed(20);
+        stats2.setGamesWon(13);
+        stats2.setTotalCleanSheets(8);
+        stats2.setTotalGoalConceded(15);
+        stats2.setGoalPerc();
+        stats2.setCleanSheetPerc();
+        stats2.setWinPerc();
 
         mockStatistics.put(team1.getId(), stats1);
         mockStatistics.put(team2.getId(), stats2);
 
-        mockDbManager = mock(DbManager.class);
+
+    }
+
+
+    private ArrayList<Attribute> defineAttributes(){
+        ArrayList<Attribute> attributes = new ArrayList<>();
+        attributes.add(new Attribute("team1_winPercentage"));
+        attributes.add(new Attribute("team1_totalGoals"));
+        attributes.add(new Attribute("team1_totalMatches"));
+        attributes.add(new Attribute("team1_totalWinMatches"));
+        attributes.add(new Attribute("team1_totalCleanSheets"));
+        attributes.add(new Attribute("team1_totalGoalsConceded"));
+        attributes.add(new Attribute("team1_goalPercentage"));
+        attributes.add(new Attribute("team1_cleanSheetPercentage"));
+
+        attributes.add(new Attribute("team2_winPercentage"));
+        attributes.add(new Attribute("team2_totalGoals"));
+        attributes.add(new Attribute("team2_totalMatches"));
+        attributes.add(new Attribute("team2_totalWinMatches"));
+        attributes.add(new Attribute("team2_totalCleanSheets"));
+        attributes.add(new Attribute("team2_totalGoalsConceded"));
+        attributes.add(new Attribute("team2_goalPercentage"));
+        attributes.add(new Attribute("team2_cleanSheetPercentage"));
+
+        List<String> classValues = List.of("Team1 win", "Team2 win");
+        attributes.add(new Attribute("result", classValues));
+
+        return attributes;
     }
 
 
@@ -92,64 +125,58 @@ public class MatchPredictionTest {
         double[] probabilities = {0.6, 0.4};
         when(mockModel.distributionForInstance(any(Instance.class))).thenReturn(probabilities);
 
-        try (MockedStatic<DbManager> mockedDbManager = Mockito.mockStatic(DbManager.class)){
-            mockedDbManager.when(DbManager::new).thenReturn(mockDbManager);
 
-            when(mockDbManager.getValueFromColumn(eq("Barcelona"), eq(Team.class), eq("name"))).thenReturn(team1);
-            when(mockDbManager.getValueFromColumn(eq("Real Madrid"), eq(Team.class), eq("name"))).thenReturn(team2);
-            when(mockDbManager.getTableById(eq(team1.getId()), eq(TeamStatistics.class))).thenReturn(stats1);
-            when(mockDbManager.getTableById(eq(team2.getId()), eq(TeamStatistics.class))).thenReturn(stats2);
+        when(mockDbManager.getValueFromColumn(eq("Barcelona"), eq(Team.class), eq("name"))).thenReturn(team1);
+        when(mockDbManager.getValueFromColumn(eq("Real Madrid"), eq(Team.class), eq("name"))).thenReturn(team2);
+        when(mockDbManager.getTableById(eq(team1.getId()), eq(TeamStatistics.class))).thenReturn(stats1);
+        when(mockDbManager.getTableById(eq(team2.getId()), eq(TeamStatistics.class))).thenReturn(stats2);
 
 
-            //Act
-            String result = MatchPrediction.predictMatch("Barcelona", "Real Madrid", mockTeams, mockModel, mockStatistics, mockDatasetStructure);
+        //Act
+        String result = MatchPrediction.predictMatch("Barcelona", "Real Madrid", mockTeams, mockModel, mockStatistics, mockDatasetStructure);
 
-            //Assert
-            assertTrue(result.contains("Probability of winning Barcelona: 0.6"));
-            assertTrue(result.contains("Probability of winning Real Madrid: 0.4"));
+        //Assert
+        assertTrue(result.contains("Probability of winning Barcelona: 0.6"));
+        assertTrue(result.contains("Probability of winning Real Madrid: 0.4"));
 
-            verify(mockDbManager).getValueFromColumn(eq("Barcelona"), eq(Team.class), eq("name"));
-            verify(mockDbManager).getValueFromColumn(eq("Real Madrid"), eq(Team.class), eq("name"));
-            verify(mockDbManager).getTableById(eq(team1.getId()), eq(TeamStatistics.class));
-            verify(mockDbManager).getTableById(eq(team2.getId()), eq(TeamStatistics.class));
-        }
+        verify(mockDbManager).getValueFromColumn(eq("Barcelona"), eq(Team.class), eq("name"));
+        verify(mockDbManager).getValueFromColumn(eq("Real Madrid"), eq(Team.class), eq("name"));
+        verify(mockDbManager).getTableById(eq(team1.getId()), eq(TeamStatistics.class));
+        verify(mockDbManager).getTableById(eq(team2.getId()), eq(TeamStatistics.class));
+
     }
 
     @Test
     public void testPredictMatch_InvalidTeamName_ReturnsErrorMessage() throws Exception {
-        try(MockedStatic<DbManager> mockedDbManager = Mockito.mockStatic(DbManager.class)){
-            mockedDbManager.when(DbManager::new).thenReturn(mockDbManager);
 
-            when(mockDbManager.getValueFromColumn(eq("NonExistentTeam"), eq(Team.class), eq("name"))).thenReturn(null);
+        when(mockDbManager.getValueFromColumn(eq("NonExistentTeam"), eq(Team.class), eq("name"))).thenReturn(null);
 
-            //Act
-            String result = MatchPrediction.predictMatch("NonExistentTeam", "Real Madrid", mockTeams, mockModel, mockStatistics, mockDatasetStructure);
+        //Act
+        String result = MatchPrediction.predictMatch("NonExistentTeam", "Real Madrid", mockTeams, mockModel, mockStatistics, mockDatasetStructure);
 
-            //Assert
-            assertEquals("Wrong team", result);
+        //Assert
+        assertEquals("Wrong team", result);
 
-            verify(mockDbManager).getValueFromColumn(eq("NonExistentTeam"), eq(Team.class), eq("name"));
-        }
+        verify(mockDbManager).getValueFromColumn(eq("NonExistentTeam"), eq(Team.class), eq("name"));
+
     }
 
     @Test
     public void testPredictMatch_MissingStatistics_ReturnsErrorMessage() throws Exception {
-        try (MockedStatic<DbManager> mockedDbManager = Mockito.mockStatic(DbManager.class)){
-            mockedDbManager.when(DbManager::new).thenReturn(mockDbManager);
 
-            when(mockDbManager.getValueFromColumn(eq("Barcelona"), eq(Team.class), eq("name"))).thenReturn(team1);
-            when(mockDbManager.getValueFromColumn(eq("Real Madrid"), eq(Team.class), eq("name"))).thenReturn(team2);
-            when(mockDbManager.getTableById(eq(team1.getId()), eq(TeamStatistics.class))).thenReturn(null);
+        when(mockDbManager.getValueFromColumn(eq("Barcelona"), eq(Team.class), eq("name"))).thenReturn(team1);
+        when(mockDbManager.getValueFromColumn(eq("Real Madrid"), eq(Team.class), eq("name"))).thenReturn(team2);
+        when(mockDbManager.getTableById(eq(team1.getId()), eq(TeamStatistics.class))).thenReturn(null);
 
-            //Act
-            String result = MatchPrediction.predictMatch("Barcelona", "Real Madrid", mockTeams, mockModel, mockStatistics, mockDatasetStructure);
+        //Act
+        String result = MatchPrediction.predictMatch("Barcelona", "Real Madrid", mockTeams, mockModel, mockStatistics, mockDatasetStructure);
 
-            assertEquals("Cannot get stats", result);
+        assertEquals("Cannot get stats", result);
 
-            verify(mockDbManager).getValueFromColumn(eq("Barcelona"), eq(Team.class), eq("name"));
-            verify(mockDbManager).getValueFromColumn(eq("Real Madrid"), eq(Team.class), eq("name"));
-            verify(mockDbManager).getTableById(eq(team1.getId()), eq(TeamStatistics.class));
-        }
+        verify(mockDbManager).getValueFromColumn(eq("Barcelona"), eq(Team.class), eq("name"));
+        verify(mockDbManager).getValueFromColumn(eq("Real Madrid"), eq(Team.class), eq("name"));
+        verify(mockDbManager).getTableById(eq(team1.getId()), eq(TeamStatistics.class));
+
     }
 
 
@@ -157,21 +184,19 @@ public class MatchPredictionTest {
     public void testTrainModel_ValidInputs_ReturnsModel()  throws Exception {
         List<Object[]> matchesFromDb = createMockMatchesData();
 
-        try (MockedStatic<DbManager> mockedDbManager = Mockito.mockStatic(DbManager.class)){
-            mockedDbManager.when(DbManager::new).thenReturn(mockDbManager);
 
-            when(mockDbManager.getFromDB(eq("matches"), eq("all"), eq("all"))).thenReturn(matchesFromDb);
-            when(mockDbManager.getTableById(any(UUID.class), eq(TeamStatistics.class))).thenReturn(stats1);
+        when(mockDbManager.getFromDB(eq("matches"), eq("all"), eq("all"))).thenReturn(matchesFromDb);
+        when(mockDbManager.getTableById(any(UUID.class), eq(TeamStatistics.class))).thenReturn(stats1);
 
-            //Act
-            Logistic model = MatchPrediction.trainModel(mockMatches, mockStatistics);
+        //Act
+        Logistic model = MatchPrediction.trainModel(mockMatches, mockStatistics);
 
-            //Assert
-            assertNotNull(model);
+        //Assert
+        assertNotNull(model);
 
-            verify(mockDbManager).getFromDB(eq("matches"), eq("all"), eq("all"));
-            verify(mockDbManager, atLeastOnce()).getTableById(any(UUID.class), eq(TeamStatistics.class));
-        }
+        verify(mockDbManager).getFromDB(eq("matches"), eq("all"), eq("all"));
+        verify(mockDbManager, atLeastOnce()).getTableById(any(UUID.class), eq(TeamStatistics.class));
+
     }
 
     private List<Object[]> createMockMatchesData() {
