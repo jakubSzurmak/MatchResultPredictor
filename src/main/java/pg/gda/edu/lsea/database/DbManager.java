@@ -19,7 +19,7 @@ import java.util.UUID;
 
 public class DbManager {
 
-    private static final EntityManagerFactory entityManagerFactory = Persistence.createEntityManagerFactory(
+    private static EntityManagerFactory entityManagerFactory = Persistence.createEntityManagerFactory(
             "pg.gda.edu.lsea");
 
 
