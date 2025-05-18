@@ -221,9 +221,12 @@ public class ConvertStatistics {
      */
     private static Integer goalConceedByTeam( Map<UUID, Integer> goalScored, UUID teamId){
         List<UUID> keys = new ArrayList<>(goalScored.keySet());
-
         UUID keyA = keys.get(0);
         UUID keyB = null;
+        if (teamId == null) {
+            return 0;
+        }
+
         if(keys.size() > 1) {
             keyB = keys.get(1);
         }
@@ -232,9 +235,7 @@ public class ConvertStatistics {
             return 0;
         }
 
-        if (teamId == null) {
-            return 0;
-        }
+
 
         if (!keyA.equals(teamId)) {
             return goalScored.getOrDefault(keyA, 0);
@@ -251,6 +252,9 @@ public class ConvertStatistics {
         List<UUID> keys = new ArrayList<>(goalScored.keySet());
         UUID keyA = keys.get(0);
         UUID keyB = null;
+        if(goalScored.get(teamId) == null) {
+            return null;
+        }
         if(keys.size() > 1) {
             keyB = keys.get(1);
         }else{
@@ -264,8 +268,11 @@ public class ConvertStatistics {
                 return 0;
             }
         }else {
-            if(goalScored.get(keyB) == 0){
+            if(goalScored.get(keyB) != null && goalScored.get(keyB) == 0){
                 return 1;
+            }
+            else if (goalScored.get(keyB) == null){
+                return null;
             }
             else{
                 return 0;

@@ -28,7 +28,7 @@ public class ParseDataServiceTest {
         byte[] fakeSerialized = Serializer.getSerializedForm(mockTeams);
 
         // Creates a spy object of ParseDataService
-        ParseDataService spyService = spy(new ParseDataService(true));
+        ParseDataService spyService = spy(new ParseDataService());
 
         // Configuration for returning fakeSerialized instead of calling real method
         doReturn(fakeSerialized).when(spyService).getTeamsList();
@@ -57,7 +57,7 @@ public class ParseDataServiceTest {
         byte[] fakeSerialized = Serializer.getSerializedForm(mockCorr);
 
         // Creates a spy object of ParseDataService
-        ParseDataService spyService = spy(new ParseDataService(true));
+        ParseDataService spyService = spy(new ParseDataService());
 
         // Configuration for returning fakeSerialized instead of calling real method
         doReturn(fakeSerialized).when(spyService).getCorrelationData();
@@ -80,7 +80,7 @@ public class ParseDataServiceTest {
     @Test
     public void testDeserializeFailure() throws Exception{
         // Creates a spy object of ParseDataService
-        ParseDataService spyService = spy(new ParseDataService(true));
+        ParseDataService spyService = spy(new ParseDataService());
 
         // Mocks to return null
         doReturn(null).when(spyService).getTeamsList();
