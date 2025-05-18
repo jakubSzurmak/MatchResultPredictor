@@ -8,17 +8,22 @@ import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import pg.gda.edu.lsea.absPerson.implPerson.Player;
 import pg.gda.edu.lsea.match.Match;
 import pg.gda.edu.lsea.team.Team;
 import pg.gda.edu.lsea.database.DbManager;
+import pg.gda.edu.lsea.absStatistics.implStatistics.TeamStatistics;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 import static org.junit.Assert.*;
@@ -27,6 +32,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
+@ExtendWith(MockitoExtension.class)
 @RunWith(MockitoJUnitRunner.class)
 public class DbManagerTest {
 
@@ -35,7 +41,7 @@ public class DbManagerTest {
 
     @Mock
     private EntityTransaction transaction;
-
+    @Spy
     @InjectMocks
     private DbManager dbManager;
 
@@ -179,5 +185,138 @@ public class DbManagerTest {
 
         // Assert
         assertEquals(expectedResult, result);
+    }
+    /**
+     * Tests getFromDB with specific condition value
+     */
+    @Test
+    public void testGetFromDB_WithSpecificCondition() {
+        // Arrange
+        jakarta.persistence.Query query = mock(jakarta.persistence.Query.class);
+        List<Object[]> expectedResult = new ArrayList<>();
+        when(entityManager.createNativeQuery("SELECT * FROM teams WHERE name LIKE '%Test%'")).thenReturn(query);
+        when(query.getResultList()).thenReturn(expectedResult);
+
+        // Act
+        Object result = dbManager.getFromDB("teams", "name", "Test");
+
+        // Assert
+        assertEquals(expectedResult, result);
+    }
+
+    /**
+     * Tests update in DB method executes the correct query
+     */
+    @Test
+    public void testUpdateInDb_ExecutesCorrectQuery() {
+        // Arrange
+        jakarta.persistence.Query query = mock(jakarta.persistence.Query.class);
+        when(entityManager.createNativeQuery(anyString())).thenReturn(query);
+        when(query.executeUpdate()).thenReturn(1);
+
+        // Act
+        dbManager.updateInDb("teams", "name", "New Team", "id", "1234");
+
+        // Assert
+        verify(transaction).begin();
+        verify(entityManager).createNativeQuery("UPDATE teams SET name = 'New Team' WHERE id LIKE '%1234%'");
+        verify(query).executeUpdate();
+        verify(transaction).commit();
+    }
+
+    /**
+     * Tests update in DB with numeric value
+     */
+    @Test
+    public void testUpdateInDb_WithNumericValue() {
+        // Arrange
+        jakarta.persistence.Query query = mock(jakarta.persistence.Query.class);
+        when(entityManager.createNativeQuery(anyString())).thenReturn(query);
+        when(query.executeUpdate()).thenReturn(1);
+
+        // Act
+        dbManager.updateInDb("teams", "score", "5", "id", "1234");
+
+        // Assert
+        verify(entityManager).createNativeQuery("UPDATE teams SET score = 5 WHERE id LIKE '%1234%'");
+    }
+
+    /**
+     * Tests delete player from DB
+     */
+    @Test
+    public void testDeleteFromDb_Player() {
+        // Arrange
+        Player player = mock(Player.class);
+        Set<Team> teamSet = mock(Set.class);
+        when(player.getTeamSet()).thenReturn(teamSet);
+        doReturn(List.of(player)).when(dbManager).getFromDBJPQL(anyString(), anyString(), anyString());
+        when(entityManager.contains(player)).thenReturn(true);
+        when(entityManager.merge(player)).thenReturn(player);
+
+        // Act
+        dbManager.deleteFromDb("Player", "id", "1");
+
+        // Assert
+        verify(transaction).begin();
+        verify(player.getTeamSet()).clear();
+        verify(entityManager).merge(player);
+        verify(entityManager).remove(player);
+        verify(transaction).commit();
+        verify(entityManager).close();
+    }
+
+    /**
+     * Tests delete team from DB
+     */
+    @Test
+    public void testDeleteFromDb_Team() {
+        // Arrange
+        Team team = mock(Team.class);
+        Set<Player> playerSet = mock(Set.class);
+        when(team.getPlayerSet()).thenReturn(playerSet);
+        when(team.getId()).thenReturn(testId);
+        doReturn(List.of(team)).when(dbManager).getFromDBJPQL(anyString(), anyString(), anyString());
+        when(entityManager.contains(team)).thenReturn(true);
+        when(entityManager.merge(team)).thenReturn(team);
+        TypedQuery<Match> matchQuery = mock(TypedQuery.class);
+        when(entityManager.createQuery(anyString(), eq(Match.class))).thenReturn(matchQuery);
+        Match match = mock(Match.class);
+        List<Match> matches = List.of(match);
+        when(matchQuery.setParameter(eq("team"), eq(team))).thenReturn(matchQuery);
+        when(matchQuery.getResultList()).thenReturn(matches);
+        TeamStatistics stats = mock(TeamStatistics.class);
+        when(entityManager.find(TeamStatistics.class, testId)).thenReturn(stats);
+
+        // Act
+        dbManager.deleteFromDb("Team", "id", testId.toString());
+
+        // Assert
+        verify(transaction).begin();
+        verify(entityManager).remove(match);
+        verify(entityManager).remove(stats);
+        verify(playerSet).clear();
+        verify(entityManager).merge(team);
+        verify(entityManager).remove(team);
+        verify(transaction).commit();
+        verify(entityManager).close();
+    }
+
+    /**
+     * Tests delete nonexistent entry from DB
+     */
+    @Test
+    public void testDeleteFromDb_NoResults() throws Exception {
+        // Arrange
+        doReturn(List.of()).when(dbManager).getFromDBJPQL(anyString(), anyString(), anyString());
+
+        // Act
+        dbManager.deleteFromDb("Player", "id", "nonexistent");
+
+        // Assert
+        verify(transaction).begin();
+        verify(transaction).commit();
+        verify(entityManager, never()).remove(any());
+        verify(entityManager).close();
     }
 }
