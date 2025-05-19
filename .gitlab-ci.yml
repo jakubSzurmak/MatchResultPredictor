@@ -21,7 +21,14 @@ validate-project:
 run-unit-tests:
   stage: test
   script:
-    - 'mvn $MAVEN_CLI_OPTS -Dmaven.main.skip=true test'
+    - mvn verify
+  artifacts:
+    when: always
+    reports:
+      junit:
+        - target/surefire-reports/TEST-*.xml
+        - target/failsafe-reports/TEST-*.xml
+
 
 build-dist:
   stage: package
@@ -42,3 +49,4 @@ deploy-to-production:
     - 'true'
   only:
     - master
+    - UnitTests
