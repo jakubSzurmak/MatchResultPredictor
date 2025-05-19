@@ -28,7 +28,7 @@ public class ParserMatch {
         ObjectMapper objectMapper = new ObjectMapper();
         List<Match> matches = new ArrayList<>();
         String directory = "matches";
-        DbManager dbManager = new DbManager();
+        DbManager dbManager = DbManager.getInstance();
         try {
             List<Path> paths = Files.walk(Paths.get(directory), 2)
                     .filter(Files::isRegularFile)

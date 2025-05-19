@@ -26,7 +26,7 @@ public class Main {
     }
 
     public static void main(String[] args) {
-        DbManager dbManager = new DbManager();
+        DbManager dbManager = DbManager.getInstance();
         Scanner scanner = new Scanner(System.in);
 
         System.out.println("Choose an operation: [delete] or [update]");

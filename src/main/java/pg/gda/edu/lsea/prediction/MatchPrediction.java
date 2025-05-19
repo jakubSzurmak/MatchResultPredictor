@@ -24,7 +24,7 @@ public class MatchPrediction {
 
     public static String predictMatch(String team1Name, String team2Name, List<Team> teams,
                                     Logistic model, Map<UUID, Statistics> statistics, Instances datasetStructure) throws Exception {
-        DbManager dbManager = new DbManager();
+        DbManager dbManager = DbManager.getInstance();
 
         //Baza
         Team team1 = dbManager.getValueFromColumn(team1Name, Team.class, "name");
@@ -64,7 +64,7 @@ public class MatchPrediction {
         Instances dataset = new Instances("MatchPrediction", attributes, matches.size());
         dataset.setClassIndex(dataset.numAttributes() - 1);
 
-        DbManager dbManager = new DbManager();
+        DbManager dbManager = DbManager.getInstance();
 
         Object result = dbManager.getFromDB("matches", "all", "all");
 
