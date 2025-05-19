@@ -40,6 +40,20 @@ public class ParseDataService {
         initializeData();
     }
 
+    public ParseDataService(boolean init) {
+        this.matches = new ArrayList<>();
+        this.referees = new HashSet<>();
+        this.coaches = new HashMap<>();
+        this.teams = new ArrayList<>();
+        this.players = new HashSet<>();
+        this.events = Collections.synchronizedList(new ArrayList<>());
+        this.statistics = new HashMap<>();
+
+        if (!init) {
+            initializeData();
+        }
+    }
+
     /**
      * Initializes all data by parsing from files
      */
