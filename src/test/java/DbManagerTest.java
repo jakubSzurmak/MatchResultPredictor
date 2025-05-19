@@ -132,7 +132,6 @@ public class DbManagerTest {
         when(entityManager.getCriteriaBuilder()).thenReturn(criteriaBuilder);
         when(criteriaBuilder.createQuery(Team.class)).thenReturn(criteriaQuery);
         when(criteriaQuery.from(Team.class)).thenReturn(root);
-        when(criteriaQuery.where(any(Predicate.class))).thenReturn(criteriaQuery);
         when(entityManager.createQuery(criteriaQuery)).thenReturn(typedQuery);
         when(typedQuery.getResultList()).thenReturn(resultList);
 
@@ -158,7 +157,6 @@ public class DbManagerTest {
         when(entityManager.getCriteriaBuilder()).thenReturn(criteriaBuilder);
         when(criteriaBuilder.createQuery(Team.class)).thenReturn(criteriaQuery);
         when(criteriaQuery.from(Team.class)).thenReturn(root);
-        when(criteriaQuery.where(any(Predicate.class))).thenReturn(criteriaQuery);
         when(entityManager.createQuery(criteriaQuery)).thenReturn(typedQuery);
         when(typedQuery.getResultList()).thenReturn(resultList);
 
