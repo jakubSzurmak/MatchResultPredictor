@@ -57,7 +57,7 @@ public class PerformanceTestMain {
     private static void runDatabasePerformanceTests(
             List<Team> teams, HashSet<Player> players, List<Event> events, List<Match> matches) {
 
-        DbManager dbManager = new DbManager();
+        DbManager dbManager = DbManager.getInstance();
         List<PerformanceTestUtil.PerformanceResult> rResults = new ArrayList<>();
 
         System.out.println("\n== Testing Database Read Operations ==");
@@ -246,7 +246,7 @@ public class PerformanceTestMain {
     private static void runAnalyticsPerformanceTests(
             List<Team> teams, HashSet<Player> players, List<Event> events, List<Match> matches) {
 
-        DbManager dbManager = new DbManager();
+        DbManager dbManager = DbManager.getInstance();
         List<PerformanceTestUtil.PerformanceResult> analysisResults = new ArrayList<>();
 
 

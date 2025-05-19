@@ -27,7 +27,7 @@ public class ParserTeam {
     public static List<Team> parsing(String filePath) throws IOException {
         ObjectMapper objectMapper = new ObjectMapper();
         List<Team> parsedTeams = new ArrayList<>();
-        DbManager dbManager = new DbManager();
+        DbManager dbManager = DbManager.getInstance();
 
         List<JsonNode> teams = objectMapper.readValue(new File(filePath), new TypeReference<>() {});
         for (JsonNode team : teams) {
