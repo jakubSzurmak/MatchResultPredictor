@@ -21,13 +21,11 @@ validate-project:
 run-unit-tests:
   stage: test
   script:
-    - mvn verify
+    - 'mvn $MAVEN_CLI_OPTS verify'
   artifacts:
-    when: always
-    reports:
-      junit:
-        - target/surefire-reports/TEST-*.xml
-        - target/failsafe-reports/TEST-*.xml
+    paths:
+      - target
+
 
 
 build-dist:
