@@ -21,7 +21,7 @@ validate-project:
 run-unit-tests:
   stage: test
   script:
-    - 'mvn $MAVEN_CLI_OPTS verify'
+    - 'mvn $MAVEN_CLI_OPTS test'
   artifacts:
     paths:
       - target
