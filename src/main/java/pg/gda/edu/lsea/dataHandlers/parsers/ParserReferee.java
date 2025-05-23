@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import pg.gda.edu.lsea.absPerson.implPerson.referee.Referee;
 
 import java.io.IOException;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -26,8 +27,13 @@ public class ParserReferee {
     public Set<Referee> parseReferee() throws IOException {
         ObjectMapper objectMapper = new ObjectMapper();
         Set<Referee> referees = new HashSet<>();
-        String directory = "matches";
+        String directory = "/matches/*";
+        Enumeration<URL> in = this.getClass().getClassLoader().getResources("matches");
+        System.out.println(in.toString());
         try {
+            List<Path> paths22;
+
+
             List<Path> paths = Files.walk(Paths.get(directory), 2)
                     .filter(Files::isRegularFile)
                     .filter(path -> path.getFileName().toString().endsWith(".json"))

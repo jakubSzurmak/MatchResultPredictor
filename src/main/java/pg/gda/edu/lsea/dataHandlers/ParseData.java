@@ -16,6 +16,8 @@ import pg.gda.edu.lsea.dataHandlers.parsers.*;
 import pg.gda.edu.lsea.absStatistics.statisticHandlers.ConvertStatistics;
 import pg.gda.edu.lsea.team.Team;
 import pg.gda.edu.lsea.prediction.MatchPrediction;
+
+import java.io.InputStream;
 import java.util.function.Function;
 import java.lang.invoke.MethodHandles;
 import java.nio.charset.StandardCharsets;
@@ -57,8 +59,8 @@ public class ParseData {
 
     private static List<Event> parseEvents() {
         List<Event> parsedEvents = Collections.synchronizedList(new ArrayList<>());
-        String directory = "events";
-
+        String directory = "/events/*";
+        System.out.println(Paths.get(directory));
         try {
             List<Path> pathsE = getFilePath(directory, 1);
             int numThreads = 8;
@@ -99,7 +101,7 @@ public class ParseData {
 
 
     private static List<Team> parseTeams() {
-        String directory = "matches";
+        String directory = "/matches/*";
         List<Team> parsedTeams = new ArrayList<>();
         Set<Team> hashTeam = new HashSet<>();
         DbManager dbManager = DbManager.getInstance();
@@ -123,12 +125,14 @@ public class ParseData {
     }
 
     private static HashSet<Player> parsePlayers() {
-        String directory2 = "lineupsModified";
-        String directory4 = "player_rating.json";
+        String directory2 = "/lineupsModified/*";
+        //String directory4 = "/player_rating.json";
+
         HashSet<Player> parsedPlayers = new HashSet<>();
         try {
+
             // Parse ratings file once and create a map for O(1) lookups with player data including DOB
-            Map<String, ParserPlayer.PlayerData> playerDataMap = ParserPlayer.parseRatingsToMap(directory4);
+            Map<String, ParserPlayer.PlayerData> playerDataMap = ParserPlayer.parseRatingsToMap(ParseData.class.getClassLoader().getResourceAsStream("player_rating.json"));
 
             List<Path> pathsP = getFilePath(directory2, 1);
             for (Path path : pathsP) {

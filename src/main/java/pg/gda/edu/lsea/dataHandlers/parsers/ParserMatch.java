@@ -27,7 +27,7 @@ public class ParserMatch {
     public List<Match> parseMatch() {
         ObjectMapper objectMapper = new ObjectMapper();
         List<Match> matches = new ArrayList<>();
-        String directory = "matches";
+        String directory = "/matches/*";
         DbManager dbManager = DbManager.getInstance();
         try {
             List<Path> paths = Files.walk(Paths.get(directory), 2)

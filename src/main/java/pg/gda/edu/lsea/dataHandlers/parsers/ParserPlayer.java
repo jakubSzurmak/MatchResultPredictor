@@ -12,6 +12,7 @@ import pg.gda.edu.lsea.team.Team;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.util.*;
@@ -27,15 +28,15 @@ public class ParserPlayer {
 
     /**
      * Creates a map of player names to their data (rating and DOB) for fast lookup
-     * @param ratingsFilePath Path to the ratings JSON file
+     * @param ratingsFile Path to the ratings JSON file
      * @return Map with player names as keys and PlayerData objects as values
      * @throws IOException If there's an error reading the file
      */
-    public static Map<String, PlayerData> parseRatingsToMap(String ratingsFilePath) throws IOException {
+    public static Map<String, PlayerData> parseRatingsToMap(InputStream ratingsFile) throws IOException {
         ObjectMapper objectMapper = new ObjectMapper();
         Map<String, PlayerData> ratingsMap = new HashMap<>();
 
-        List<JsonNode> ratings = objectMapper.readValue(new File(ratingsFilePath),
+        List<JsonNode> ratings = objectMapper.readValue(ratingsFile,
                 new TypeReference<>() {});
 
         // Pre-process all ratings into a map for O(1) lookup

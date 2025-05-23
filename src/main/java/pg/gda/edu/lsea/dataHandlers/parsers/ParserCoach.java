@@ -68,8 +68,8 @@ public class ParserCoach {
     public Map<UUID,Coach> parseCoache() throws IOException {
         ObjectMapper objectMapper = new ObjectMapper();
         Set<ResultHolder> bothCoaches = new HashSet<>();
-        int counter = 0;
-        String directory = "matches";
+        String directory = "/matches/*";
+        System.out.println(Paths.get(directory));
         try {
             List<Path> paths = Files.walk(Paths.get(directory), 2)
                     .filter(Files::isRegularFile)

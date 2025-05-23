@@ -5,17 +5,21 @@ import java.io.*;
 import jakarta.servlet.http.*;
 import jakarta.servlet.annotation.*;
 
-@WebServlet(name = "helloServlet", value = "/hello-servlet")
-public class HelloServlet extends HttpServlet {
+import pg.gda.edu.lsea.database.DbManager;
+
+@WebServlet(name = "analysisServlet", value = "/analysis-servlet")
+public class analysisServlet extends HttpServlet {
     private String message;
+    private DbManager dbMgr;
 
     public void init() {
-        message = "Hello World!";
+        message = "Select teams for match outcome analysis";
+        dbMgr = DbManager.getInstance();
     }
 
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         response.setContentType("text/html");
-
+        
         // Hello
         PrintWriter out = response.getWriter();
         out.println("<html><body>");
