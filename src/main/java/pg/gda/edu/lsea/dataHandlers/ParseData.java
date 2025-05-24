@@ -341,7 +341,7 @@ public class ParseData {
                                  List<Team> parsedTeams, HashSet<Player> parsedPlayers, List<Event> parsedEvents) throws Exception {
         System.out.println("Parsing data...");
 
-        final CountDownLatch latch = new CountDownLatch(6);
+        final CountDownLatch latch = new CountDownLatch(1);
     /*
         List<Match> matches = new ArrayList<>();
         Set<Referee> referees = new HashSet<>();
@@ -355,7 +355,7 @@ public class ParseData {
         functionalThread(() -> {
             try {
                 try {
-                    referees.addAll(new ParserReferee().parseReferee());
+                    referees.addAll(new ParserReferee().parseReferee(getFileListingsLine(ParseData.class.getClassLoader().getResourceAsStream("matchesModified/matchFile"))));
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
@@ -369,7 +369,7 @@ public class ParseData {
         functionalThread(() -> {
             try {
                 try {
-                    coaches.putAll(new ParserCoach().parseCoache());
+                    coaches.putAll(new ParserCoach().parseCoache(getFileListingsLine(ParseData.class.getClassLoader().getResourceAsStream("matchesModified/matchFile"))));
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
@@ -390,7 +390,7 @@ public class ParseData {
 
         functionalThread(() -> {
             try {
-                matches.addAll(new ParserMatch().parseMatch());
+                matches.addAll(new ParserMatch().parseMatch(getFileListingsLine(ParseData.class.getClassLoader().getResourceAsStream("matchesModified/matchFile"))));
                 System.out.println("Matches parsing complete: " + matches.size());
             } catch (Exception e) {
                 e.printStackTrace();

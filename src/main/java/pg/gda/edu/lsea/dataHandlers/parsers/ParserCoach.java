@@ -4,8 +4,10 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import pg.gda.edu.lsea.absPerson.implPerson.coach.Coach;
 import pg.gda.edu.lsea.absPerson.implPerson.coach.ResultHolder;
+import pg.gda.edu.lsea.dataHandlers.ParseData;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -65,24 +67,20 @@ public class ParserCoach {
      * @return map containing Coach objects with UUID as key
      * @throws IOException if there is an error reading or parsing the JSON file
      */
-    public Map<UUID,Coach> parseCoache() throws IOException {
+    public Map<UUID,Coach> parseCoache(String[] filenames) throws IOException {
         ObjectMapper objectMapper = new ObjectMapper();
         Set<ResultHolder> bothCoaches = new HashSet<>();
-        String directory = "/matches/*";
-        System.out.println(Paths.get(directory));
-        try {
-            List<Path> paths = Files.walk(Paths.get(directory), 2)
-                    .filter(Files::isRegularFile)
-                    .filter(path -> path.getFileName().toString().endsWith(".json"))
-                    .collect(Collectors.toList());
+        //String directory = "/matches/*";
 
-            for (Path path : paths) {
+        try {
+            for (String path : filenames) {
                 try {
-                    bothCoaches.addAll(objectMapper.readValue(path.toFile(),
+                    bothCoaches.addAll(objectMapper.readValue("matchesModified/"
+                                    + path.substring(2, path.length()-1),
                             new TypeReference<Set<ResultHolder>>() {
                             }));
                 } catch (Exception e) {
-                    System.err.println("Failed to parse JSON in file: " + path.toString() + " due to: " + e.getMessage());
+                    System.err.println("Failed to parse JSON in file: " + path + " due to: " + e.getMessage());
                 }
             }
         } catch (Exception e) {

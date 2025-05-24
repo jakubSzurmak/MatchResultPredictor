@@ -24,23 +24,18 @@ public class ParserMatch {
      *
      * @return List of parsed Match objects
      */
-    public List<Match> parseMatch() {
+    public List<Match> parseMatch(String[] filenames) {
         ObjectMapper objectMapper = new ObjectMapper();
         List<Match> matches = new ArrayList<>();
-        String directory = "/matches/*";
         DbManager dbManager = DbManager.getInstance();
         try {
-            List<Path> paths = Files.walk(Paths.get(directory), 2)
-                    .filter(Files::isRegularFile)
-                    .filter(path -> path.getFileName().toString().endsWith(".json"))
-                    .collect(Collectors.toList());
 
-            for (Path path : paths) {
+            for (String path : filenames) {
                 try {
-                    matches.addAll(objectMapper.readValue(path.toFile(),
-                            new TypeReference<List<Match>>() {}));
+                    matches.addAll(objectMapper.readValue("matchesModified/"
+                                    + path.substring(2, path.length()-1), new TypeReference<List<Match>>() {}));
                 } catch (Exception e) {
-                    System.err.println("Failed to parse JSON in file: " + path.toString() + " due to: " + e.getMessage());
+                    System.err.println("Failed to parse JSON in file: " + path + " due to: " + e.getMessage());
                 }
             }
         } catch (Exception e) {
