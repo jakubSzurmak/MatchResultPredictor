@@ -341,7 +341,7 @@ public class ParseData {
                                  List<Team> parsedTeams, HashSet<Player> parsedPlayers, List<Event> parsedEvents) throws Exception {
         System.out.println("Parsing data...");
 
-        final CountDownLatch latch = new CountDownLatch(1);
+        final CountDownLatch latch = new CountDownLatch(6);
     /*
         List<Match> matches = new ArrayList<>();
         Set<Referee> referees = new HashSet<>();
