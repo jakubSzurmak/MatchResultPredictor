@@ -8,7 +8,7 @@
     <%
         // prepare data once to not import in each servlet, servlets only parse from db
         new ParseDataService();
-        System.out.println(Paths.get("matches"));
+
     %>
 </head>
 <body>

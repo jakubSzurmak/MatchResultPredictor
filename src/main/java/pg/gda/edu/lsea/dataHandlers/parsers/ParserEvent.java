@@ -1,5 +1,6 @@
 package pg.gda.edu.lsea.dataHandlers.parsers;
 
+import pg.gda.edu.lsea.dataHandlers.ParseData;
 import pg.gda.edu.lsea.event.Event;
 
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -8,6 +9,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalTime;
 import java.util.*;
@@ -47,7 +49,8 @@ public class ParserEvent {
         ObjectMapper objectMapper = new ObjectMapper();
         List<Event> parsedEvents = new ArrayList<>();
 
-        List<JsonNode> events = objectMapper.readValue(new File(filePath), new TypeReference<List<JsonNode>>() {});
+        //List<JsonNode> events = objectMapper.readValue(new File(filePath), new TypeReference<List<JsonNode>>() {});
+        List<JsonNode> events = objectMapper.readValue(ParserEvent.class.getClassLoader().getResourceAsStream(filePath), new TypeReference<List<JsonNode>>() {});
         Map<UUID, ArrayList<UUID>> team1 = new HashMap<>();
         int counter = 0;
         for (JsonNode event : events) {

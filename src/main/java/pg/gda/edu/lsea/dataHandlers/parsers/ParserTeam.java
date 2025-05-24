@@ -27,9 +27,10 @@ public class ParserTeam {
     public static List<Team> parsing(String filePath) throws IOException {
         ObjectMapper objectMapper = new ObjectMapper();
         List<Team> parsedTeams = new ArrayList<>();
-        DbManager dbManager = DbManager.getInstance();
+        //DbManager dbManager = DbManager.getInstance();
 
-        List<JsonNode> teams = objectMapper.readValue(new File(filePath), new TypeReference<>() {});
+        //List<JsonNode> teams = objectMapper.readValue(new File(filePath), new TypeReference<>() {});
+        List<JsonNode> teams = objectMapper.readValue(ParserTeam.class.getClassLoader().getResourceAsStream(filePath), new TypeReference<>() {});
         for (JsonNode team : teams) {
 
             JsonNode homeTeamNode = team.get("home_team");

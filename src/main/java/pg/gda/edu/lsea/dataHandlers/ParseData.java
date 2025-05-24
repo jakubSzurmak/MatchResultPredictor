@@ -17,7 +17,9 @@ import pg.gda.edu.lsea.absStatistics.statisticHandlers.ConvertStatistics;
 import pg.gda.edu.lsea.team.Team;
 import pg.gda.edu.lsea.prediction.MatchPrediction;
 
+import java.io.BufferedReader;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.function.Function;
 import java.lang.invoke.MethodHandles;
 import java.nio.charset.StandardCharsets;
@@ -34,6 +36,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.stream.Collectors;
+
 import weka.classifiers.functions.Logistic;
 import weka.core.Attribute;
 import weka.core.Instances;
@@ -57,58 +60,71 @@ public class ParseData {
     }
 
 
+    private static String[] getFileListingsLine(InputStream f) throws IOException {
+        BufferedReader reader = new BufferedReader(new InputStreamReader(f));
+        String line = reader.readLine();
+        String[] filenames = line.split(",");
+        return filenames;
+    }
+
     private static List<Event> parseEvents() {
         List<Event> parsedEvents = Collections.synchronizedList(new ArrayList<>());
-        String directory = "/events/*";
-        System.out.println(Paths.get(directory));
-        try {
-            List<Path> pathsE = getFilePath(directory, 1);
-            int numThreads = 8;
-            ExecutorService executor = Executors.newFixedThreadPool(numThreads);
-            CountDownLatch eventLatch = new CountDownLatch(pathsE.size());
-            for (Path path : pathsE) {
-                executor.submit(() -> {
-                    try {
-                        // CRITICAL SECTION #1: Multiple threads getting an event counter
-                        int currentCounter = eventCounter.getAndIncrement();
-                        List<Event> threadEvents = ParserEvent.parsing(String.valueOf(path.toFile()), currentCounter);
-
-                        // CRITICAL SECTION #2: Multiple threads updating shared collection
-                        eventsLock.writeLock().lock();
-                        try {
-                            parsedEvents.addAll(threadEvents);
-                        } finally {
-                            eventsLock.writeLock().unlock();
-                        }
-
-                       // System.out.println("Parsed events from: " + path.getFileName() + " - Added " + threadEvents.size() + " events");
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    } finally {
-                        eventLatch.countDown();
-                    }
-                });
+        int numThreads = 10;
+        ExecutorService executor = Executors.newFixedThreadPool(numThreads);
+        try (InputStream pathsE = ParseData.class.getClassLoader().getResourceAsStream("events/eventFile")) {
+            if (pathsE == null) {
+                System.out.println("No events found");
+                return null;
             }
-            // Wait for all event parsing to complete
-            eventLatch.await();
-            executor.shutdown();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+            String[] filenames = getFileListingsLine(pathsE);
+            if(filenames.length > 0){
+                CountDownLatch eventLatch = new CountDownLatch(filenames.length - 2);
+                for (String path : filenames) {
+                    executor.submit(() -> {
+                        try {
+                            // CRITICAL SECTION #1: Multiple threads getting an event counter
+                            int currentCounter = eventCounter.getAndIncrement();
+                            List<Event> threadEvents = ParserEvent.parsing("events/"
+                                    + path.substring(2, path.length()-1), currentCounter);
 
+                            // CRITICAL SECTION #2: Multiple threads updating shared collection
+                            eventsLock.writeLock().lock();
+                            try {
+                                parsedEvents.addAll(threadEvents);
+                            } finally {
+                                eventsLock.writeLock().unlock();
+                            }
+                            // System.out.println("Parsed events from: " + path.getFileName() + " - Added " + threadEvents.size() + " events");
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        } finally {
+                            eventLatch.countDown();
+                        }
+                    });
+                }
+                // Wait for all event parsing to complete
+                eventLatch.await();
+                executor.shutdown();
+            }
+        } catch (IOException | InterruptedException e) {
+            throw new RuntimeException(e);
+        }
         return parsedEvents;
     }
 
 
     private static List<Team> parseTeams() {
-        String directory = "/matches/*";
+        //String directory = "/matches/*";
+        InputStream directory = ParseData.class.getClassLoader().getResourceAsStream("matchesModified/matchFile");
         List<Team> parsedTeams = new ArrayList<>();
         Set<Team> hashTeam = new HashSet<>();
         DbManager dbManager = DbManager.getInstance();
         try {
-            List<Path> pathsL = getFilePath(directory, 2);
-            for (Path path : pathsL) {
-                parsedTeams.addAll(ParserTeam.parsing(String.valueOf(path.toFile())));
+            //List<Path> pathsL = getFilePath(directory, 2);
+            String[] filenames = getFileListingsLine(directory);
+            for (String path : filenames) {
+                parsedTeams.addAll(ParserTeam.parsing("matchesModified/"
+                        + path.substring(2, path.length()-1)));
             }
 
         } catch (Exception e) {
@@ -116,7 +132,7 @@ public class ParseData {
         }
         hashTeam.addAll(parsedTeams);
         System.out.println(hashTeam.size() + " size unique teams");
-        for(Team team:parsedTeams){
+        for (Team team : parsedTeams) {
             team.setPlayerSet(null);
             dbManager.saveToDb(team);
         }
@@ -125,19 +141,22 @@ public class ParseData {
     }
 
     private static HashSet<Player> parsePlayers() {
-        String directory2 = "/lineupsModified/*";
+        //String directory2 = "/lineupsModified/*";
         //String directory4 = "/player_rating.json";
-
+        InputStream directory2 = ParseData.class.getClassLoader().getResourceAsStream("lineupsModified/lineupsFile");
         HashSet<Player> parsedPlayers = new HashSet<>();
         try {
 
             // Parse ratings file once and create a map for O(1) lookups with player data including DOB
-            Map<String, ParserPlayer.PlayerData> playerDataMap = ParserPlayer.parseRatingsToMap(ParseData.class.getClassLoader().getResourceAsStream("player_rating.json"));
+            Map<String, ParserPlayer.PlayerData> playerDataMap = ParserPlayer.parseRatingsToMap(
+                    ParseData.class.getClassLoader().getResourceAsStream("player_rating.json"));
 
-            List<Path> pathsP = getFilePath(directory2, 1);
-            for (Path path : pathsP) {
+            String[] pathsP = getFileListingsLine(directory2);
+            //List<Path> pathsP = getFilePath(directory2, 1);
+            for (String path : pathsP) {
                 // Use the method that accepts the player data map
-                parsedPlayers.addAll(ParserPlayer.parsing(String.valueOf(path.toFile()), playerDataMap));
+                parsedPlayers.addAll(ParserPlayer.parsing("lineupsModified/"
+                        + path.substring(2, path.length()-1), playerDataMap));
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -152,24 +171,24 @@ public class ParseData {
         t.start();
     }
 
-    public static Map<UUID, Statistics> getStats (HashSet<Player> parsedPlayers, List<Event> parsedEvents,List<Match> matches) {
+    public static Map<UUID, Statistics> getStats(HashSet<Player> parsedPlayers, List<Event> parsedEvents, List<Match> matches) {
         ConvertStatistics convertStatistics = new ConvertStatistics();
         Map<UUID, Statistics> stats = new HashMap<>();
         DbManager dbManager = DbManager.getInstance();
-        convertStatistics.getPlayerStat(parsedPlayers, parsedEvents,stats);
+        convertStatistics.getPlayerStat(parsedPlayers, parsedEvents, stats);
         convertStatistics.getTeamCoachStats(stats, matches);
         // Pakowanie do bazy team statistics, player statistics, goalkeeper statistics
-        for(Map.Entry<UUID, Statistics> stat: stats.entrySet()) {
+        for (Map.Entry<UUID, Statistics> stat : stats.entrySet()) {
             if (stat.getValue() instanceof TeamStatistics teamS) {
                 Team team = dbManager.getTableById(stat.getKey(), Team.class);
                 teamS.setTeam(team);
-               dbManager.saveToDb(teamS);
+                dbManager.saveToDb(teamS);
             } else if (stat.getValue() instanceof fPlayerStatistics) {
                 Player player = dbManager.getTableById(stat.getKey(), Player.class);
                 fPlayerStatistics playerS = (fPlayerStatistics) stat.getValue();
                 playerS.setPlayer(player);
                 dbManager.saveToDb(playerS);
-            } else if (stat.getValue() instanceof gPlayerStatistics){
+            } else if (stat.getValue() instanceof gPlayerStatistics) {
                 Player player = dbManager.getTableById(stat.getKey(), Player.class);
                 gPlayerStatistics playerS = (gPlayerStatistics) stat.getValue();
                 playerS.setPlayer(player);
@@ -181,7 +200,7 @@ public class ParseData {
     }
 
 
-    public static List<String> getCorreletion(Map<UUID, Statistics> stats, HashSet<Player> parsedPlayers){
+    public static List<String> getCorreletion(Map<UUID, Statistics> stats, HashSet<Player> parsedPlayers) {
         Map<String, List<Integer>> statsList = new HashMap<>();
         DbManager dbManager = DbManager.getInstance();
         List<Integer> totalShots = new ArrayList<>();
@@ -211,7 +230,7 @@ public class ParseData {
         List<Object[]> resultList = (List<Object[]>) result;
         // Liczenie korelacji z bazą - do testowania
         for (Object[] row : resultList) {
-          //  System.out.println(Arrays.toString(row));
+            //  System.out.println(Arrays.toString(row));
             gamesPlayed.add((Integer) row[0]);
             wonMatches.add((Integer) row[1]);
             goalsScored.add((Integer) row[2]);
@@ -266,8 +285,8 @@ public class ParseData {
         return finalCorr;
     }
 
-    public static String getPrediction(List<Match> matches,Map<UUID, Statistics> stats , List<Team> parsedTeams, String teamHome,
-                                     String teamAway) throws Exception {
+    public static String getPrediction(List<Match> matches, Map<UUID, Statistics> stats, List<Team> parsedTeams, String teamHome,
+                                       String teamAway) throws Exception {
         System.out.println("Train data...");
 
         Logistic logisticModel = new Logistic();
@@ -307,11 +326,11 @@ public class ParseData {
         return "Cannot get prediction";
     }
 
-    public static void handleManyToMany(HashSet<Player>players){
+    public static void handleManyToMany(HashSet<Player> players) {
         // Pakowanie playersow do bazy przy jednoczesnym zajęciem się relacją wiele do wiele między teams a players
         DbManager dbManager = DbManager.getInstance();
-        for(Player player:players){
-            Team team = dbManager.getValueFromColumn(player.getCurrClub(), Team.class, "name" );
+        for (Player player : players) {
+            Team team = dbManager.getValueFromColumn(player.getCurrClub(), Team.class, "name");
             player.updateTeamSet(team);
             team.updatePlayerSet(player);
             dbManager.saveToDb(player);
@@ -407,9 +426,9 @@ public class ParseData {
         System.out.println(parsedEvents.size() + " - events in total");
 
 
-     //   Map<UUID, Statistics> stats = getStats(parsedPlayers, parsedEvents, matches);
-     //   getCorreletion(stats, parsedPlayers);
-       // getPrediction(matches, stats, parsedTeams, "Barcelona", "Real Madrid");
+        //   Map<UUID, Statistics> stats = getStats(parsedPlayers, parsedEvents, matches);
+        //   getCorreletion(stats, parsedPlayers);
+        // getPrediction(matches, stats, parsedTeams, "Barcelona", "Real Madrid");
 
 
     }
