@@ -1,15 +1,8 @@
-<%@ page import="pg.gda.edu.lsea.network.services.ParseDataService" %>
-<%@ page import="java.nio.file.Paths" %>
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <!DOCTYPE html>
 <html>
 <head>
     <title>JSP - Hello World</title>
-    <%
-        // prepare data once to not import in each servlet, servlets only parse from db
-        new ParseDataService();
-
-    %>
 </head>
 <body>
 <h1><%= "Hello World! \n" %></h1>

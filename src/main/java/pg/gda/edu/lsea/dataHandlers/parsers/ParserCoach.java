@@ -75,8 +75,7 @@ public class ParserCoach {
         try {
             for (String path : filenames) {
                 try {
-                    bothCoaches.addAll(objectMapper.readValue("matchesModified/"
-                                    + path.substring(2, path.length()-1),
+                    bothCoaches.addAll(objectMapper.readValue("matchesModified/" + path.substring(2, path.length()-1),
                             new TypeReference<Set<ResultHolder>>() {
                             }));
                 } catch (Exception e) {

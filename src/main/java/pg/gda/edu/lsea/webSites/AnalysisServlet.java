@@ -8,7 +8,7 @@ import jakarta.servlet.annotation.*;
 import pg.gda.edu.lsea.database.DbManager;
 
 @WebServlet(name = "analysisServlet", value = "/analysis-servlet")
-public class analysisServlet extends HttpServlet {
+public class AnalysisServlet extends HttpServlet {
     private String message;
     private DbManager dbMgr;
 
