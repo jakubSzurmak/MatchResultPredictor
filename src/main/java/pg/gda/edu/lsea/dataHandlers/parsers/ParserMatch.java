@@ -8,6 +8,8 @@ import pg.gda.edu.lsea.team.Team;
 import pg.gda.edu.lsea.dataHandlers.utils.InputToTempFile;
 
 
+import javax.swing.text.html.parser.Parser;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,15 +30,15 @@ public class ParserMatch {
         String strippedPath;
         try {
             for (String path : filenames) {
-
+                strippedPath = "matchesModified/" + path.substring(1, path.length()-1);
+                InputStream is = ParserMatch.class.getResourceAsStream(path);
+                ;
                 try {
-                    strippedPath = "matchesModified/" + path.substring(1, path.length()-1);
 
-                    matches.addAll(objectMapper.readValue(InputToTempFile.iSToF(ParserMatch.class.getClassLoader().
-                                    getResourceAsStream(strippedPath)),
-                            new TypeReference<List<Match>>() {}));
+
+                    matches.addAll(objectMapper.readValue(is, new TypeReference<List<Match>>() {}));
                 } catch (Exception e) {
-                    System.err.println(e.getMessage());
+                    System.err.println("Match" + e.getMessage());
                 }
             }
         } catch (Exception e) {

@@ -75,20 +75,14 @@ public class ParserCoach {
         try {
             for (String path : filenames) {
                 strippedPath = "matchesModified/" + path.substring(1, path.length()-1);
-                File tempFile = File.createTempFile("temp", ".json");
-                tempFile.deleteOnExit();
-                OutputStream os = new FileOutputStream(tempFile);
-                ParserMatch.class.getClassLoader().
-                        getResourceAsStream(strippedPath).transferTo(os);
+                InputStream is = ParserCoach.class.getResourceAsStream(strippedPath);
                 try {
-                    bothCoaches.addAll(objectMapper.readValue(tempFile,
-                            new TypeReference<Set<ResultHolder>>() {
-                            }));
+                    bothCoaches.addAll(objectMapper.readValue(is, new TypeReference<Set<ResultHolder>>() {}));
 
 
 
                 } catch (Exception e) {
-                    System.err.println("Failed to parse JSON in file: " + strippedPath + " due to: " + e.getMessage());
+                    System.err.println("Failed COACH to parse JSON in file: " + strippedPath + " due to: " + e.getMessage());
                 }
             }
         } catch (Exception e) {
