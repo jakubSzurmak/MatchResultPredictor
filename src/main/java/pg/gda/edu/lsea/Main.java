@@ -13,6 +13,12 @@ import java.util.List;
  */
 public class Main {
 
+    /**
+     * Retrieves and prints the names of all teams from the database.
+     *
+     * @param dbManager Instance of DbManager to perform database operations
+     */
+
     private static void displayTeams(DbManager dbManager) {
         Object result = dbManager.getFromDB("teams", "id", "all");
 
@@ -25,6 +31,9 @@ public class Main {
         }
     }
 
+    /**
+     * Runs a console interface to perform delete or update operations on the database.
+     */
     public static void main(String[] args) {
         DbManager dbManager = DbManager.getInstance();
         Scanner scanner = new Scanner(System.in);

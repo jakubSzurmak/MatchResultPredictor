@@ -41,7 +41,18 @@ import weka.classifiers.functions.Logistic;
 import weka.core.Attribute;
 import weka.core.Instances;
 
+/**
+ * Utility class for parsing data from JSON files
+ */
+
 public class ParseData {
+
+    /**
+     * Converts a string ID to a UUID using UTF-8 encoding.
+     *
+     * @param id the string to convert
+     * @return UUID generated from the string
+     */
     private static UUID convertToUUID(String id) {
         return UUID.nameUUIDFromBytes(String.valueOf(id).getBytes(StandardCharsets.UTF_8));
     }
@@ -52,6 +63,14 @@ public class ParseData {
     // Thread-safe counter for event processing
     private static final AtomicInteger eventCounter = new AtomicInteger(0);
 
+    /**
+     * Retrieves a list of JSON file paths from a directory up to the given depth.
+     *
+     * @param directory the root directory to search
+     * @param depth the maximum depth to traverse
+     * @return list of Paths to JSON files
+     * @throws IOException if an I/O error occurs
+     */
     private static List<Path> getFilePath(String directory, int depth) throws IOException {
         return Files.walk(Paths.get(directory), depth)
                 .filter(Files::isRegularFile)
@@ -67,6 +86,11 @@ public class ParseData {
         return filenames;
     }
 
+    /**
+     * Parses event data from JSON files in the "events" directory.
+     *
+     * @return a list of parsed Event objects
+     */
     private static List<Event> parseEvents() {
         List<Event> parsedEvents = Collections.synchronizedList(new ArrayList<>());
         int numThreads = 10;
@@ -112,7 +136,11 @@ public class ParseData {
         return parsedEvents;
     }
 
-
+    /**
+     * Parses team data from JSON files in the "matches" directory.
+     *
+     * @return a list of parsed Team objects
+     */
     private static List<Team> parseTeams() {
         //String directory = "/matches/*";
         InputStream directory = ParseData.class.getClassLoader().getResourceAsStream("matchesModified/matchFile");
@@ -140,6 +168,11 @@ public class ParseData {
         return parsedTeams;
     }
 
+    /**
+     * Parses player data from JSON files in the "players" directory.
+     *
+     * @return a list of parsed Player objects
+     */
     private static HashSet<Player> parsePlayers() {
         //String directory2 = "/lineupsModified/*";
         //String directory4 = "/player_rating.json";
@@ -166,11 +199,27 @@ public class ParseData {
         return parsedPlayers;
     }
 
+    /**
+     * Starts a new thread to run the given task asynchronously.
+     *
+     * @param task the Runnable task to execute in a new thread
+     */
     private static void functionalThread(Runnable task) {
         Thread t = new Thread(task);
         t.start();
     }
 
+    /**
+     * Computes and returns statistics for players, teams, and coaches.
+     *
+     * It processes player and event data to generate statistics, associates
+     * team and coach stats from matches, and persists all statistics to the database.
+     *
+     * @param parsedPlayers the set of players to analyze
+     * @param parsedEvents the list of events related to matches and players
+     * @param matches the list of matches to gather team/coach statistics
+     * @return a map of UUIDs to their corresponding Statistics objects
+     */
     public static Map<UUID, Statistics> getStats(HashSet<Player> parsedPlayers, List<Event> parsedEvents, List<Match> matches) {
         ConvertStatistics convertStatistics = new ConvertStatistics();
         Map<UUID, Statistics> stats = new HashMap<>();
@@ -199,7 +248,13 @@ public class ParseData {
 
     }
 
-
+    /**
+     * Calculates Pearson correlations between different player statistics.
+     *
+     * @param stats         Map of player IDs to their statistics.
+     * @param parsedPlayers Set of players to consider.
+     * @return List of correlation results as formatted strings.
+     */
     public static List<String> getCorreletion(Map<UUID, Statistics> stats, HashSet<Player> parsedPlayers) {
         Map<String, List<Integer>> statsList = new HashMap<>();
         DbManager dbManager = DbManager.getInstance();
@@ -285,6 +340,17 @@ public class ParseData {
         return finalCorr;
     }
 
+    /**
+     * Predicts the outcome of a match between two teams using a trained model.
+     *
+     * @param matches      List of all matches.
+     * @param stats        Map of team/player statistics.
+     * @param parsedTeams  List of parsed teams.
+     * @param teamHome     Name of the home team.
+     * @param teamAway     Name of the away team.
+     * @return Prediction result as a string.
+     * @throws Exception if model training or prediction fails.
+     */
     public static String getPrediction(List<Match> matches, Map<UUID, Statistics> stats, List<Team> parsedTeams, String teamHome,
                                        String teamAway) throws Exception {
         System.out.println("Train data...");
@@ -326,6 +392,11 @@ public class ParseData {
         return "Cannot get prediction";
     }
 
+    /**
+     * Handles many-to-many relationships between players and teams and saves players to the database.
+     *
+     * @param players Set of parsed players.
+     */
     public static void handleManyToMany(HashSet<Player> players) {
         // Pakowanie playersow do bazy przy jednoczesnym zajęciem się relacją wiele do wiele między teams a players
         DbManager dbManager = DbManager.getInstance();
@@ -337,6 +408,17 @@ public class ParseData {
         }
     }
 
+    /**
+     * Parses matches, referees, coaches, teams, players, and events concurrently using threads.
+     *
+     * @param matches       List to store parsed matches.
+     * @param referees      Set to store parsed referees.
+     * @param coaches       Map to store parsed coaches.
+     * @param parsedTeams   List to store parsed teams.
+     * @param parsedPlayers Set to store parsed players.
+     * @param parsedEvents  List to store parsed events.
+     * @throws Exception if thread execution is interrupted or parsing fails.
+     */
     public static void parseData(List<Match> matches, Set<Referee> referees, Map<UUID, Coach> coaches,
                                  List<Team> parsedTeams, HashSet<Player> parsedPlayers, List<Event> parsedEvents) throws Exception {
         System.out.println("Parsing data...");
