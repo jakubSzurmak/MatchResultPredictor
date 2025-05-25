@@ -1,9 +1,7 @@
 package pg.gda.edu.lsea.webSites;
 
 import pg.gda.edu.lsea.database.DbManager;
-import pg.gda.edu.lsea.dataHandlers.ParseData;
 import pg.gda.edu.lsea.team.Team;
-
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -15,8 +13,8 @@ import java.io.IOException;
 import java.util.List;
 
 
-@WebServlet(name = "analysisServlet", value = "/analysis-servlet" )
-public class AnalysisServlet extends HttpServlet {
+@WebServlet(name = "teamServlet", value = "/team-servlet" )
+public class TeamServlet extends HttpServlet {
     private DbManager dbMgr;
 
     public void init() {
@@ -26,19 +24,6 @@ public class AnalysisServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         List<Team> teams = (List<Team>) dbMgr.getFromDBJPQL("Teams",  "id", "all"); // Fetch from DB
         request.setAttribute("teams", teams);   // Set data for JSP
-        request.getRequestDispatcher("/jsp/analysis.jsp").forward(request, response); // Forward to JSP
-    }
-
-    protected void doPost(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        String homeName = request.getParameter("homeTeam");
-        String awayName = request.getParameter("awayTeam");
-        System.out.println(homeName + " " + awayName);
-        if (homeName != null && awayName != null) {
-
-            //ParseData pD = new ParseData();
-            //request.setAttribute("homeTeam",pD.getPrediction());
-        }
-
+        request.getRequestDispatcher("/jsp/teams.jsp").forward(request, response); // Forward to JSP
     }
 }
