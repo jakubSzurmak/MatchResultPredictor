@@ -16,12 +16,27 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-
+/**
+ * Provides functionality for training a logistic regression model and predicting match outcomes
+ * using team statistics. Utilizes the Weka library for machine learning.
+ */
 public class MatchPrediction {
     private static UUID convertToUUID(String id) {
         return UUID.fromString(id);
     }
 
+    /**
+     * Predicts the outcome of a match between two teams using a trained logistic regression model.
+     *
+     * @param team1Name        The name of the first team (home).
+     * @param team2Name        The name of the second team (away).
+     * @param teams            List of all teams (used when not querying DB, currently unused).
+     * @param model            Trained Weka logistic regression model.
+     * @param statistics       Map of team UUIDs to their statistics (used when not querying DB).
+     * @param datasetStructure Dataset structure used to create the instance (class index must be set).
+     * @return A string describing the probability of each team winning.
+     * @throws Exception If team data or statistics cannot be retrieved or model prediction fails.
+     */
     public static String predictMatch(String team1Name, String team2Name, List<Team> teams,
                                     Logistic model, Map<UUID, Statistics> statistics, Instances datasetStructure) throws Exception {
         DbManager dbManager = DbManager.getInstance();
@@ -59,6 +74,15 @@ public class MatchPrediction {
     }
 
 
+    /**
+     * Trains a logistic regression model based on historical match outcomes and team statistics.
+     * Fetches data directly from the database and skips incomplete or ambiguous records.
+     *
+     * @param matches     List of matches (used when not training from DB, currently unused).
+     * @param statistics  Map of team UUIDs to statistics (used when not training from DB).
+     * @return Trained Weka logistic regression model.
+     * @throws Exception If there is an issue accessing the database or training the model.
+     */
     public static Logistic trainModel(List<Match> matches, Map<UUID, Statistics> statistics) throws Exception {
         ArrayList<Attribute> attributes = defineAttributes();
         Instances dataset = new Instances("MatchPrediction", attributes, matches.size());
@@ -142,6 +166,11 @@ public class MatchPrediction {
         return logistic;
     }
 
+    /**
+     * Defines and returns the list of attributes used in the logistic regression model.
+     *
+     * @return List of Weka attributes.
+     */
     private static ArrayList<Attribute> defineAttributes() {
         ArrayList<Attribute> attributes = new ArrayList<>();
         attributes.add(new Attribute("team1_winPercentage"));
@@ -168,6 +197,14 @@ public class MatchPrediction {
         return attributes;
     }
 
+    /**
+     * Creates a Weka DenseInstance representing a match between two teams based on their statistics.
+     *
+     * @param stats1   Statistics for team 1 (home team).
+     * @param stats2   Statistics for team 2 (away team).
+     * @param dataset  Dataset to which this instance belongs (needed for attribute structure).
+     * @return A DenseInstance ready for classification or training.
+     */
     private static DenseInstance createInstance(Statistics stats1, Statistics stats2, Instances dataset) {
         DenseInstance instance = new DenseInstance(dataset.numAttributes());
         instance.setValue(0, stats1.getWinPerc());
