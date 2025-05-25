@@ -28,6 +28,10 @@ public class DbManager {
 
     }
 
+    /**
+     * ensures only one instance of DbManager is used
+     * @return this instance
+     */
     public static DbManager getInstance() {
         if (instance == null) {
             instance = new DbManager();
@@ -35,10 +39,19 @@ public class DbManager {
         return instance;
     }
 
+    /**
+     * Sets a custom instance of the DbManager
+     * @param customInstance The DbManager instance to set
+     */
     public static void setInstance(DbManager customInstance) {
         instance = customInstance;
     }
 
+    /**
+     * Saves the given entity to the database.
+     *
+     * @param entity The object to persist
+     */
     public void saveToDb(Object entity) {
         EntityManager entityManager = entityManagerFactory.createEntityManager();
         try{
@@ -52,11 +65,26 @@ public class DbManager {
         }
     }
 
+    /**
+     * Retrieves a database record by its ID and class type.
+     *
+     * @param id        The UUID of the entity
+     * @param classType The class of the entity to retrieve
+     * @return The found entity
+     */
     public <C> C getTableById(UUID id, Class<C> classType)  {
         EntityManager entityManager = entityManagerFactory.createEntityManager();
         return entityManager.find(classType, id);
     }
 
+    /**
+     * Retrieves the first entity matching a column value.
+     *
+     * @param name       Value to match
+     * @param classType  Entity type
+     * @param columnName Column to search by
+     * @return Matching entity or null if not found
+     */
     public <C> C getValueFromColumn(String name, Class<C> classType, String columnName) {
         EntityManager entityManager = entityManagerFactory.createEntityManager();
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
@@ -71,6 +99,14 @@ public class DbManager {
         return null;
     }
 
+    /**
+     * Executes a SQL SELECT query on the specified table with an optional condition.
+     *
+     * @param selectionTable  Table name
+     * @param conditionColumn Column to filter by
+     * @param conditionValue  Filter value or "all" to fetch all rows
+     * @return List of result rows or null if no column is specified
+     */
     public Object getFromDB(String selectionTable, String conditionColumn, String conditionValue) {
         if(!conditionColumn.isEmpty()){
             EntityManager entityManager = entityManagerFactory.createEntityManager();
@@ -93,6 +129,14 @@ public class DbManager {
         }
     }
 
+    /**
+     * Retrieves entities using JPQL based on table name and a filter condition.
+     *
+     * @param selectionTable  Name of the entity (e.g. "players", "teams")
+     * @param conditionColumn Column name to filter by
+     * @param conditionValue  Value to match or "all" to retrieve all records
+     * @return List of matching entities or null if no column is provided
+     */
     public Object getFromDBJPQL(String selectionTable, String conditionColumn, String conditionValue) {
         if (!conditionColumn.isEmpty()) {
             EntityManager entityManager = entityManagerFactory.createEntityManager();
@@ -131,7 +175,15 @@ public class DbManager {
         }
     }
 
-
+    /**
+     * Updates specified column values in a database table based on a condition.
+     *
+     * @param table           Name of the table to update
+     * @param setColumn       Column to be updated
+     * @param setValue        New value to set
+     * @param conditionColumn Column to filter rows by
+     * @param conditionValue  Value to match or "all" to update all rows
+     */
     public void updateInDb(String table, String setColumn, String setValue, String conditionColumn, String conditionValue) {
         if (!conditionColumn.isEmpty()) {
             EntityManager entityManager = entityManagerFactory.createEntityManager();
@@ -237,7 +289,14 @@ public class DbManager {
         System.out.println("All separate transactions completed.");
     }
 
-
+    /**
+     * Deletes records from the specified table based on a condition,
+     * handling related entities and relationships appropriately.
+     *
+     * @param tableName       Name of the table to delete from
+     * @param conditionColumn Column to filter records by
+     * @param conditionValue  Value to match or "all" to delete all records
+     */
     public void deleteFromDb(String tableName, String conditionColumn, String conditionValue) {
         EntityManager entityManager = entityManagerFactory.createEntityManager();
 
