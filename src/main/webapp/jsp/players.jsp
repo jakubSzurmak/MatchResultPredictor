@@ -19,7 +19,7 @@
     </c:forEach>
 </table>
 
-<a href="index">Back to Home</a>
+<a href="index.jsp">Back to Home</a>
 </body>
 </html>
 

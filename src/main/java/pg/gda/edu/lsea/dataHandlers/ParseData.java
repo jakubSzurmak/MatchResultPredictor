@@ -91,9 +91,9 @@ public class ParseData {
      *
      * @return a list of parsed Event objects
      */
-    private static List<Event> parseEvents() {
+    public static List<Event> parseEvents() {
         List<Event> parsedEvents = Collections.synchronizedList(new ArrayList<>());
-        int numThreads = 10;
+        int numThreads = 8;
         ExecutorService executor = Executors.newFixedThreadPool(numThreads);
         try (InputStream pathsE = ParseData.class.getClassLoader().getResourceAsStream("events/eventFile")) {
             if (pathsE == null) {
