@@ -30,9 +30,10 @@ public class ParserMatch {
             for (String path : filenames) {
 
                 try {
-                    strippedPath = path.substring(2, path.length()-1);
+                    strippedPath = "matchesModified/" + path.substring(1, path.length()-1);
+
                     matches.addAll(objectMapper.readValue(InputToTempFile.iSToF(ParserMatch.class.getClassLoader().
-                                    getResourceAsStream("matchesModified/" + strippedPath)),
+                                    getResourceAsStream(strippedPath)),
                             new TypeReference<List<Match>>() {}));
                 } catch (Exception e) {
                     System.err.println(e.getMessage());

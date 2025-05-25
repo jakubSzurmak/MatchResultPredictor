@@ -82,7 +82,7 @@ public class ParseData {
     private static String[] getFileListingsLine(InputStream f) throws IOException {
         BufferedReader reader = new BufferedReader(new InputStreamReader(f));
         String line = reader.readLine();
-        String[] filenames = line.split(",");
+        String[] filenames = line.split(", ");
         return filenames;
     }
 
@@ -102,14 +102,14 @@ public class ParseData {
             }
             String[] filenames = getFileListingsLine(pathsE);
             if(filenames.length > 0){
-                CountDownLatch eventLatch = new CountDownLatch(filenames.length - 2);
+                CountDownLatch eventLatch = new CountDownLatch(filenames.length);
                 for (String path : filenames) {
                     executor.submit(() -> {
                         try {
                             // CRITICAL SECTION #1: Multiple threads getting an event counter
                             int currentCounter = eventCounter.getAndIncrement();
                             List<Event> threadEvents = ParserEvent.parsing("events/"
-                                    + path.substring(2, path.length()-1), currentCounter);
+                                    + path.substring(1, path.length()-1), currentCounter);
 
                             // CRITICAL SECTION #2: Multiple threads updating shared collection
                             eventsLock.writeLock().lock();
@@ -152,7 +152,7 @@ public class ParseData {
             String[] filenames = getFileListingsLine(directory);
             for (String path : filenames) {
                 parsedTeams.addAll(ParserTeam.parsing("matchesModified/"
-                        + path.substring(2, path.length()-1)));
+                        + path.substring(1, path.length()-1)));
             }
 
         } catch (Exception e) {
@@ -189,7 +189,7 @@ public class ParseData {
             for (String path : pathsP) {
                 // Use the method that accepts the player data map
                 parsedPlayers.addAll(ParserPlayer.parsing("lineupsModified/"
-                        + path.substring(2, path.length()-1), playerDataMap));
+                        + path.substring(1, path.length()-1), playerDataMap));
             }
         } catch (Exception e) {
             e.printStackTrace();

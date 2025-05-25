@@ -27,7 +27,7 @@ public class ParserReferee {
         String strippedPath;
         try {
             for (String path : filenames) {
-                strippedPath = path.substring(2, path.length()-1);
+                strippedPath = "matchesModified/" + path.substring(1, path.length()-1);
                 try {
                     referees.addAll(objectMapper.readValue(InputToTempFile.iSToF(ParserMatch.class.getClassLoader().
                                     getResourceAsStream(strippedPath)),
@@ -35,7 +35,7 @@ public class ParserReferee {
                             }));
                 } catch (Exception e) {
 
-                    System.err.println("Failed to parse JSON in file: " + path + " due to: " + e.getMessage());
+                    System.err.println("Failed to parse JSON in file: " + strippedPath + " due to: " + e.getMessage());
                 }
             }
         } catch (Exception e) {

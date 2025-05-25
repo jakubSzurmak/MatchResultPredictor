@@ -7,8 +7,7 @@ import pg.gda.edu.lsea.absPerson.implPerson.coach.ResultHolder;
 import pg.gda.edu.lsea.dataHandlers.ParseData;
 import pg.gda.edu.lsea.dataHandlers.utils.InputToTempFile;
 
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -72,17 +71,24 @@ public class ParserCoach {
         ObjectMapper objectMapper = new ObjectMapper();
         Set<ResultHolder> bothCoaches = new HashSet<>();
         String strippedPath;
-
+        // UNOFFICIAL FOR TESTING TESTFILE HERE INSTEAD OF FUNC
         try {
             for (String path : filenames) {
-                strippedPath = path.substring(2, path.length()-1);
+                strippedPath = "matchesModified/" + path.substring(1, path.length()-1);
+                File tempFile = File.createTempFile("temp", ".json");
+                tempFile.deleteOnExit();
+                OutputStream os = new FileOutputStream(tempFile);
+                ParserMatch.class.getClassLoader().
+                        getResourceAsStream(strippedPath).transferTo(os);
                 try {
-                    bothCoaches.addAll(objectMapper.readValue(InputToTempFile.iSToF(ParserMatch.class.getClassLoader().
-                                    getResourceAsStream(strippedPath)),
+                    bothCoaches.addAll(objectMapper.readValue(tempFile,
                             new TypeReference<Set<ResultHolder>>() {
                             }));
+
+
+
                 } catch (Exception e) {
-                    System.err.println("Failed to parse JSON in file: " + path + " due to: " + e.getMessage());
+                    System.err.println("Failed to parse JSON in file: " + strippedPath + " due to: " + e.getMessage());
                 }
             }
         } catch (Exception e) {
