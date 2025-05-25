@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import pg.gda.edu.lsea.absPerson.implPerson.coach.Coach;
 import pg.gda.edu.lsea.absPerson.implPerson.coach.ResultHolder;
 import pg.gda.edu.lsea.dataHandlers.ParseData;
+import pg.gda.edu.lsea.dataHandlers.utils.InputToTempFile;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -70,12 +71,14 @@ public class ParserCoach {
     public Map<UUID,Coach> parseCoache(String[] filenames) throws IOException {
         ObjectMapper objectMapper = new ObjectMapper();
         Set<ResultHolder> bothCoaches = new HashSet<>();
-        //String directory = "/matches/*";
+        String strippedPath;
 
         try {
             for (String path : filenames) {
+                strippedPath = path.substring(2, path.length()-1);
                 try {
-                    bothCoaches.addAll(objectMapper.readValue("matchesModified/" + path.substring(2, path.length()-1),
+                    bothCoaches.addAll(objectMapper.readValue(InputToTempFile.iSToF(ParserMatch.class.getClassLoader().
+                                    getResourceAsStream(strippedPath)),
                             new TypeReference<Set<ResultHolder>>() {
                             }));
                 } catch (Exception e) {

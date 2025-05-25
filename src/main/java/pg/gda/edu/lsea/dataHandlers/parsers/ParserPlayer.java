@@ -71,7 +71,7 @@ public class ParserPlayer {
     public static HashSet<Player> parsing(String filePath, Map<String, PlayerData> playerDataMap) throws IOException {
         ObjectMapper objectMapper = new ObjectMapper();
         HashSet<Player> parsedPlayers = new HashSet<>();
-        //DbManager dbManager = DbManager.getInstance();
+        DbManager dbManager = DbManager.getInstance();
         List<JsonNode> teams = objectMapper.readValue(ParserPlayer.class.getClassLoader().getResourceAsStream(filePath), new TypeReference<>() {});
 
         for (JsonNode team: teams) {

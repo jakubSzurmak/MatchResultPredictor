@@ -11,6 +11,5 @@ public class Sniffer implements ServletContextListener {
     @Override
     public void contextInitialized(ServletContextEvent sce) {
         new ParseDataService();
-        System.out.println("Data initialized successfully.");
     }
 }

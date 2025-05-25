@@ -5,14 +5,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import pg.gda.edu.lsea.database.DbManager;
 import pg.gda.edu.lsea.match.Match;
 import pg.gda.edu.lsea.team.Team;
+import pg.gda.edu.lsea.dataHandlers.utils.InputToTempFile;
 
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Vector;
-import java.util.stream.Collectors;
+
 
 /**
  * Utility class for parsing match data from JSON files into Match objects
@@ -26,21 +24,24 @@ public class ParserMatch {
      */
     public List<Match> parseMatch(String[] filenames) {
         ObjectMapper objectMapper = new ObjectMapper();
-        List<Match> matches = new ArrayList<>();
-        DbManager dbManager = DbManager.getInstance();
+        ArrayList<Match> matches = new ArrayList<>();
+        String strippedPath;
         try {
-
             for (String path : filenames) {
+
                 try {
-                    matches.addAll(objectMapper.readValue("matchesModified/"
-                                    + path.substring(2, path.length()-1), new TypeReference<List<Match>>() {}));
+                    strippedPath = path.substring(2, path.length()-1);
+                    matches.addAll(objectMapper.readValue(InputToTempFile.iSToF(ParserMatch.class.getClassLoader().
+                                    getResourceAsStream("matchesModified/" + strippedPath)),
+                            new TypeReference<List<Match>>() {}));
                 } catch (Exception e) {
-                    System.err.println("Failed to parse JSON in file: " + path + " due to: " + e.getMessage());
+                    System.err.println(e.getMessage());
                 }
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
+        DbManager dbManager = DbManager.getInstance();
         for(Match match : matches) {
             Team homeTeam = dbManager.getTableById(match.getHomeTeamId(), Team.class);
             Team awayTeam = dbManager.getTableById(match.getAwayTeamId(), Team.class);

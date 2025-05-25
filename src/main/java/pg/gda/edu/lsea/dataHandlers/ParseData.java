@@ -421,7 +421,6 @@ public class ParseData {
      */
     public static void parseData(List<Match> matches, Set<Referee> referees, Map<UUID, Coach> coaches,
                                  List<Team> parsedTeams, HashSet<Player> parsedPlayers, List<Event> parsedEvents) throws Exception {
-        System.out.println("Parsing data...");
 
         final CountDownLatch latch = new CountDownLatch(6);
     /*
@@ -436,26 +435,20 @@ public class ParseData {
 
         functionalThread(() -> {
             try {
-                try {
-                    referees.addAll(new ParserReferee().parseReferee(getFileListingsLine(ParseData.class.getClassLoader().getResourceAsStream("matchesModified/matchFile"))));
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-                System.out.println("Referees parsing complete: " + referees.size());
+                matches.addAll(new ParserMatch().parseMatch(getFileListingsLine(ParseData.class.getClassLoader().getResourceAsStream("matchesModified/matchFile"))));
+                referees.addAll(new ParserReferee().parseReferee(getFileListingsLine(ParseData.class.getClassLoader().getResourceAsStream("matchesModified/matchFile"))));
+                System.out.println("Matches parsing complete: " + matches.size());
+            } catch (Exception e) {
+                e.printStackTrace();
             } finally {
                 latch.countDown();
             }
         });
 
-
         functionalThread(() -> {
             try {
-                try {
-                    coaches.putAll(new ParserCoach().parseCoache(getFileListingsLine(ParseData.class.getClassLoader().getResourceAsStream("matchesModified/matchFile"))));
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-                System.out.println("Coaches parsing complete: " + coaches.size());
+                parsedEvents.addAll(parseEvents());
+                System.out.println("Events parsing complete: " + parsedEvents.size());
             } finally {
                 latch.countDown();
             }
@@ -472,41 +465,42 @@ public class ParseData {
 
         functionalThread(() -> {
             try {
-                matches.addAll(new ParserMatch().parseMatch(getFileListingsLine(ParseData.class.getClassLoader().getResourceAsStream("matchesModified/matchFile"))));
-                System.out.println("Matches parsing complete: " + matches.size());
-            } catch (Exception e) {
-                e.printStackTrace();
-            } finally {
-                latch.countDown();
-            }
-        });
-
-
-        functionalThread(() -> {
-            try {
                 parsedPlayers.addAll(parsePlayers());
                 System.out.println("Players parsing complete: " + parsedPlayers.size());
             } finally {
                 latch.countDown();
             }
         });
+
         functionalThread(() -> {
             try {
-                parsedEvents.addAll(parseEvents());
-                System.out.println("Events parsing complete: " + parsedEvents.size());
+                try {
+                    referees.addAll(new ParserReferee().parseReferee(getFileListingsLine(ParseData.class.getClassLoader().getResourceAsStream("matchesModified/matchFile"))));
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+                System.out.println("Referees parsing complete: " + referees.size());
+            } finally {
+                latch.countDown();
+            }
+        });
+//
+//
+        functionalThread(() -> {
+            try {
+                try {
+                    coaches.putAll(new ParserCoach().parseCoache(getFileListingsLine(ParseData.class.getClassLoader().getResourceAsStream("matchesModified/matchFile"))));
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+                System.out.println("Coaches parsing complete: " + coaches.size());
             } finally {
                 latch.countDown();
             }
         });
 
-        latch.await();
-        System.out.println(matches.size() + " - matches in total");
-        System.out.println(referees.size() + " - referees in total");
-        System.out.println(coaches.size() + " - coaches in total");
-        System.out.println(parsedTeams.size() + " - teams in total");
-        System.out.println(parsedPlayers.size() + " - players in total");
-        System.out.println(parsedEvents.size() + " - events in total");
 
+        latch.await();
 
         //   Map<UUID, Statistics> stats = getStats(parsedPlayers, parsedEvents, matches);
         //   getCorreletion(stats, parsedPlayers);
