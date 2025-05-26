@@ -21,7 +21,7 @@ validate-project:
 run-unit-tests:
   stage: test
   script:
-    - 'mvn $MAVEN_CLI_OPTS -Dmaven.main.skip=true test'
+    - 'mvn $MAVEN_CLI_OPTS -X test'
 
 build-dist:
   stage: package
@@ -42,3 +42,4 @@ deploy-to-production:
     - 'true'
   only:
     - master
+    - EEMigration
