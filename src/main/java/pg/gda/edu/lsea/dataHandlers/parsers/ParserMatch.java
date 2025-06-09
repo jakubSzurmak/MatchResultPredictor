@@ -31,7 +31,7 @@ public class ParserMatch {
         try {
             for (String path : filenames) {
                 strippedPath = "matchesModified/" + path.substring(1, path.length()-1);
-                InputStream is = ParserMatch.class.getResourceAsStream(path);
+                InputStream is = ParserMatch.class.getResourceAsStream(strippedPath);
                 ;
                 try {
 

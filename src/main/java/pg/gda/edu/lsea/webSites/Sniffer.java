@@ -10,6 +10,6 @@ public class Sniffer implements ServletContextListener {
 
     @Override
     public void contextInitialized(ServletContextEvent sce) {
-        new ParseDataService();
+       //new ParseDataService();
     }
 }

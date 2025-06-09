@@ -93,7 +93,7 @@ public class ParseData {
      */
     public static List<Event> parseEvents() {
         List<Event> parsedEvents = Collections.synchronizedList(new ArrayList<>());
-        int numThreads = 8;
+        int numThreads = 3;
         ExecutorService executor = Executors.newFixedThreadPool(numThreads);
         try (InputStream pathsE = ParseData.class.getClassLoader().getResourceAsStream("events/eventFile")) {
             if (pathsE == null) {
@@ -422,7 +422,7 @@ public class ParseData {
     public static void parseData(List<Match> matches, Set<Referee> referees, Map<UUID, Coach> coaches,
                                  List<Team> parsedTeams, HashSet<Player> parsedPlayers, List<Event> parsedEvents) throws Exception {
 
-        final CountDownLatch latch = new CountDownLatch(6);
+        final CountDownLatch latch = new CountDownLatch(5);
     /*
         List<Match> matches = new ArrayList<>();
         Set<Referee> referees = new HashSet<>();
@@ -445,14 +445,14 @@ public class ParseData {
             }
         });
 
-        functionalThread(() -> {
-            try {
-                parsedEvents.addAll(parseEvents());
-                System.out.println("Events parsing complete: " + parsedEvents.size());
-            } finally {
-                latch.countDown();
-            }
-        });
+        //functionalThread(() -> {
+        //    try {
+        //        parsedEvents.addAll(parseEvents());
+        //        System.out.println("Events parsing complete: " + parsedEvents.size());
+        //    } finally {
+        //        latch.countDown();
+        //    }
+        //});
 
         functionalThread(() -> {
             try {
@@ -483,7 +483,7 @@ public class ParseData {
             } finally {
                 latch.countDown();
             }
-        });
+          });
 //
 //
         functionalThread(() -> {
@@ -498,6 +498,7 @@ public class ParseData {
                 latch.countDown();
             }
         });
+
 
 
         latch.await();
