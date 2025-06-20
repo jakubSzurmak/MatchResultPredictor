@@ -5,17 +5,6 @@
 <head>
     <title>Match List</title>
     <style>
-        .delete-btn {
-            background-color: #dc3545;
-            color: white;
-            border: none;
-            padding: 5px 10px;
-            cursor: pointer;
-            border-radius: 3px;
-        }
-        .delete-btn:hover {
-            background-color: #c82333;
-        }
         table {
             border-collapse: collapse;
             width: 100%;
@@ -31,6 +20,7 @@
     </style>
 </head>
 <body>
+<a href="index.jsp">Back to Home</a>
 <h2>All Matches</h2>
 <table border="1">
     <tr>
@@ -42,13 +32,12 @@
     <c:forEach var="match" items="${matches}">
         <tr>
             <td>${match.id}</td>
+            <td>${match.awayscore}</td>
+            <td>${match.homescore}</td>
+            <td>${match.awayteamid}</td>
+            <td>${match.hometeamid}</td>
             <td>
-                <form method="post" action="match-servlet" style="display: inline;"
-                      onsubmit="return confirm('Are you sure you want to delete this match?');">
-                    <input type="hidden" name="action" value="delete">
-                    <input type="hidden" name="matchId" value="${match.id}">
-                    <button type="submit" class="delete-btn">Delete</button>
-                </form>
+                <a href="delete-item?type=${"match"}&matchId=${match.id}">Delete</a>
             </td>
         </tr>
     </c:forEach>
@@ -66,8 +55,6 @@
     </div>
 </c:if>
 
-<br>
-<a href="index.jsp">Back to Home</a>
 </body>
 </html>
 

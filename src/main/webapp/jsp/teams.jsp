@@ -35,7 +35,7 @@
     <tr>
       <td>${team.id}</td>
       <td>${team.name}</td>
-      <td><a href="delete-team?teamId=${team.id}">Delete</a></td>
+      <td><a href="delete-item?type=${"team"}&teamId=${team.id}">Delete</a></td>
       <td><a href="editTeamServlet">Edit</a></td>
 
     </tr>

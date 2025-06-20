@@ -5,17 +5,6 @@
 <head>
     <title>Players List</title>
     <style>
-        .delete-btn {
-            background-color: #dc3545;
-            color: white;
-            border: none;
-            padding: 5px 10px;
-            cursor: pointer;
-            border-radius: 3px;
-        }
-        .delete-btn:hover {
-            background-color: #c82333;
-        }
         table {
             border-collapse: collapse;
             width: 100%;
@@ -35,20 +24,12 @@
 <table border="1">
     <tr>
         <th>ID</th>
-        <th>Name</th>
         <th>Actions</th>
     </tr>
     <c:forEach var="player" items="${players}">
         <tr>
             <td>${player.id}</td>
-            <td>
-                <form method="post" action="player-servlet" style="display: inline;"
-                      onsubmit="return confirm('Are you sure you want to delete player: ${player.id}?');">
-                    <input type="hidden" name="action" value="delete">
-                    <input type="hidden" name="playerId" value="${player.id}">
-                    <button type="submit" class="delete-btn">Delete</button>
-                </form>
-            </td>
+            <td><a href="delete-item?type=${"player"}&playerId=${player.id}">Delete</a></td>
         </tr>
     </c:forEach>
 </table>

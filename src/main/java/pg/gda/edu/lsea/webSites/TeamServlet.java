@@ -11,7 +11,6 @@ import jakarta.servlet.http.HttpServlet;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.UUID;
 
 
 @WebServlet(name = "teamServlet", value = "/team-servlet" )
